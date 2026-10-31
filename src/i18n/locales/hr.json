@@ -68,6 +68,10 @@
     "sourceLegend": "Izvor podataka",
     "fileLabel": "Odaberi datoteku",
     "allAlreadyImported": "Sve transakcije iz datoteke su već u bazi.",
+    "previewCount": "{count} novih transakcija za uvoz",
+    "moreRows": "… i još {count} redaka",
+    "importButton": "Uvezi u bazu",
+    "done": "Uvezeno {count} transakcija.",
     "sources": {
       "revolut": "Revolut CSV",
       "ersteCardClub": "Erste Card Club PDF"
@@ -78,7 +82,6 @@
       "csv.notRevolut": "Datoteka nije Revolut CSV izvoz.",
       "import.failed": "Uvoz nije uspio. Pokušaj ponovno.",
       "empty": "Nema transakcija za uvoz iz ove datoteke.",
-      "pdf.pending": "PDF uvoz još nije dostupan u ovom buildu.",
       "pdf.noText": "PDF nema tekstualni sloj (sken). Uvoz nije moguć."
     },
     "revolut": {
@@ -90,7 +93,8 @@
       "done": "Uvezeno {count} transakcija."
     },
     "ersteCardClub": {
-      "help": "Uvezi PDF izvod Erste Card Club kartice. Podržani su samo PDF-ovi s tekstualnim slojem."
+      "help": "Uvezi PDF izvod Erste Card Club kartice. Podržani su samo PDF-ovi s tekstualnim slojem.",
+      "skipped": "Preskočeno: {other} ostalih redaka, {payment} uplata, {bad} neprepoznatih."
     }
   },
   "settings": {

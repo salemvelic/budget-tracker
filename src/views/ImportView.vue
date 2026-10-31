@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import ImportPreview from '@/components/ImportPreview.vue'
@@ -7,6 +7,7 @@ import { useLiveQuery } from '@/composables/useLiveQuery'
 import { filterNewImportRows, importParsedRows } from '@/db/importRows'
 import { db, type CategoryRule } from '@/db'
 import { categorizeDescription, DEFAULT_CATEGORY_RULES } from '@/domain/categorize'
+import { parseErsteCardClubLines, type ErsteCardClubSkipped } from '@/domain/importers/ersteCardClub'
 import { parseRevolutCsv, type RevolutParseSkipped } from '@/domain/importers/revolut'
 import type { ParsedImportRow } from '@/domain/importers/types'
 
@@ -19,11 +20,12 @@ const source = ref<ImportSource>('revolut')
 const errorCode = ref('')
 const fileName = ref('')
 const preview = ref<ParsedImportRow[]>([])
-const skipped = ref<RevolutParseSkipped | null>(null)
+const revolutSkipped = ref<RevolutParseSkipped | null>(null)
+const ersteSkipped = ref<ErsteCardClubSkipped | null>(null)
+const skippedText = ref('')
 const importedCount = ref<number | null>(null)
 const allAlreadyImported = ref(false)
 const importing = ref(false)
-const parsedTotal = ref(0)
 
 const rules = useLiveQuery(() => db.rules.toArray(), [] as CategoryRule[])
 
@@ -41,13 +43,26 @@ function resetFileInput() {
   if (fileInput.value) fileInput.value.value = ''
 }
 
+watch(source, () => {
+  errorCode.value = ''
+  fileName.value = ''
+  preview.value = []
+  revolutSkipped.value = null
+  ersteSkipped.value = null
+  skippedText.value = ''
+  importedCount.value = null
+  allAlreadyImported.value = false
+  resetFileInput()
+})
+
 async function onFileChange(event: Event) {
   errorCode.value = ''
   importedCount.value = null
   allAlreadyImported.value = false
   preview.value = []
-  skipped.value = null
-  parsedTotal.value = 0
+  revolutSkipped.value = null
+  ersteSkipped.value = null
+  skippedText.value = ''
 
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
@@ -59,8 +74,12 @@ async function onFileChange(event: Event) {
     if (source.value === 'revolut') {
       const text = await file.text()
       const result = parseRevolutCsv(text, categorize)
-      skipped.value = result.skipped
-      parsedTotal.value = result.rows.length
+      revolutSkipped.value = result.skipped
+      skippedText.value = t('import.revolut.skipped', {
+        pending: result.skipped.notCompleted,
+        other: result.skipped.otherType,
+        fx: result.skipped.foreignCurrency,
+      })
       preview.value = await filterNewImportRows(result.rows)
       if (result.rows.length > 0 && preview.value.length === 0) {
         allAlreadyImported.value = true
@@ -69,7 +88,26 @@ async function onFileChange(event: Event) {
         errorCode.value = 'empty'
       }
     } else {
-      errorCode.value = 'pdf.pending'
+      const { extractPdfLines } = await import('@/services/pdfText')
+      const lines = await extractPdfLines(file)
+      if (lines.length === 0) {
+        errorCode.value = 'pdf.noText'
+        return
+      }
+      const result = parseErsteCardClubLines(lines, categorize)
+      ersteSkipped.value = result.skipped
+      skippedText.value = t('import.ersteCardClub.skipped', {
+        other: result.skipped.nonTransaction,
+        payment: result.skipped.payment,
+        bad: result.skipped.unparseable,
+      })
+      preview.value = await filterNewImportRows(result.rows)
+      if (result.rows.length > 0 && preview.value.length === 0) {
+        allAlreadyImported.value = true
+      }
+      if (result.rows.length === 0) {
+        errorCode.value = 'empty'
+      }
     }
   } catch (e) {
     errorCode.value = e instanceof Error ? e.message : 'invalid'
@@ -83,7 +121,9 @@ async function runImport() {
   try {
     importedCount.value = await importParsedRows(preview.value)
     preview.value = []
-    skipped.value = null
+    revolutSkipped.value = null
+    ersteSkipped.value = null
+    skippedText.value = ''
     resetFileInput()
   } catch {
     errorCode.value = 'import.failed'
@@ -109,9 +149,7 @@ async function runImport() {
       </fieldset>
 
       <p class="mb-4 mt-4 text-sm text-muted">
-        {{
-          source === 'revolut' ? t('import.revolut.help') : t('import.ersteCardClub.help')
-        }}
+        {{ source === 'revolut' ? t('import.revolut.help') : t('import.ersteCardClub.help') }}
       </p>
       <label class="block text-sm font-medium">
         {{ t('import.fileLabel') }}
@@ -130,13 +168,13 @@ async function runImport() {
 
     <ImportPreview
       :preview="preview"
-      :skipped="skipped"
+      :skipped-text="skippedText"
       :importing="importing"
       @import="runImport"
     />
 
     <p v-if="importedCount != null" class="text-sm text-success">
-      {{ t('import.revolut.done', { count: importedCount }) }}
+      {{ t('import.done', { count: importedCount }) }}
     </p>
   </div>
 </template>

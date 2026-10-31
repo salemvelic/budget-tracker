@@ -68,6 +68,10 @@
     "sourceLegend": "Data source",
     "fileLabel": "Choose file",
     "allAlreadyImported": "All transactions from this file are already imported.",
+    "previewCount": "{count} new transactions to import",
+    "moreRows": "… and {count} more rows",
+    "importButton": "Import into database",
+    "done": "Imported {count} transactions.",
     "sources": {
       "revolut": "Revolut CSV",
       "ersteCardClub": "Erste Card Club PDF"
@@ -78,7 +82,6 @@
       "csv.notRevolut": "Not a Revolut CSV export.",
       "import.failed": "Import failed. Try again.",
       "empty": "No transactions to import from this file.",
-      "pdf.pending": "PDF import is not ready in this build yet.",
       "pdf.noText": "PDF has no text layer (scan). Import is not possible."
     },
     "revolut": {
@@ -90,7 +93,8 @@
       "done": "Imported {count} transactions."
     },
     "ersteCardClub": {
-      "help": "Import Erste Card Club card statement PDF. Only PDFs with a text layer are supported."
+      "help": "Import Erste Card Club card statement PDF. Only PDFs with a text layer are supported.",
+      "skipped": "Skipped: {other} other lines, {payment} payments, {bad} unparseable."
     }
   },
   "settings": {
