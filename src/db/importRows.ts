@@ -1,3 +1,5 @@
+import { toRaw } from 'vue'
+
 import { db } from '@/db'
 import { dedupeWithinBatch, type ParsedImportRow } from '@/domain/importers/types'
 
@@ -16,6 +18,7 @@ export async function filterNewImportRows(rows: ParsedImportRow[]): Promise<Pars
 export async function importParsedRows(rows: ParsedImportRow[]): Promise<number> {
   const toAdd = await filterNewImportRows(rows)
   if (toAdd.length === 0) return 0
-  await db.txns.bulkAdd(toAdd)
+  // IndexedDB cannot clone Vue reactive proxies.
+  await db.txns.bulkAdd(toAdd.map((row) => ({ ...toRaw(row) })))
   return toAdd.length
 }

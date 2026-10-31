@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { ref } from 'vue'
 
 import { assignImportHashes } from '@/domain/importers/types'
 
@@ -62,6 +63,25 @@ describe('importParsedRows', () => {
 
     expect(await db.txns.count()).toBe(0)
     expect(await importParsedRows([row])).toBe(0)
+  })
+
+  it('stores rows held in Vue reactive state', async () => {
+    const preview = ref(
+      assignImportHashes([
+        {
+          date: '2026-10-04',
+          amountCents: 700,
+          merchant: 'Demo pharmacy',
+          source: 'kartica',
+          category: 'other',
+          note: 'rata 1/3',
+          externalId: 'D2',
+        },
+      ]),
+    )
+
+    expect(await importParsedRows(preview.value)).toBe(1)
+    expect(await db.txns.count()).toBe(1)
   })
 
   it('deletes manual transactions without leaving a tombstone', async () => {
