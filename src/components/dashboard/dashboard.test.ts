@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import CategoryBreakdown from '@/components/dashboard/CategoryBreakdown.vue'
 import IncomeCard from '@/components/dashboard/IncomeCard.vue'
+import RecurringCard from '@/components/dashboard/RecurringCard.vue'
 import SavingsCard from '@/components/dashboard/SavingsCard.vue'
 import { DEFAULT_CATEGORIES } from '@/domain/categories'
 import type { MonthPlan } from '@/domain/plan'
@@ -130,6 +131,35 @@ describe('IncomeCard', () => {
     expect(wrapper.text()).not.toContain('Stopa štednje')
     await header.trigger('click')
     expect(wrapper.text()).toContain('Stopa štednje')
+  })
+})
+
+describe('RecurringCard', () => {
+  it('renders recurring rows and collapses', async () => {
+    const wrapper = mount(RecurringCard, {
+      props: {
+        selectedMonth: '2026-10',
+        categories: DEFAULT_CATEGORIES,
+        txns: [
+          {
+            date: '2026-09-05',
+            amountCents: 999,
+            merchant: 'Demo Stream',
+            category: 'subscriptions',
+          },
+          {
+            date: '2026-08-05',
+            amountCents: 999,
+            merchant: 'Demo Stream',
+            category: 'subscriptions',
+          },
+        ],
+      },
+      global,
+    })
+    expect(wrapper.text()).toContain('Ponavljajuća')
+    await sectionToggleButton(wrapper).trigger('click')
+    expect(wrapper.text()).not.toContain('demo stream')
   })
 })
 

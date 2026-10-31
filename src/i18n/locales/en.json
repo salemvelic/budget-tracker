@@ -63,7 +63,11 @@
     "incomeSaved": "Saved",
     "incomeSavingsRate": "Savings rate",
     "incomeNet": "Net (income − spending − savings)",
-    "trendLine": "last mo. {last} · 3-mo avg {avg}"
+    "trendLine": "last mo. {last} · 3-mo avg {avg}",
+    "recurringHeading": "Recurring payments",
+    "recurringPaid": "paid {amount}",
+    "recurringPending": "not yet · typical {amount}",
+    "recurringTotal": "typical {amount}/mo"
   },
   "transactions": {
     "empty": "No transactions for the selected month.",

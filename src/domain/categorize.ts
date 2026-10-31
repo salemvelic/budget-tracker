@@ -78,7 +78,7 @@ export function validateRulePattern(pattern: string): string {
   return /^\|+$|\|\||^\||\|$/.test(trimmed) ? 'rule.invalid' : ''
 }
 
-function normalizeMerchant(merchant: string): string {
+export function normalizeMerchant(merchant: string): string {
   return merchant.replace(/\s+/g, ' ').trim().toLowerCase()
 }
 

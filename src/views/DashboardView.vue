@@ -7,6 +7,7 @@ import CategoryBreakdown, {
   type CategoryBreakdownRow,
 } from '@/components/dashboard/CategoryBreakdown.vue'
 import IncomeCard from '@/components/dashboard/IncomeCard.vue'
+import RecurringCard from '@/components/dashboard/RecurringCard.vue'
 import SavingsCard from '@/components/dashboard/SavingsCard.vue'
 import SummaryCards from '@/components/dashboard/SummaryCards.vue'
 import MonthPicker from '@/components/MonthPicker.vue'
@@ -210,6 +211,8 @@ const remainingClass = computed(() => {
     />
 
     <IncomeCard :plan="plan" />
+
+    <RecurringCard :txns="windowTxns" :categories="categories" :selected-month="selectedMonth" />
 
     <section
       v-if="coverage.length"
