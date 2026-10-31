@@ -143,7 +143,19 @@ export function parseZabaLines(
       return
     }
     if (current.inflow && type !== 'B') {
-      countSkip(skipped, 'income')
+      const parts =
+        TRANSFER_PREFIX_RE.test(text) || DIRECT_DEBIT_PREFIX_RE.test(text)
+          ? transferParts(text)
+          : { merchant: text.trim() }
+      drafts.push({
+        date: current.date,
+        amountCents: current.amountCents,
+        merchant: parts.merchant,
+        source: 'zaba',
+        category: 'income',
+        note: parts.note,
+        externalId,
+      })
       return
     }
     if (!current.inflow && CARD_BILL_RE.test(text)) {

@@ -33,6 +33,7 @@
     "cash": "Gotovina",
     "loans": "Krediti",
     "savings": "Štednja i ulaganja",
+    "income": "Priljevi (plaća i sl.)",
     "other": "Ostalo"
   },
   "dashboard": {
@@ -54,7 +55,14 @@
     "byCategory": "Po kategorijama",
     "noExpenses": "Nema troškova u ovoj kategoriji.",
     "backupDue": "Nema sigurnosne kopije u zadnjih 30 dana.",
-    "backupDueLink": "Izvezi u Postavkama"
+    "backupDueLink": "Izvezi u Postavkama",
+    "incomeHeading": "Priljevi i štednja",
+    "incomeTotal": "Priljevi",
+    "incomeSpent": "Potrošeno",
+    "incomeSaved": "Ušteđeno",
+    "incomeSavingsRate": "Stopa štednje",
+    "incomeNet": "Neto (priljevi − potrošnja − štednja)",
+    "trendLine": "prošli mj. {last} · prosjek 3 mj. {avg}"
   },
   "transactions": {
     "empty": "Nema transakcija za odabrani mjesec.",
@@ -113,14 +121,13 @@
       "revolut": "Revolut izvadak",
       "zaba": "Izvadak Zagrebačke banke"
     },
-    "help": "Odaberi PDF: Erste obavijest o troškovima kartice, Revolut izvadak računa ili jedinstveni izvadak građana Zagrebačke banke. Vrsta se prepoznaje automatski. Uvoze se kartična plaćanja, podizanje gotovine (kategorija Gotovina), rate kredita (Krediti), računi, naknade i povrati. Uplate u Revolut Robo portfolio i na investicijski račun bilježe se kao Štednja i ulaganja i ne računaju se u potrošnju. Plaća i ostali priljevi, nadoplate Revoluta, plaćanje Erste kartice i prijenosi se preskaču.",
+    "help": "Odaberi PDF: Erste obavijest o troškovima kartice, Revolut izvadak računa ili jedinstveni izvadak građana Zagrebačke banke. Vrsta se prepoznaje automatski. Uvoze se kartična plaćanja, podizanje gotovine (kategorija Gotovina), rate kredita (Krediti), računi, naknade, povrati i priljevi poput plaće (Priljevi). Uplate u Revolut Robo portfolio i na investicijski račun bilježe se kao Štednja i ulaganja i ne računaju se u potrošnju. Nadoplate Revoluta, plaćanje Erste kartice i slični prijenosi se preskaču.",
     "skipReasons": {
       "pending": "Na čekanju",
       "reversed": "Stornirano",
       "foreignCurrency": "Računi u drugim valutama",
       "transfer": "Nadoplate i prijenosi",
       "payment": "Uplate za karticu",
-      "income": "Priljevi (plaća i uplate)",
       "unparseable": "Neprepoznati redci"
     },
     "errors": {

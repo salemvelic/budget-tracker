@@ -33,6 +33,7 @@
     "cash": "Cash",
     "loans": "Loans",
     "savings": "Savings & investments",
+    "income": "Income (salary etc.)",
     "other": "Other"
   },
   "dashboard": {
@@ -54,7 +55,14 @@
     "byCategory": "By category",
     "noExpenses": "No expenses in this category.",
     "backupDue": "No backup in the last 30 days.",
-    "backupDueLink": "Export in Settings"
+    "backupDueLink": "Export in Settings",
+    "incomeHeading": "Income & savings",
+    "incomeTotal": "Income",
+    "incomeSpent": "Spent",
+    "incomeSaved": "Saved",
+    "incomeSavingsRate": "Savings rate",
+    "incomeNet": "Net (income − spending − savings)",
+    "trendLine": "last mo. {last} · 3-mo avg {avg}"
   },
   "transactions": {
     "empty": "No transactions for the selected month.",
@@ -113,14 +121,13 @@
       "revolut": "Revolut statement",
       "zaba": "Zagrebačka banka statement"
     },
-    "help": "Choose a PDF: an Erste card statement, a Revolut account statement or a Zagrebačka banka statement (Jedinstveni izvadak građana); the type is detected automatically. Card payments, cash withdrawals (Cash category), loan instalments (Loans), bills, fees and refunds are imported. Payments into Revolut Robo portfolio and the investment account are recorded as Savings & investments and are not counted as spending. Salary and other incoming payments, Revolut top-ups, Erste card bill payments and transfers are skipped.",
+    "help": "Choose a PDF: an Erste card statement, a Revolut account statement or a Zagrebačka banka statement (Jedinstveni izvadak građana); the type is detected automatically. Card payments, cash withdrawals (Cash category), loan instalments (Loans), bills, fees, refunds and incoming payments such as salary (Income) are imported. Payments into Revolut Robo portfolio and the investment account are recorded as Savings & investments and are not counted as spending. Revolut top-ups, Erste card bill payments and similar transfers are skipped.",
     "skipReasons": {
       "pending": "Pending",
       "reversed": "Reversed",
       "foreignCurrency": "Other currency accounts",
       "transfer": "Top-ups and transfers",
       "payment": "Card bill payments",
-      "income": "Incoming payments (salary etc.)",
       "unparseable": "Unrecognised rows"
     },
     "errors": {

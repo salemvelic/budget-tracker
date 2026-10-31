@@ -94,6 +94,30 @@ describe('ImportPreview', () => {
     expect(wrapper.text()).not.toContain('Na čekanju')
   })
 
+  it('starts duplicate rows unchecked', () => {
+    const row = {
+      date: '2026-10-01',
+      amountCents: 100,
+      merchant: 'Demo',
+      source: 'zaba' as const,
+      category: 'other',
+      importHash: 'zaba|dup',
+    }
+    const excluded = new Set(['zaba|dup'])
+    const wrapper = mount(ImportPreview, {
+      props: {
+        preview: [row],
+        skipped: {},
+        importing: false,
+        excluded,
+        duplicateHints: new Map([['zaba|dup', 'Existing shop']]),
+      },
+      global,
+    })
+    const checkbox = wrapper.find('input[type="checkbox"]').element as HTMLInputElement
+    expect(checkbox.checked).toBe(false)
+  })
+
   it('lets the category be changed before import', async () => {
     await db.categories.bulkPut(DEFAULT_CATEGORIES)
     const row = {

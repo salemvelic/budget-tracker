@@ -111,6 +111,13 @@ describe('parseZabaLines', () => {
     expect(rows.map((r) => [r.date, r.merchant, r.amountCents, r.category, r.note])).toEqual([
       ['2026-10-01', 'DEMO GROCERS Zagreb', 1230, 'groceries', undefined],
       ['2026-10-03', 'Demo Shop online Zagreb', 2500, 'other', 'rata 2/6'],
+      [
+        '2026-10-05',
+        'OSOBNO PRIMANJE ISPLAĆENO U CIJELOSTI Demo d.o.o.',
+        150000,
+        'income',
+        undefined,
+      ],
       ['2026-10-06', 'DEMO KLUB', 4000, 'entertainment', 'Ulaznica Hajduk'],
       ['2026-10-07', 'Bankomat Banke DEMO TRG 1 ZAGREB', 5000, 'cash', undefined],
       ['2026-10-08', 'DEMO RESTORAN SPLIT', -800, 'restaurants', undefined],
@@ -119,8 +126,8 @@ describe('parseZabaLines', () => {
     ])
   })
 
-  it('skips Revolut top-ups, the Erste card bill and incoming payments', () => {
-    expect(skipped).toEqual({ transfer: 1, payment: 1, income: 1 })
+  it('skips Revolut top-ups and the Erste card bill', () => {
+    expect(skipped).toEqual({ transfer: 1, payment: 1 })
   })
 
   it('uses the bank reference for the import hash', () => {

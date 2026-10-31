@@ -17,6 +17,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'cash', nameKey: 'categories.cash' },
   { id: 'loans', nameKey: 'categories.loans', kind: 'fixed' },
   { id: 'savings', nameKey: 'categories.savings', kind: 'savings' },
+  { id: 'income', nameKey: 'categories.income', kind: 'income' },
   { id: 'other', nameKey: 'categories.other' },
 ]
 
@@ -38,9 +39,12 @@ export function effectiveKind(id: string, categories: Category[]): CategoryKind 
   return categories.find((category) => category.id === topLevelId(id, categories))?.kind
 }
 
-/** Categories that count as spending (everything except savings). */
+/** Categories that count as spending (everything except savings and income). */
 export function spendingCategories(categories: Category[]): Category[] {
-  return categories.filter((category) => effectiveKind(category.id, categories) !== 'savings')
+  return categories.filter((category) => {
+    const kind = effectiveKind(category.id, categories)
+    return kind !== 'savings' && kind !== 'income'
+  })
 }
 
 /** Totals per top-level category, with subcategory amounts added to their parent. */

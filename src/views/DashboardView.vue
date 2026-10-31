@@ -3,8 +3,13 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 
+import CategoryBreakdown, {
+  type CategoryBreakdownRow,
+} from '@/components/dashboard/CategoryBreakdown.vue'
+import IncomeCard from '@/components/dashboard/IncomeCard.vue'
+import SavingsCard from '@/components/dashboard/SavingsCard.vue'
+import SummaryCards from '@/components/dashboard/SummaryCards.vue'
 import MonthPicker from '@/components/MonthPicker.vue'
-import DashboardExpenseList from '@/components/DashboardExpenseList.vue'
 import { useLiveQuery } from '@/composables/useLiveQuery'
 import { db, type Category, type Txn, type TxnSource } from '@/db'
 import { latestImportDates } from '@/db/txns'
@@ -13,9 +18,17 @@ import { isSameMerchant } from '@/domain/categorize'
 import { backupDue } from '@/domain/backup'
 import { monthCoverage } from '@/domain/coverage'
 import { formatEur } from '@/domain/money'
-import { dailyAllowanceCents, formatIsoDate, monthKey, monthRange, todayIso } from '@/domain/month'
+import {
+  dailyAllowanceCents,
+  formatIsoDate,
+  monthKey,
+  monthRange,
+  shiftMonth,
+  todayIso,
+} from '@/domain/month'
 import { monthPlan } from '@/domain/plan'
-import { totalsByCategory, totalsByMerchant, txnsInCategory } from '@/domain/transactions'
+import { categoryTrends } from '@/domain/trends'
+import { totalsByCategory, totalsByMerchant } from '@/domain/transactions'
 import { useSettingsStore } from '@/stores/settings'
 
 const { t, locale } = useI18n()
@@ -38,14 +51,21 @@ onMounted(() => {
   void settingsStore.load()
 })
 
-const txns = useLiveQuery(
+const windowTxns = useLiveQuery(
   async () => {
-    const { start, end } = monthRange(selectedMonth.value)
+    const start = monthRange(shiftMonth(selectedMonth.value, -3)).start
+    const end = monthRange(selectedMonth.value).end
     return db.txns.where('date').between(start, end, true, true).toArray()
   },
   [] as Txn[],
   selectedMonth,
 )
+
+const txns = computed(() => {
+  const { start, end } = monthRange(selectedMonth.value)
+  return windowTxns.value.filter((txn) => txn.date >= start && txn.date <= end)
+})
+
 const categories = useLiveQuery(() => db.categories.toArray(), [] as Category[])
 const latest = useLiveQuery(latestImportDates, {} as Partial<Record<TxnSource, string>>)
 const allTxnCount = useLiveQuery(async () => db.txns.count(), 0)
@@ -81,7 +101,7 @@ const savingsTxns = computed(() =>
 )
 const savingsGroups = computed(() => totalsByMerchant(savingsTxns.value))
 
-const categoryTotals = computed(() => {
+const categoryTotals = computed((): CategoryBreakdownRow[] => {
   const rolled = rollupTotals(totals.value, categories.value)
   return Object.entries(rolled)
     .filter(([id]) => !nonSpendingCategoryIds.value.has(id))
@@ -95,25 +115,34 @@ const categoryTotals = computed(() => {
     }))
 })
 
-function nameOf(id: string) {
-  const category = categories.value.find((item) => item.id === id)
-  return category ? t(category.nameKey) : id
-}
+const categoryTrendsById = computed(() => {
+  const current = rollupTotals(totals.value, categories.value)
+  for (const id of Object.keys(current)) {
+    if (nonSpendingCategoryIds.value.has(id)) delete current[id]
+  }
+  const previous = [
+    shiftMonth(selectedMonth.value, -1),
+    shiftMonth(selectedMonth.value, -2),
+    shiftMonth(selectedMonth.value, -3),
+  ].map((ym) => {
+    const { start, end } = monthRange(ym)
+    const monthTxns = windowTxns.value.filter((txn) => txn.date >= start && txn.date <= end)
+    const rolled = rollupTotals(totalsByCategory(monthTxns), categories.value)
+    for (const id of Object.keys(rolled)) {
+      if (nonSpendingCategoryIds.value.has(id)) delete rolled[id]
+    }
+    return { totals: rolled, hasData: monthTxns.length > 0 }
+  }) as [
+    { totals: Record<string, number>; hasData: boolean },
+    { totals: Record<string, number>; hasData: boolean },
+    { totals: Record<string, number>; hasData: boolean },
+  ]
+  return categoryTrends(current, previous)
+})
 
-const openListTxns = computed(() =>
-  openListId.value ? txnsInCategory(txns.value, openListId.value) : [],
-)
-
-function categoryHasSubrows(row: (typeof categoryTotals.value)[number]) {
-  return row.children.length > 0
-}
-
-function expensesFor(categoryId: string) {
-  return txnsInCategory(txns.value, categoryId)
-}
-
-function onCategoryClick(row: (typeof categoryTotals.value)[number]) {
-  if (categoryHasSubrows(row)) {
+function onCategoryClick(row: CategoryBreakdownRow) {
+  const hasChildren = row.children.length > 0
+  if (hasChildren) {
     if (expandedId.value === row.id) {
       expandedId.value = null
       const open = openListId.value
@@ -172,47 +201,14 @@ const remainingClass = computed(() => {
       }}</RouterLink>
     </p>
 
-    <section class="grid gap-4 sm:grid-cols-2">
-      <article class="border-border bg-surface-muted rounded-xl border p-4">
-        <p class="text-muted text-sm">{{ t('dashboard.monthSpend') }}</p>
-        <p class="mt-1 text-2xl font-semibold tabular-nums">{{ formatEur(plan.spentCents) }}</p>
-        <p v-if="plan.fixedSpentCents" class="text-muted mt-1 text-sm">
-          {{ t('dashboard.fixedPart') }}:
-          <span class="tabular-nums">{{ formatEur(plan.fixedSpentCents) }}</span>
-        </p>
-        <p class="text-muted mt-2 text-sm">
-          {{ t('dashboard.monthLimit') }}:
-          <span class="text-foreground tabular-nums">{{ formatEur(plan.limitCents) }}</span>
-          <span v-if="plan.usesCategoryBudgets"> ({{ t('dashboard.limitFromBudgets') }})</span>
-        </p>
-      </article>
-      <article class="border-border bg-surface-muted rounded-xl border p-4">
-        <p class="text-muted text-sm">{{ t('dashboard.remaining') }}</p>
-        <p class="mt-1 text-2xl font-semibold tabular-nums" :class="remainingClass">
-          {{ formatEur(plan.remainingCents) }}
-        </p>
-        <p v-if="plan.fixedReservedCents" class="text-muted mt-1 text-sm">
-          {{ t('dashboard.flexibleLeft') }}:
-          <span class="text-foreground tabular-nums">{{ formatEur(plan.flexibleLeftCents) }}</span>
-        </p>
-        <p v-if="isCurrentMonth" class="text-muted mt-2 text-sm">
-          <template v-if="plan.limitCents === 0">
-            {{ t('dashboard.noLimitHint') }}
-          </template>
-          <template v-else-if="plan.flexibleLeftCents < 0">
-            <span class="text-danger">
-              {{
-                t('dashboard.variableOver', { amount: formatEur(Math.abs(plan.flexibleLeftCents)) })
-              }}
-            </span>
-          </template>
-          <template v-else>
-            {{ t('dashboard.dailyAllowance') }}:
-            <span class="text-foreground tabular-nums">{{ formatEur(dailyCents) }}</span>
-          </template>
-        </p>
-      </article>
-    </section>
+    <SummaryCards
+      :plan="plan"
+      :is-current-month="isCurrentMonth"
+      :daily-cents="dailyCents"
+      :remaining-class="remainingClass"
+    />
+
+    <IncomeCard :plan="plan" />
 
     <section
       v-if="coverage.length"
@@ -235,51 +231,15 @@ const remainingClass = computed(() => {
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2">
-      <article class="border-border bg-surface-muted rounded-xl border p-4">
-        <component
-          :is="savingsGroups.length ? 'button' : 'div'"
-          :type="savingsGroups.length ? 'button' : undefined"
-          class="w-full text-left"
-          :class="savingsGroups.length ? 'hover:bg-surface rounded-lg' : ''"
-          :aria-expanded="savingsGroups.length ? savingsOpen : undefined"
-          @click="savingsGroups.length ? onSavingsClick() : undefined"
-        >
-          <p class="text-muted text-sm">{{ t('dashboard.savedThisMonth') }}</p>
-          <div class="mt-1 flex items-center justify-between gap-2">
-            <span class="flex min-w-0 items-center gap-1">
-              <span
-                v-if="savingsGroups.length"
-                class="text-muted inline-block w-4 shrink-0 transition-transform"
-                :class="savingsOpen ? 'rotate-90' : ''"
-                aria-hidden="true"
-              >
-                ›
-              </span>
-              <span class="text-2xl font-semibold tabular-nums">{{
-                formatEur(plan.savedCents)
-              }}</span>
-            </span>
-          </div>
-        </component>
-        <ul v-if="savingsOpen && savingsGroups.length" class="mt-2 space-y-0.5 text-sm">
-          <li v-for="group in savingsGroups" :key="group.merchant">
-            <button
-              type="button"
-              class="text-muted hover:bg-surface flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left"
-              :aria-expanded="isOpenSavingsGroup(group.merchant)"
-              @click="onSavingsGroupClick(group.merchant)"
-            >
-              <span class="min-w-0 break-words">{{ group.merchant }}</span>
-              <span class="shrink-0 tabular-nums">{{ formatEur(group.cents) }}</span>
-            </button>
-            <DashboardExpenseList
-              v-if="isOpenSavingsGroup(group.merchant)"
-              :txns="group.txns"
-              variant="indented"
-            />
-          </li>
-        </ul>
-      </article>
+      <SavingsCard
+        :plan="plan"
+        :savings-groups="savingsGroups"
+        :savings-open="savingsOpen"
+        :open-savings-merchant="openSavingsMerchant"
+        :is-open-savings-group="isOpenSavingsGroup"
+        @savings-click="onSavingsClick"
+        @savings-group-click="onSavingsGroupClick"
+      />
       <article class="border-border bg-surface-muted rounded-xl border p-4">
         <div class="flex items-center justify-between gap-3">
           <p class="text-muted text-sm">{{ t('dashboard.emergencyFund') }}</p>
@@ -301,59 +261,15 @@ const remainingClass = computed(() => {
       </article>
     </section>
 
-    <section class="border-border bg-surface-muted rounded-xl border p-4">
-      <h2 class="mb-3 font-medium">{{ t('dashboard.byCategory') }}</h2>
-      <ul v-if="categoryTotals.length" class="space-y-2">
-        <li v-for="row in categoryTotals" :key="row.id" class="text-sm">
-          <button
-            type="button"
-            class="hover:bg-surface flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left"
-            :aria-expanded="categoryHasSubrows(row) ? expandedId === row.id : openListId === row.id"
-            @click="onCategoryClick(row)"
-          >
-            <span class="flex min-w-0 items-center gap-1">
-              <span
-                v-if="categoryHasSubrows(row)"
-                class="text-muted inline-block w-4 shrink-0 transition-transform"
-                :class="expandedId === row.id ? 'rotate-90' : ''"
-                aria-hidden="true"
-              >
-                ›
-              </span>
-              <span v-else class="inline-block w-4 shrink-0" aria-hidden="true" />
-              <span>{{ nameOf(row.id) }}</span>
-            </span>
-            <span class="shrink-0 font-medium tabular-nums">{{ formatEur(row.cents) }}</span>
-          </button>
-          <DashboardExpenseList
-            v-if="openListId === row.id && !categoryHasSubrows(row)"
-            :txns="openListTxns"
-            variant="leaf"
-          />
-          <ul v-if="expandedId === row.id" class="mt-1 space-y-0.5 pl-4 text-xs">
-            <li v-for="[childId, cents] in row.children" :key="childId">
-              <button
-                type="button"
-                class="text-muted hover:bg-surface flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left"
-                :aria-expanded="openListId === childId"
-                @click="onSubcategoryClick(childId)"
-              >
-                <span>{{ nameOf(childId) }}</span>
-                <span class="tabular-nums">{{ formatEur(cents) }}</span>
-              </button>
-              <DashboardExpenseList
-                v-if="openListId === childId"
-                :txns="openListTxns"
-                variant="indented"
-              />
-            </li>
-            <li v-if="expensesFor(row.id).length">
-              <DashboardExpenseList :txns="expensesFor(row.id)" variant="indented" />
-            </li>
-          </ul>
-        </li>
-      </ul>
-      <p v-else class="text-muted text-sm">{{ t('dashboard.noSpend') }}</p>
-    </section>
+    <CategoryBreakdown
+      :rows="categoryTotals"
+      :trends="categoryTrendsById"
+      :categories="categories"
+      :txns="txns"
+      :expanded-id="expandedId"
+      :open-list-id="openListId"
+      @category-click="onCategoryClick"
+      @subcategory-click="onSubcategoryClick"
+    />
   </div>
 </template>

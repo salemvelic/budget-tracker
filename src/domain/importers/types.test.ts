@@ -50,10 +50,10 @@ describe('countSkip', () => {
 
 describe('mergeSkipped', () => {
   it('adds counts per reason across files', () => {
-    expect(mergeSkipped({ transfer: 2, pending: 1 }, {}, { transfer: 3, income: 1 })).toEqual({
+    expect(mergeSkipped({ transfer: 2, pending: 1 }, {}, { transfer: 3, payment: 1 })).toEqual({
       transfer: 5,
       pending: 1,
-      income: 1,
+      payment: 1,
     })
   })
 })
