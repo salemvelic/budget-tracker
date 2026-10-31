@@ -42,3 +42,12 @@ export function totalsByCategory(txns: Pick<Txn, 'amountCents' | 'category'>[]):
   }
   return totals
 }
+
+export function txnsInCategory(
+  txns: Pick<Txn, 'id' | 'date' | 'amountCents' | 'merchant' | 'source' | 'category' | 'note'>[],
+  categoryId: string,
+): Pick<Txn, 'id' | 'date' | 'amountCents' | 'merchant' | 'source' | 'category' | 'note'>[] {
+  return txns
+    .filter((txn) => txn.category === categoryId)
+    .sort((a, b) => b.date.localeCompare(a.date) || (b.id ?? 0) - (a.id ?? 0))
+}
