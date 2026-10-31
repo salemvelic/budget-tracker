@@ -64,7 +64,9 @@ async function onFileChange(event: Event) {
         rows.push(...result.rows)
         skips.push(result.skipped)
         files.value.push(
-          result.rows.length === 0 ? { name: file.name, errorCode: 'empty' } : { name: file.name, kind: result.kind },
+          result.rows.length === 0
+            ? { name: file.name, errorCode: 'empty' }
+            : { name: file.name, kind: result.kind },
         )
       } catch (e) {
         files.value.push({ name: file.name, errorCode: e instanceof Error ? e.message : 'invalid' })
@@ -105,8 +107,8 @@ async function runImport() {
 
 <template>
   <div class="space-y-6">
-    <section class="rounded-xl border border-border bg-surface-muted p-6">
-      <p class="mb-4 text-sm text-muted">{{ t('import.help') }}</p>
+    <section class="border-border bg-surface-muted rounded-xl border p-6">
+      <p class="text-muted mb-4 text-sm">{{ t('import.help') }}</p>
       <label class="block text-sm font-medium">
         {{ t('import.fileLabel') }}
         <input
@@ -119,18 +121,26 @@ async function runImport() {
         />
       </label>
       <ul v-if="files.length" class="mt-2 space-y-0.5 text-sm">
-        <li v-for="file in files" :key="file.name" :class="file.errorCode ? 'text-danger' : 'text-muted'">
+        <li
+          v-for="file in files"
+          :key="file.name"
+          :class="file.errorCode ? 'text-danger' : 'text-muted'"
+        >
           {{
             t('import.fileResult', {
               name: file.name,
-              kind: file.errorCode ? errorMessage(file.errorCode) : t(`import.detected.${file.kind}`),
+              kind: file.errorCode
+                ? errorMessage(file.errorCode)
+                : t(`import.detected.${file.kind}`),
             })
           }}
         </li>
       </ul>
-      <p v-if="busy" class="mt-2 text-sm text-muted">{{ t('import.reading') }}</p>
-      <p v-if="errorCode" class="mt-2 text-sm text-danger">{{ errorMessage(errorCode) }}</p>
-      <p v-if="allAlreadyImported" class="mt-2 text-sm text-muted">{{ t('import.allAlreadyImported') }}</p>
+      <p v-if="busy" class="text-muted mt-2 text-sm">{{ t('import.reading') }}</p>
+      <p v-if="errorCode" class="text-danger mt-2 text-sm">{{ errorMessage(errorCode) }}</p>
+      <p v-if="allAlreadyImported" class="text-muted mt-2 text-sm">
+        {{ t('import.allAlreadyImported') }}
+      </p>
     </section>
 
     <ImportPreview
@@ -141,7 +151,7 @@ async function runImport() {
       @set-category="setCategory"
     />
 
-    <p v-if="importedCount != null" class="text-sm text-success">
+    <p v-if="importedCount != null" class="text-success text-sm">
       {{ t('import.done', { count: importedCount }) }}
     </p>
   </div>

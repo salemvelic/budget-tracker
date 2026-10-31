@@ -16,7 +16,11 @@ export async function deleteTxn(id: number): Promise<void> {
  * Sets the category of one transaction. With `remember`, also saves a rule for the merchant
  * and moves the merchant's other transactions; returns how many others changed.
  */
-export async function recategorizeTxn(txn: Txn, category: string, remember: boolean): Promise<number> {
+export async function recategorizeTxn(
+  txn: Txn,
+  category: string,
+  remember: boolean,
+): Promise<number> {
   if (txn.id == null) return 0
   const id = txn.id
   return db.transaction('rw', db.txns, db.rules, async () => {
@@ -29,7 +33,12 @@ export async function recategorizeTxn(txn: Txn, category: string, remember: bool
     else await db.rules.add({ pattern, category })
 
     const others = await db.txns
-      .filter((other) => other.id !== id && other.category !== category && isSameMerchant(other.merchant, txn.merchant))
+      .filter(
+        (other) =>
+          other.id !== id &&
+          other.category !== category &&
+          isSameMerchant(other.merchant, txn.merchant),
+      )
       .toArray()
     for (const other of others) await db.txns.update(other.id!, { category })
     return others.length

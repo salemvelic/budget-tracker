@@ -52,7 +52,10 @@ async function submit() {
 </script>
 
 <template>
-  <form class="space-y-4 rounded-xl border border-border bg-surface-muted p-6" @submit.prevent="submit">
+  <form
+    class="border-border bg-surface-muted space-y-4 rounded-xl border p-6"
+    @submit.prevent="submit"
+  >
     <h2 class="font-semibold">{{ t('settings.limitsHeading') }}</h2>
     <label v-for="field in fields" :key="field.key" class="block space-y-1 text-sm">
       <span class="text-muted">{{ t(field.labelKey) }}</span>
@@ -60,19 +63,19 @@ async function submit() {
         v-model="form[field.key]"
         type="text"
         inputmode="decimal"
-        class="w-full rounded-lg border border-border bg-surface px-3 py-2 tabular-nums"
+        class="border-border bg-surface w-full rounded-lg border px-3 py-2 tabular-nums"
         @input="status = 'idle'"
       />
-      <span v-if="field.hintKey" class="block text-xs text-muted">{{ t(field.hintKey) }}</span>
+      <span v-if="field.hintKey" class="text-muted block text-xs">{{ t(field.hintKey) }}</span>
     </label>
     <button
       type="submit"
-      class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-foreground disabled:opacity-50"
+      class="bg-brand text-brand-foreground rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
       :disabled="!parsed"
     >
       {{ t('common.save') }}
     </button>
-    <p v-if="status === 'saved'" class="text-sm text-success">{{ t('settings.saved') }}</p>
-    <p v-if="status === 'error'" class="text-sm text-danger">{{ t('settings.saveFailed') }}</p>
+    <p v-if="status === 'saved'" class="text-success text-sm">{{ t('settings.saved') }}</p>
+    <p v-if="status === 'error'" class="text-danger text-sm">{{ t('settings.saveFailed') }}</p>
   </form>
 </template>

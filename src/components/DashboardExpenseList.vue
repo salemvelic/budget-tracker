@@ -15,8 +15,8 @@ const { t, locale } = useI18n()
 
 <template>
   <ul
-    class="mt-1 space-y-1 border-l border-border text-xs"
-    :class="variant === 'leaf' ? 'pl-6' : 'pl-4 text-muted'"
+    class="border-border mt-1 space-y-1 border-l text-xs"
+    :class="variant === 'leaf' ? 'pl-6' : 'text-muted pl-4'"
   >
     <li v-if="!txns.length" class="text-muted">{{ t('dashboard.noExpenses') }}</li>
     <li v-for="txn in txns" :key="txn.id" class="flex justify-between gap-3 py-0.5">

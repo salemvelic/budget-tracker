@@ -78,7 +78,9 @@ describe('categorizeDescription', () => {
   })
 
   it('lets earlier (user) rules win', () => {
-    expect(categorizeDescription('Amazon', [{ pattern: 'amazon', category: 'other' }])).toBe('other')
+    expect(categorizeDescription('Amazon', [{ pattern: 'amazon', category: 'other' }])).toBe(
+      'other',
+    )
   })
 })
 

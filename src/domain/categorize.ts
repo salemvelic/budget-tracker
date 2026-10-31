@@ -31,12 +31,19 @@ export const DEFAULT_CATEGORY_RULES: Rule[] = [
   },
   { pattern: 'ina|petrol|tifon|crodux|omv|mol|lukoil|shell|fuel|ktc.*?b\\.p\\.', category: 'fuel' },
   { pattern: 'bolt|uber|yandex|taxi|autoceste|naplatna|parking', category: 'transport' },
-  { pattern: 'hep|vodovod|toplinarstvo|plinara|režije|rezije|telekom|a1|telemach|utility|utilities', category: 'utilities' },
   {
-    pattern: 'amazon|ekupi|emmezeta|ikea|mueller|müller|dm|deichmann|decathlon|zara|sancta domenica',
+    pattern: 'hep|vodovod|toplinarstvo|plinara|režije|rezije|telekom|a1|telemach|utility|utilities',
+    category: 'utilities',
+  },
+  {
+    pattern:
+      'amazon|ekupi|emmezeta|ikea|mueller|müller|dm|deichmann|decathlon|zara|sancta domenica',
     category: 'shopping',
   },
-  { pattern: 'netflix|spotify|disney|apple|youtube|hbo|premium plan|myheritage', category: 'subscriptions' },
+  {
+    pattern: 'netflix|spotify|disney|apple|youtube|hbo|premium plan|myheritage',
+    category: 'subscriptions',
+  },
 ]
 
 export function matchesCategoryPattern(pattern: string, description: string): boolean {
@@ -47,7 +54,10 @@ export function matchesCategoryPattern(pattern: string, description: string): bo
   }
 }
 
-export function categorizeDescription(description: string, rules: Rule[] = DEFAULT_CATEGORY_RULES): string {
+export function categorizeDescription(
+  description: string,
+  rules: Rule[] = DEFAULT_CATEGORY_RULES,
+): string {
   for (const rule of rules) {
     if (matchesCategoryPattern(rule.pattern, description)) {
       return rule.category
@@ -96,7 +106,9 @@ const SUBCATEGORY_UPGRADES: Record<string, string[] | '*'> = {
  * Category for an existing transaction once subcategories exist, or null to keep it.
  * Only moves broad or default placements; anything the user picked elsewhere stays.
  */
-export function subcategoryUpgrade(txn: Pick<Txn, 'merchant' | 'note' | 'category'>): string | null {
+export function subcategoryUpgrade(
+  txn: Pick<Txn, 'merchant' | 'note' | 'category'>,
+): string | null {
   const allowed = SUBCATEGORY_UPGRADES[txn.category]
   if (!allowed) return null
   const next = categorizeDescription(txnDescription(txn))

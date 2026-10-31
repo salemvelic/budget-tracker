@@ -3,7 +3,16 @@ import { describe, expect, it } from 'vitest'
 import { backupFileName, buildBackup, parseBackup, type BackupData } from './backup'
 
 const data: BackupData = {
-  txns: [{ id: 1, date: '2026-10-01', amountCents: 1250, merchant: 'Demo', source: 'kartica', category: 'food' }],
+  txns: [
+    {
+      id: 1,
+      date: '2026-10-01',
+      amountCents: 1250,
+      merchant: 'Demo',
+      source: 'kartica',
+      category: 'food',
+    },
+  ],
   rules: [{ id: 1, pattern: 'demo', category: 'food' }],
   categories: [{ id: 'food', nameKey: 'categories.food', budgetCents: 20000 }],
   settings: [{ key: 'monthlyLimitCents', value: '60000' }],
@@ -25,7 +34,9 @@ describe('backup', () => {
   })
 
   it('rejects unknown versions', () => {
-    expect(() => parseBackup(JSON.stringify({ ...buildBackup(data), version: 99 }))).toThrow('backup.version')
+    expect(() => parseBackup(JSON.stringify({ ...buildBackup(data), version: 99 }))).toThrow(
+      'backup.version',
+    )
   })
 
   it('accepts backups without ignoredImports', () => {
@@ -34,6 +45,8 @@ describe('backup', () => {
   })
 
   it('names files with the export date', () => {
-    expect(backupFileName(new Date('2026-10-31T10:00:00Z'))).toBe('budget-tracker-backup-2026-10-31.json')
+    expect(backupFileName(new Date('2026-10-31T10:00:00Z'))).toBe(
+      'budget-tracker-backup-2026-10-31.json',
+    )
   })
 })

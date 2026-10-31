@@ -21,7 +21,12 @@ const LINES: TextLine[] = [
   [c(43, '2. lis 2026.'), c(125, 'Demo Grocers'), c(335, '1.012,50€'), c(526, '126,98€')],
   [c(125, 'Revolut tečaj: 1,00€ = 5,30 RON'), c(335, '66,25 RON')],
   card,
-  [c(43, '3. lis 2026.'), c(125, 'Podizanje gotovine na lokaciji: Demo 1'), c(335, '51,00€'), c(531, '75,98€')],
+  [
+    c(43, '3. lis 2026.'),
+    c(125, 'Podizanje gotovine na lokaciji: Demo 1'),
+    c(335, '51,00€'),
+    c(531, '75,98€'),
+  ],
   [c(125, 'Naknada: 1,00€'), c(335, '50,00€')],
   card,
   [c(43, '4. lis 2026.'), c(125, 'Demo Taxi'), c(417, '2,40€'), c(526, '78,38€')],

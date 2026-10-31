@@ -9,7 +9,9 @@ export function useCategoryLabel(categories: Ref<Category[]>) {
   return (id: string): string => {
     const category = categories.value.find((item) => item.id === id)
     if (!category) return id
-    const parent = category.parentId ? categories.value.find((item) => item.id === category.parentId) : undefined
+    const parent = category.parentId
+      ? categories.value.find((item) => item.id === category.parentId)
+      : undefined
     return parent ? `${t(parent.nameKey)} › ${t(category.nameKey)}` : t(category.nameKey)
   }
 }

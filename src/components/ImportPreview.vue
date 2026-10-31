@@ -27,16 +27,20 @@ const categories = useLiveQuery(() => db.categories.toArray(), [] as Category[])
 const skippedEntries = computed(() =>
   (Object.entries(props.skipped) as [SkipReason, number][]).filter(([, count]) => count > 0),
 )
-
 </script>
 
 <template>
-  <section v-if="preview.length" class="space-y-3 rounded-xl border border-border bg-surface-muted p-6">
+  <section
+    v-if="preview.length"
+    class="border-border bg-surface-muted space-y-3 rounded-xl border p-6"
+  >
     <p class="text-sm">
       {{ t('import.previewCount', { count: preview.length }) }}
       <span class="text-muted">{{ t('import.previewHelp') }}</span>
     </p>
-    <ul class="max-h-[28rem] divide-y divide-border overflow-y-auto rounded-lg border border-border bg-surface">
+    <ul
+      class="divide-border border-border bg-surface max-h-[28rem] divide-y overflow-y-auto rounded-lg border"
+    >
       <li
         v-for="(row, index) in preview"
         :key="row.importHash"
@@ -52,16 +56,18 @@ const skippedEntries = computed(() =>
             :model-value="row.category"
             :categories="categories"
             :aria-label="t('transactions.categoryFor', { merchant: row.merchant })"
-            class="rounded-lg border border-border bg-surface-muted px-2 py-1 text-sm"
+            class="border-border bg-surface-muted rounded-lg border px-2 py-1 text-sm"
             @update:model-value="emit('setCategory', index, $event)"
           />
-          <span class="w-24 text-right font-medium tabular-nums">{{ formatEur(row.amountCents) }}</span>
+          <span class="w-24 text-right font-medium tabular-nums">{{
+            formatEur(row.amountCents)
+          }}</span>
         </span>
       </li>
     </ul>
     <button
       type="button"
-      class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-foreground disabled:opacity-50"
+      class="bg-brand text-brand-foreground rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
       :disabled="importing"
       @click="emit('import')"
     >
@@ -69,7 +75,10 @@ const skippedEntries = computed(() =>
     </button>
   </section>
 
-  <section v-if="skippedEntries.length" class="rounded-xl border border-border p-4 text-xs text-muted">
+  <section
+    v-if="skippedEntries.length"
+    class="border-border text-muted rounded-xl border p-4 text-xs"
+  >
     <p class="mb-1 font-medium">{{ t('import.skippedHeading') }}</p>
     <ul class="space-y-0.5">
       <li v-for="[reason, count] in skippedEntries" :key="reason">

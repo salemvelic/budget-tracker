@@ -23,10 +23,12 @@ function linkClass(name: string) {
 
 <template>
   <nav
-    class="fixed inset-x-0 bottom-0 z-10 border-t border-border bg-surface/95 backdrop-blur md:static md:border-t-0 md:bg-transparent md:backdrop-blur-none"
+    class="border-border bg-surface/95 fixed inset-x-0 bottom-0 z-10 border-t backdrop-blur md:static md:border-t-0 md:bg-transparent md:backdrop-blur-none"
     aria-label="Main"
   >
-    <ul class="mx-auto flex max-w-3xl justify-around gap-1 px-2 py-2 md:justify-start md:gap-2 md:px-0">
+    <ul
+      class="mx-auto flex max-w-3xl justify-around gap-1 px-2 py-2 md:justify-start md:gap-2 md:px-0"
+    >
       <li v-for="link in links" :key="link.name">
         <RouterLink
           :to="{ name: link.name }"

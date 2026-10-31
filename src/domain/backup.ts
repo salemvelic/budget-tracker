@@ -55,7 +55,8 @@ const isCategory = (v: unknown): v is Category =>
   isRecord(v) && typeof v.id === 'string' && typeof v.nameKey === 'string'
 const isSetting = (v: unknown): v is SettingRow =>
   isRecord(v) && typeof v.key === 'string' && typeof v.value === 'string'
-const isIgnored = (v: unknown): v is IgnoredImport => isRecord(v) && typeof v.importHash === 'string'
+const isIgnored = (v: unknown): v is IgnoredImport =>
+  isRecord(v) && typeof v.importHash === 'string'
 
 /** Validate a backup file's JSON text; throws `backup.invalid` or `backup.version`. */
 export function parseBackup(text: string): BackupData {

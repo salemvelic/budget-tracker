@@ -13,12 +13,41 @@ const LINES: TextLine[] = [
   [c(38, '30.09.26'), c(96, 'D101'), c(212, 'Obračun god. članarine - DEMO'), c(536, '50,00')],
   [c(212, 'KORISNIK')],
   [c(212, 'Ukupno troškovi usluga ESB'), c(535, '50,00')],
-  [c(38, '01.10.26'), c(96, 'D102'), c(154, 'D900'), c(212, 'DEMO GROCERS 12 Zagreb'), c(329, 'EUR'), c(539, '1.234,56')],
-  [c(38, '02.10.26'), c(96, 'D103'), c(154, 'D901'), c(212, 'DEMO CAFE'), c(329, 'RON'), c(419, '100,00'), c(539, '19,90')],
+  [
+    c(38, '01.10.26'),
+    c(96, 'D102'),
+    c(154, 'D900'),
+    c(212, 'DEMO GROCERS 12 Zagreb'),
+    c(329, 'EUR'),
+    c(539, '1.234,56'),
+  ],
+  [
+    c(38, '02.10.26'),
+    c(96, 'D103'),
+    c(154, 'D901'),
+    c(212, 'DEMO CAFE'),
+    c(329, 'RON'),
+    c(419, '100,00'),
+    c(539, '19,90'),
+  ],
   [c(212, 'Bucuresti;Tečaj ESB na dan')],
   [c(212, '02.10.26: 5,020000')],
-  [c(38, '03.10.26'), c(96, 'D104'), c(154, 'D902'), c(212, 'DEMO SHOP WEB (1/3)'), c(329, 'EUR'), c(539, '10,00')],
-  [c(38, '04.10.26'), c(96, 'D105'), c(154, 'D903'), c(212, 'DEMO AIRLINE'), c(329, 'EUR'), c(531, '- 99,00')],
+  [
+    c(38, '03.10.26'),
+    c(96, 'D104'),
+    c(154, 'D902'),
+    c(212, 'DEMO SHOP WEB (1/3)'),
+    c(329, 'EUR'),
+    c(539, '10,00'),
+  ],
+  [
+    c(38, '04.10.26'),
+    c(96, 'D105'),
+    c(154, 'D903'),
+    c(212, 'DEMO AIRLINE'),
+    c(329, 'EUR'),
+    c(531, '- 99,00'),
+  ],
   [c(212, 'Ukupno DEMO'), c(519, '1.215,46 EUR')],
 ]
 
@@ -38,11 +67,18 @@ describe('parseErsteCardClubLines', () => {
   })
 
   it('uses ID1 for the import hash and converts dates', () => {
-    expect(rows[1]).toMatchObject({ date: '2026-10-01', importHash: 'kartica|id:D102', source: 'kartica' })
+    expect(rows[1]).toMatchObject({
+      date: '2026-10-01',
+      importHash: 'kartica|id:D102',
+      source: 'kartica',
+    })
   })
 
   it('puts membership in other and appends wrapped description lines', () => {
-    expect(rows[0]).toMatchObject({ merchant: 'Obračun god. članarine - DEMO KORISNIK', category: 'other' })
+    expect(rows[0]).toMatchObject({
+      merchant: 'Obračun god. članarine - DEMO KORISNIK',
+      category: 'other',
+    })
   })
 
   it('notes foreign amounts and installments, ignoring exchange-rate lines', () => {

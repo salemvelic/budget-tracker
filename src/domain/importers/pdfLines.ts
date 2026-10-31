@@ -30,9 +30,7 @@ function toCells(items: PositionedText[]): TextLine {
 
 /** Group one page's text items into top-to-bottom lines of left-to-right cells. */
 export function groupPageText(items: PositionedText[]): TextLine[] {
-  const withText = items
-    .filter((item) => item.text.trim().length > 0)
-    .sort((a, b) => b.y - a.y)
+  const withText = items.filter((item) => item.text.trim().length > 0).sort((a, b) => b.y - a.y)
 
   const lines: TextLine[] = []
   let bucket: PositionedText[] = []

@@ -9,7 +9,9 @@ describe('validateSettings', () => {
 
   it('rejects negative or fractional amounts', () => {
     expect(() => validateSettings({ monthlyLimitCents: -1 })).toThrow('Invalid monthlyLimitCents')
-    expect(() => validateSettings({ emergencySavedCents: 1.5 })).toThrow('Invalid emergencySavedCents')
+    expect(() => validateSettings({ emergencySavedCents: 1.5 })).toThrow(
+      'Invalid emergencySavedCents',
+    )
   })
 })
 

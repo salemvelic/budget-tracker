@@ -11,7 +11,10 @@ export async function filterNewImportRows(rows: ParsedImportRow[]): Promise<Pars
     db.txns.where('importHash').anyOf(hashes).toArray(),
     db.ignoredImports.where('importHash').anyOf(hashes).toArray(),
   ])
-  const known = new Set([...existing.map((txn) => txn.importHash), ...ignored.map((row) => row.importHash)])
+  const known = new Set([
+    ...existing.map((txn) => txn.importHash),
+    ...ignored.map((row) => row.importHash),
+  ])
   return unique.filter((row) => !known.has(row.importHash))
 }
 

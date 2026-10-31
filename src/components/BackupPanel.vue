@@ -19,7 +19,9 @@ onMounted(async () => {
 
 async function exportBackup() {
   const file = buildBackup(await readBackupData())
-  const url = URL.createObjectURL(new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' }))
+  const url = URL.createObjectURL(
+    new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' }),
+  )
   const link = document.createElement('a')
   link.href = url
   link.download = backupFileName()
@@ -47,24 +49,42 @@ async function onRestoreFile(event: Event) {
 </script>
 
 <template>
-  <section class="space-y-4 rounded-xl border border-border bg-surface-muted p-6">
+  <section class="border-border bg-surface-muted space-y-4 rounded-xl border p-6">
     <div>
       <h2 class="font-semibold">{{ t('settings.backup.heading') }}</h2>
-      <p class="mt-1 text-sm text-muted">{{ t('settings.backup.help') }}</p>
+      <p class="text-muted mt-1 text-sm">{{ t('settings.backup.help') }}</p>
     </div>
     <div class="flex flex-wrap gap-3">
-      <button type="button" class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-foreground" @click="exportBackup">
+      <button
+        type="button"
+        class="bg-brand text-brand-foreground rounded-lg px-4 py-2 text-sm font-medium"
+        @click="exportBackup"
+      >
         {{ t('settings.backup.export') }}
       </button>
-      <button type="button" class="rounded-lg border border-border px-4 py-2 text-sm font-medium" @click="fileInput?.click()">
+      <button
+        type="button"
+        class="border-border rounded-lg border px-4 py-2 text-sm font-medium"
+        @click="fileInput?.click()"
+      >
         {{ t('settings.backup.restore') }}
       </button>
-      <input ref="fileInput" type="file" accept=".json,application/json" class="hidden" @change="onRestoreFile" />
+      <input
+        ref="fileInput"
+        type="file"
+        accept=".json,application/json"
+        class="hidden"
+        @change="onRestoreFile"
+      />
     </div>
-    <p v-if="message" class="text-sm" :class="message.kind === 'success' ? 'text-success' : 'text-danger'">
+    <p
+      v-if="message"
+      class="text-sm"
+      :class="message.kind === 'success' ? 'text-success' : 'text-danger'"
+    >
       {{ t(message.key) }}
     </p>
-    <p v-if="persisted != null" class="text-xs text-muted">
+    <p v-if="persisted != null" class="text-muted text-xs">
       {{ persisted ? t('settings.backup.persisted') : t('settings.backup.notPersisted') }}
     </p>
   </section>

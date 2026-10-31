@@ -10,10 +10,25 @@ describe('backup restore', () => {
   })
 
   it('replaces local data with the backup', async () => {
-    await db.txns.add({ date: '2026-09-01', amountCents: 100, merchant: 'Old', source: 'gotovina', category: 'other' })
+    await db.txns.add({
+      date: '2026-09-01',
+      amountCents: 100,
+      merchant: 'Old',
+      source: 'gotovina',
+      category: 'other',
+    })
     const backup = {
       ...(await readBackupData()),
-      txns: [{ id: 7, date: '2026-10-01', amountCents: 500, merchant: 'New', source: 'kartica' as const, category: 'food' }],
+      txns: [
+        {
+          id: 7,
+          date: '2026-10-01',
+          amountCents: 500,
+          merchant: 'New',
+          source: 'kartica' as const,
+          category: 'food',
+        },
+      ],
       ignoredImports: [{ importHash: 'kartica|id:X' }],
     }
 

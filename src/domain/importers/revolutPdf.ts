@@ -62,7 +62,10 @@ interface RawRow {
 
 export function isRevolutStatement(lines: TextLine[]): boolean {
   const texts = lines.map(lineText)
-  return texts.some((t) => t.includes('Revolut Bank UAB')) && texts.some((t) => /Izvadak za [A-Z]{3}/.test(t))
+  return (
+    texts.some((t) => t.includes('Revolut Bank UAB')) &&
+    texts.some((t) => /Izvadak za [A-Z]{3}/.test(t))
+  )
 }
 
 function isoDate(raw: string): string | null {
@@ -103,7 +106,10 @@ export function parseRevolutPdfLines(
   let section: Section = 'none'
   let previousBalance: number | null = null
   let current: RawRow | null = null
-  const savingsByDay = new Map<string, { date: string; merchant: string; amountCents: number; count: number }>()
+  const savingsByDay = new Map<
+    string,
+    { date: string; merchant: string; amountCents: number; count: number }
+  >()
 
   const finish = (row: RawRow) => {
     const balance = tryAmount(row.balance)
@@ -133,7 +139,12 @@ export function parseRevolutPdfLines(
     if (savings) {
       // Round-ups arrive dozens of times a month; one row per day keeps the list readable.
       const key = `${row.date}|${savings}`
-      const day = savingsByDay.get(key) ?? { date: row.date, merchant: savings, amountCents: 0, count: 0 }
+      const day = savingsByDay.get(key) ?? {
+        date: row.date,
+        merchant: savings,
+        amountCents: 0,
+        count: 0,
+      }
       day.amountCents += outflow
       day.count += 1
       savingsByDay.set(key, day)

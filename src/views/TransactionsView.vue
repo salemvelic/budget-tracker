@@ -50,7 +50,9 @@ async function removeTxn(id: number) {
 
 async function changeCategory(txn: Txn, category: string) {
   const moved = await recategorizeTxn(txn, category, remember.value)
-  ruleMessage.value = remember.value ? t('transactions.ruleSaved', { merchant: txn.merchant, count: moved }) : ''
+  ruleMessage.value = remember.value
+    ? t('transactions.ruleSaved', { merchant: txn.merchant, count: moved })
+    : ''
 }
 </script>
 
@@ -75,7 +77,7 @@ async function changeCategory(txn: Txn, category: string) {
         <input v-model="remember" type="checkbox" />
         {{ t('transactions.rememberRule') }}
       </label>
-      <p v-if="ruleMessage" class="text-sm text-success">{{ ruleMessage }}</p>
+      <p v-if="ruleMessage" class="text-success text-sm">{{ ruleMessage }}</p>
       <TransactionList
         :txns="sortedTxns"
         :categories="categories"
