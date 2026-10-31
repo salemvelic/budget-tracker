@@ -33,11 +33,17 @@ export interface SettingRow {
   value: string
 }
 
+/** Import hash of a deleted imported transaction, so re-imports don't bring it back. */
+export interface IgnoredImport {
+  importHash: string
+}
+
 class BudgetDatabase extends Dexie {
   txns!: Table<Txn, number>
   rules!: Table<CategoryRule, number>
   categories!: Table<Category, string>
   settings!: Table<SettingRow, string>
+  ignoredImports!: Table<IgnoredImport, string>
 
   constructor() {
     super('budget-tracker')
@@ -46,6 +52,9 @@ class BudgetDatabase extends Dexie {
       rules: '++id, pattern',
       categories: '&id',
       settings: '&key',
+    })
+    this.version(2).stores({
+      ignoredImports: '&importHash',
     })
   }
 }

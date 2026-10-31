@@ -7,6 +7,7 @@ import TransactionForm from '@/components/TransactionForm.vue'
 import TransactionList from '@/components/TransactionList.vue'
 import { useLiveQuery } from '@/composables/useLiveQuery'
 import { db, type Txn } from '@/db'
+import { deleteTxn } from '@/db/txns'
 import { monthKey, monthRange } from '@/domain/month'
 import type { TxnInput } from '@/domain/transactions'
 
@@ -39,7 +40,7 @@ async function saveTxn(input: TxnInput) {
 }
 
 async function removeTxn(id: number) {
-  await db.txns.delete(id)
+  await deleteTxn(id)
   if (editing.value?.id === id) {
     editing.value = null
   }

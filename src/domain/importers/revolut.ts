@@ -4,24 +4,16 @@ import { categorizeDescription } from '@/domain/categorize'
 import { parseHrAmount } from '@/domain/money'
 import {
   assignImportHashes,
-  type ParsedImportRow,
+  countSkip,
+  type ImportParseResult,
+  type ImportSkipped,
   type ParsedImportRowDraft,
 } from '@/domain/importers/types'
 
 const REQUIRED_COLUMNS = ['Type', 'State', 'Amount', 'Description'] as const
 const SPEND_TYPES = new Set(['CARD_PAYMENT', 'FEE'])
 const REFUND_TYPES = new Set(['CARD_REFUND'])
-
-export interface RevolutParseSkipped {
-  notCompleted: number
-  otherType: number
-  foreignCurrency: number
-}
-
-export interface RevolutParseResult {
-  rows: ParsedImportRow[]
-  skipped: RevolutParseSkipped
-}
+const CASH_TYPES = new Set(['ATM'])
 
 type CategorizeFn = (description: string) => string
 
@@ -35,28 +27,20 @@ function parseRevolutDate(raw: string): string | null {
 function parseFeeCents(feeRaw: string | undefined): number {
   if (!feeRaw?.trim()) return 0
   try {
-    const cents = parseHrAmount(feeRaw)
-    return Math.abs(cents)
+    return Math.abs(parseHrAmount(feeRaw))
   } catch {
     return 0
   }
 }
 
 function amountCentsForRow(type: string, amountRaw: string, feeRaw: string | undefined): number | null {
-  const trimmed = amountRaw.trim()
-  if (!trimmed) return null
-
   try {
-    const amountCents = parseHrAmount(trimmed)
-    const feeCents = parseFeeCents(feeRaw)
-
+    const amountCents = parseHrAmount(amountRaw)
     if (SPEND_TYPES.has(type)) {
-      if (amountCents >= 0) return null
-      return Math.abs(amountCents) + feeCents
+      return amountCents < 0 ? Math.abs(amountCents) + parseFeeCents(feeRaw) : null
     }
     if (REFUND_TYPES.has(type)) {
-      if (amountCents <= 0) return null
-      return -Math.abs(amountCents)
+      return amountCents > 0 ? -amountCents : null
     }
     return null
   } catch {
@@ -65,20 +49,15 @@ function amountCentsForRow(type: string, amountRaw: string, feeRaw: string | und
 }
 
 function assertRevolutHeaders(fields: string[] | undefined): void {
-  if (!fields?.length) {
+  if (!fields || REQUIRED_COLUMNS.some((column) => !fields.includes(column))) {
     throw new Error('csv.notRevolut')
-  }
-  for (const column of REQUIRED_COLUMNS) {
-    if (!fields.includes(column)) {
-      throw new Error('csv.notRevolut')
-    }
   }
 }
 
 export function parseRevolutCsv(
   csvText: string,
   categorize: CategorizeFn = categorizeDescription,
-): RevolutParseResult {
+): ImportParseResult {
   const { data, errors, meta } = Papa.parse<Record<string, string>>(csvText, {
     header: true,
     skipEmptyLines: true,
@@ -87,32 +66,28 @@ export function parseRevolutCsv(
   if (errors.length > 0) {
     throw new Error('csv.invalid')
   }
-
   assertRevolutHeaders(meta.fields)
 
-  const skipped: RevolutParseSkipped = {
-    notCompleted: 0,
-    otherType: 0,
-    foreignCurrency: 0,
-  }
+  const skipped: ImportSkipped = {}
   const drafts: ParsedImportRowDraft[] = []
 
   for (const row of data) {
-    const state = (row.State ?? '').trim().toUpperCase()
-    if (state !== 'COMPLETED') {
-      skipped.notCompleted += 1
+    if ((row.State ?? '').trim().toUpperCase() !== 'COMPLETED') {
+      countSkip(skipped, 'pending')
       continue
     }
-
-    const currency = (row.Currency ?? 'EUR').trim().toUpperCase()
-    if (currency !== 'EUR') {
-      skipped.foreignCurrency += 1
+    if ((row.Currency ?? 'EUR').trim().toUpperCase() !== 'EUR') {
+      countSkip(skipped, 'foreignCurrency')
       continue
     }
 
     const type = (row.Type ?? '').trim().toUpperCase()
+    if (CASH_TYPES.has(type)) {
+      countSkip(skipped, 'cash')
+      continue
+    }
     if (!SPEND_TYPES.has(type) && !REFUND_TYPES.has(type)) {
-      skipped.otherType += 1
+      countSkip(skipped, 'transfer')
       continue
     }
 
@@ -121,7 +96,7 @@ export function parseRevolutCsv(
     const amountCents = amountCentsForRow(type, row.Amount ?? '', row.Fee)
 
     if (!date || !merchant || amountCents == null || amountCents === 0) {
-      skipped.otherType += 1
+      countSkip(skipped, 'unparseable')
       continue
     }
 
