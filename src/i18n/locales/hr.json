@@ -64,6 +64,19 @@
       "form.invalid": "Provjeri unos."
     }
   },
+  "import": {
+    "errors": {
+      "invalid": "CSV datoteka nije valjana ili nije Revolut izvoz."
+    },
+    "revolut": {
+      "help": "Uvezi Revolut CSV izvoz (Account statement). Uvozimo samo završene transakcije s negativnim iznosom (potrošnja). Duplikati se preskaču.",
+      "fileLabel": "Odaberi CSV datoteku",
+      "previewCount": "{count} novih transakcija za uvoz",
+      "moreRows": "… i još {count} redaka",
+      "importButton": "Uvezi u bazu",
+      "done": "Uvezeno {count} transakcija."
+    }
+  },
   "settings": {
     "monthlyLimit": "Mjesečni limit potrošnje",
     "emergencyTarget": "Cilj hitnog fonda",

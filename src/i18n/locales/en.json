@@ -64,6 +64,19 @@
       "form.invalid": "Check your input."
     }
   },
+  "import": {
+    "errors": {
+      "invalid": "The file is not a valid Revolut CSV export."
+    },
+    "revolut": {
+      "help": "Import a Revolut CSV account statement. Only completed outflows (negative amounts) are imported. Duplicates are skipped.",
+      "fileLabel": "Choose CSV file",
+      "previewCount": "{count} new transactions to import",
+      "moreRows": "… and {count} more rows",
+      "importButton": "Import into database",
+      "done": "Imported {count} transactions."
+    }
+  },
   "settings": {
     "monthlyLimit": "Monthly spending limit",
     "emergencyTarget": "Emergency fund target",
