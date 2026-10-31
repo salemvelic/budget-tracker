@@ -56,6 +56,13 @@ class BudgetDatabase extends Dexie {
     this.version(2).stores({
       ignoredImports: '&importHash',
     })
+    this.version(3)
+      .stores({})
+      .upgrade(async (tx) => {
+        const categories = tx.table<Category, string>('categories')
+        const known = new Set(await categories.toCollection().primaryKeys())
+        await categories.bulkPut(DEFAULT_CATEGORIES.filter((category) => !known.has(category.id)))
+      })
   }
 }
 

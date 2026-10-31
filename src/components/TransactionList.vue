@@ -16,6 +16,12 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
+function confirmRemove(txn: Txn) {
+  if (txn.id != null && window.confirm(t('transactions.confirmDelete', { merchant: txn.merchant }))) {
+    emit('remove', txn.id)
+  }
+}
+
 function categoryLabel(categories: Category[], id: string) {
   const category = categories.find((item) => item.id === id)
   return category ? t(category.nameKey) : id
@@ -51,7 +57,7 @@ function categoryLabel(categories: Category[], id: string) {
         <button
           type="button"
           class="rounded-lg border border-border px-3 py-1.5 text-sm text-danger"
-          @click="txn.id != null && emit('remove', txn.id)"
+          @click="confirmRemove(txn)"
         >
           {{ t('common.delete') }}
         </button>

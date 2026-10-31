@@ -3,6 +3,7 @@ import type { Category } from '@/db'
 export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'food', nameKey: 'categories.food' },
   { id: 'fuel', nameKey: 'categories.fuel' },
+  { id: 'transport', nameKey: 'categories.transport' },
   { id: 'utilities', nameKey: 'categories.utilities' },
   { id: 'shopping', nameKey: 'categories.shopping' },
   { id: 'subscriptions', nameKey: 'categories.subscriptions' },

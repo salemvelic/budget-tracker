@@ -14,6 +14,7 @@ function keys(obj: object, prefix = ''): string[] {
 const ERROR_CODES = {
   transactions: ['amount.empty', 'amount.invalid', 'date.invalid', 'merchant.empty', 'category.empty'],
   import: ['csv.invalid', 'csv.notRevolut', 'import.failed', 'pdf.noText', 'pdf.unknown', 'empty'],
+  'settings.rules': ['rule.empty', 'rule.invalid'],
 }
 
 describe('locales', () => {
