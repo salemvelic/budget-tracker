@@ -13,11 +13,14 @@ const props = defineProps<{
   preview: ParsedImportRow[]
   skipped: ImportSkipped
   importing: boolean
+  excluded: Set<string>
+  duplicateHints: Map<string, string>
 }>()
 
 const emit = defineEmits<{
   import: []
   setCategory: [index: number, category: string]
+  toggleInclude: [importHash: string, include: boolean]
 }>()
 
 const { t, locale } = useI18n()
@@ -26,6 +29,10 @@ const categories = useLiveQuery(() => db.categories.toArray(), [] as Category[])
 
 const skippedEntries = computed(() =>
   (Object.entries(props.skipped) as [SkipReason, number][]).filter(([, count]) => count > 0),
+)
+
+const includeCount = computed(
+  () => props.preview.filter((row) => !props.excluded.has(row.importHash)).length,
 )
 </script>
 
@@ -47,9 +54,32 @@ const skippedEntries = computed(() =>
         class="flex flex-col gap-2 px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between"
       >
         <span class="min-w-0 break-words">
-          <span class="text-muted tabular-nums">{{ formatIsoDate(row.date, locale) }}</span>
-          · {{ row.merchant }}
-          <span v-if="row.note" class="text-muted">({{ row.note }})</span>
+          <label class="flex items-start gap-2">
+            <input
+              type="checkbox"
+              class="mt-1"
+              :checked="!excluded.has(row.importHash)"
+              @change="
+                emit(
+                  'toggleInclude',
+                  row.importHash,
+                  ($event.target as HTMLInputElement).checked,
+                )
+              "
+            />
+            <span>
+              <span class="text-muted tabular-nums">{{ formatIsoDate(row.date, locale) }}</span>
+              · {{ row.merchant }}
+              <span v-if="row.note" class="text-muted">({{ row.note }})</span>
+              <span v-if="duplicateHints.get(row.importHash)" class="text-warning block text-xs">
+                {{
+                  t('import.possibleDuplicate', {
+                    merchant: duplicateHints.get(row.importHash),
+                  })
+                }}
+              </span>
+            </span>
+          </label>
         </span>
         <span class="flex shrink-0 items-center gap-2">
           <CategorySelect
@@ -68,7 +98,7 @@ const skippedEntries = computed(() =>
     <button
       type="button"
       class="bg-brand text-brand-foreground rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
-      :disabled="importing"
+      :disabled="importing || includeCount === 0"
       @click="emit('import')"
     >
       {{ t('import.importButton') }}

@@ -28,6 +28,15 @@ export function backupFileName(now: Date = new Date()): string {
   return `budget-tracker-backup-${now.toISOString().slice(0, 10)}.json`
 }
 
+const BACKUP_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000
+
+/** True when there is data and no backup in the last 30 days (or never). */
+export function backupDue(lastBackupAt: number, txnCount: number, now = Date.now()): boolean {
+  if (txnCount === 0) return false
+  if (lastBackupAt === 0) return true
+  return now - lastBackupAt > BACKUP_INTERVAL_MS
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value != null && !Array.isArray(value)
 }

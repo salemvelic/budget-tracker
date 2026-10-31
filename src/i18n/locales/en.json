@@ -55,7 +55,9 @@
     "byCategory": "By category",
     "showSubcategories": "Show subcategories: {category}",
     "showExpenses": "Show expenses: {category}",
-    "noExpenses": "No expenses in this category."
+    "noExpenses": "No expenses in this category.",
+    "backupDue": "No backup in the last 30 days.",
+    "backupDueLink": "Export in Settings"
   },
   "transactions": {
     "empty": "No transactions for the selected month.",
@@ -102,6 +104,9 @@
     "previewHelp": "You can change categories before importing.",
     "fileResult": "{name}: {kind}",
     "importButton": "Import into database",
+    "includeRow": "Import",
+    "possibleDuplicate": "Possible duplicate: {merchant}",
+    "backupReminder": "Make a backup.",
     "done": "Imported {count} transactions.",
     "skippedHeading": "Not imported",
     "detected": {

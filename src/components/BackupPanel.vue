@@ -27,6 +27,7 @@ async function exportBackup() {
   link.download = backupFileName()
   link.click()
   URL.revokeObjectURL(url)
+  await settingsStore.save({ lastBackupAt: Date.now() })
   message.value = { kind: 'success', key: 'settings.backup.exported' }
 }
 

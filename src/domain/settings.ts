@@ -4,19 +4,22 @@ export interface AppSettings {
   monthlyLimitCents: number
   emergencyTargetCents: number
   emergencySavedCents: number
+  lastBackupAt: number
 }
 
 export const SETTINGS_KEYS = {
   monthlyLimitCents: 'monthlyLimitCents',
   emergencyTargetCents: 'emergencyTargetCents',
   emergencySavedCents: 'emergencySavedCents',
+  lastBackupAt: 'lastBackupAt',
 } as const satisfies Record<keyof AppSettings, string>
 
 /** Generic demo defaults — not personal financial data. */
 export const DEFAULT_SETTINGS: AppSettings = {
-  monthlyLimitCents: 60_000,
+  monthlyLimitCents: 0,
   emergencyTargetCents: 300_000,
   emergencySavedCents: 0,
+  lastBackupAt: 0,
 }
 
 export function validateSettings(input: Partial<AppSettings>): AppSettings {
