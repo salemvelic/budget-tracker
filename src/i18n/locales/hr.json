@@ -63,7 +63,11 @@
     "incomeSaved": "Ušteđeno",
     "incomeSavingsRate": "Stopa štednje",
     "incomeNet": "Neto (priljevi − potrošnja − štednja)",
-    "trendLine": "prošli mj. {last} · prosjek 3 mj. {avg}"
+    "trendLine": "prošli mj. {last} · prosjek 3 mj. {avg}",
+    "recurringHeading": "Ponavljajuća plaćanja",
+    "recurringPaid": "plaćeno {amount}",
+    "recurringPending": "još nije · tipično {amount}",
+    "recurringTotal": "tipično {amount}/mj."
   },
   "transactions": {
     "empty": "Nema transakcija za odabrani mjesec.",
