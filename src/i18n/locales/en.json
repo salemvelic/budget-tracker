@@ -54,6 +54,14 @@
       "add": "Add",
       "update": "Save changes",
       "invalid": "Check your input."
+    },
+    "errors": {
+      "amount.empty": "Enter an amount.",
+      "amount.invalid": "Amount is not valid.",
+      "date.invalid": "Date is not valid.",
+      "merchant.empty": "Enter a merchant or description.",
+      "category.empty": "Choose a category.",
+      "form.invalid": "Check your input."
     }
   },
   "settings": {

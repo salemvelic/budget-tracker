@@ -16,10 +16,14 @@ const editing = ref<Txn | null>(null)
 
 const categories = useLiveQuery(() => db.categories.toArray(), [])
 
-const txns = useLiveQuery(async () => {
-  const { start, end } = monthRange(selectedMonth.value)
-  return db.txns.where('date').between(start, end, true, true).sortBy('date')
-}, [])
+const txns = useLiveQuery(
+  async () => {
+    const { start, end } = monthRange(selectedMonth.value)
+    return db.txns.where('date').between(start, end, true, true).sortBy('date')
+  },
+  [],
+  selectedMonth,
+)
 
 const sortedTxns = computed(() =>
   [...txns.value].sort((a, b) => b.date.localeCompare(a.date) || (b.id ?? 0) - (a.id ?? 0)),
