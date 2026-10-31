@@ -119,13 +119,9 @@ export function parseRevolutPdfLines(
       countSkip(skipped, 'unparseable')
       return
     }
-    if (CASH_RE.test(desc)) {
-      countSkip(skipped, 'cash')
-      return
-    }
-
+    const isCash = CASH_RE.test(desc)
     const isFee = !row.card && outflow > 0 && FEE_RE.test(desc)
-    if (!row.card && !isFee) {
+    if (!row.card && !isCash && !isFee) {
       countSkip(skipped, 'transfer')
       return
     }
@@ -135,7 +131,7 @@ export function parseRevolutPdfLines(
       amountCents: outflow,
       merchant: desc,
       source: 'revolut',
-      category: isFee ? 'subscriptions' : categorize(desc),
+      category: isCash ? 'cash' : isFee ? 'subscriptions' : categorize(desc),
     })
   }
 

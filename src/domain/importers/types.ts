@@ -20,7 +20,6 @@ export type SkipReason =
   | 'reversed'
   | 'foreignCurrency'
   | 'transfer'
-  | 'cash'
   | 'payment'
   | 'unparseable'
 

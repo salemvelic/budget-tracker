@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import ImportPreview from '@/components/ImportPreview.vue'
@@ -8,15 +8,10 @@ import { filterNewImportRows, importParsedRows } from '@/db/importRows'
 import { db, type CategoryRule } from '@/db'
 import { categorizeDescription, DEFAULT_CATEGORY_RULES } from '@/domain/categorize'
 import { parsePdfStatement, type PdfStatementKind } from '@/domain/importers/pdfStatement'
-import { parseRevolutCsv } from '@/domain/importers/revolut'
 import type { ImportParseResult, ImportSkipped, ParsedImportRow } from '@/domain/importers/types'
-
-type FileKind = 'csv' | 'pdf'
 
 const { t, te } = useI18n()
 
-const fileInput = ref<HTMLInputElement | null>(null)
-const fileKind = ref<FileKind>('pdf')
 const errorCode = ref('')
 const fileName = ref('')
 const detected = ref<PdfStatementKind | null>(null)
@@ -47,14 +42,7 @@ function reset() {
   allAlreadyImported.value = false
 }
 
-watch(fileKind, () => {
-  reset()
-  fileName.value = ''
-  if (fileInput.value) fileInput.value.value = ''
-})
-
 async function parseFile(file: File): Promise<ImportParseResult> {
-  if (fileKind.value === 'csv') return parseRevolutCsv(await file.text(), categorize)
   const { extractPdfLines } = await import('@/services/pdfText')
   const result = parsePdfStatement(await extractPdfLines(file), categorize)
   detected.value = result.kind
@@ -102,27 +90,12 @@ async function runImport() {
 <template>
   <div class="space-y-6">
     <section class="rounded-xl border border-border bg-surface-muted p-6">
-      <fieldset class="space-y-3">
-        <legend class="text-sm font-medium">{{ t('import.sourceLegend') }}</legend>
-        <label class="mr-4 inline-flex items-center gap-2 text-sm">
-          <input v-model="fileKind" type="radio" value="pdf" />
-          {{ t('import.sources.pdf') }}
-        </label>
-        <label class="inline-flex items-center gap-2 text-sm">
-          <input v-model="fileKind" type="radio" value="csv" />
-          {{ t('import.sources.csv') }}
-        </label>
-      </fieldset>
-
-      <p class="mt-4 mb-4 text-sm text-muted">
-        {{ fileKind === 'pdf' ? t('import.help.pdf') : t('import.help.csv') }}
-      </p>
+      <p class="mb-4 text-sm text-muted">{{ t('import.help') }}</p>
       <label class="block text-sm font-medium">
         {{ t('import.fileLabel') }}
         <input
-          ref="fileInput"
           type="file"
-          :accept="fileKind === 'csv' ? '.csv,text/csv' : '.pdf,application/pdf'"
+          accept=".pdf,application/pdf"
           :disabled="busy"
           class="mt-2 block w-full text-sm"
           @change="onFileChange"

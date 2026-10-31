@@ -24,6 +24,7 @@
     "utilities": "Utilities",
     "shopping": "Shopping",
     "subscriptions": "Subscriptions",
+    "cash": "Cash",
     "other": "Other"
   },
   "dashboard": {
@@ -70,7 +71,6 @@
     }
   },
   "import": {
-    "sourceLegend": "File type",
     "fileLabel": "Choose file",
     "reading": "Reading file…",
     "allAlreadyImported": "All transactions from this file are already imported.",
@@ -79,34 +79,22 @@
     "importButton": "Import into database",
     "done": "Imported {count} transactions.",
     "skippedHeading": "Not imported",
-    "sources": {
-      "pdf": "PDF statement (Erste card or Revolut)",
-      "csv": "Revolut CSV"
-    },
     "detected": {
       "erste": "Erste card statement",
       "revolut": "Revolut statement"
     },
-    "help": {
-      "pdf": "Choose an Erste card statement or a Revolut account statement PDF; the type is detected automatically. Card payments, fees and refunds are imported. Top-ups, transfers, investments, cash withdrawals and card bill payments are skipped.",
-      "csv": "Revolut CSV export. Imports card payments, fees and refunds in EUR; transfers and top-ups are skipped."
-    },
+    "help": "Choose a PDF: an Erste card statement or a Revolut account statement; the type is detected automatically. Card payments, cash withdrawals (Cash category), fees and refunds are imported. Top-ups, transfers, investments and card bill payments are skipped.",
     "skipReasons": {
       "pending": "Pending",
       "reversed": "Reversed",
       "foreignCurrency": "Other currency accounts",
       "transfer": "Top-ups, transfers and investments",
-      "cash": "Cash withdrawals",
       "payment": "Card bill payments",
       "unparseable": "Unrecognised rows"
     },
     "errors": {
       "invalid": "The file is not valid.",
       "empty": "No transactions to import from this file.",
-      "csv": {
-        "invalid": "Invalid CSV.",
-        "notRevolut": "Not a Revolut CSV export."
-      },
       "import": { "failed": "Import failed. Try again." },
       "pdf": {
         "noText": "PDF has no text layer (scan). Import is not possible.",
