@@ -6,12 +6,12 @@ type Rule = Pick<CategoryRule, 'pattern' | 'category'>
 export const DEFAULT_CATEGORY_RULES: Rule[] = [
   {
     pattern:
-      "restoran|restaurant|\\p{L}*pizz\\p{L}*|bistro|konoba|street food|burger|kebab|mcdonald's|wolt|glovo",
+      "restoran|restaurant|\\p{L}*pizz\\p{L}*|bistro|konoba|street food|burger|kebab|mcdonald's|wolt|glovo|mirni kuti[ćc]",
     category: 'restaurants',
   },
   {
     pattern:
-      'konzum|superkonzum|lidl|plodine|spar|interspar|eurospar|kaufland|studenac|tommy|ribola|billa|carrefour|profi|mega image|mlinar|pekara|orchard|grocers|trgovina krk|bakmaz|korzinka',
+      'konzum|superkonzum|lidl|plodine|spar|interspar|eurospar|kaufland|studenac|tommy|ribola|billa|carrefour|profi|mega image|mlinar|pekara|dubravica|kort marketi|kort|orchard|grocers|trgovina krk|bakmaz|korzinka',
     category: 'groceries',
   },
   {
