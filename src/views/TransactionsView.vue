@@ -20,6 +20,7 @@ const remember = ref(true)
 const ruleMessage = ref('')
 
 const pendingRule = ref<{ merchant: string; category: string } | null>(null)
+const ruleSaveCategory = ref('')
 const rulePattern = ref('')
 const ruleAttempted = ref(false)
 
@@ -45,13 +46,12 @@ const ruleError = computed(() => {
 })
 
 async function saveTxn(input: TxnInput) {
-  const payload = { ...input, categoryLocked: true as const }
   if (editing.value?.id != null) {
-    await db.txns.update(editing.value.id, payload)
+    await db.txns.update(editing.value.id, { ...input, categoryLocked: true })
     editing.value = null
     return
   }
-  await db.txns.add(payload)
+  await db.txns.add(input)
 }
 
 async function removeTxn(id: number) {
@@ -67,9 +67,15 @@ async function changeCategory(txn: Txn, category: string) {
   await recategorizeTxn(txn, category)
   if (remember.value) {
     pendingRule.value = { merchant: txn.merchant, category }
+    ruleSaveCategory.value = category
     rulePattern.value = suggestedRulePattern(txn.merchant)
     ruleAttempted.value = false
   }
+}
+
+function onRuleCategoryChange(category: string) {
+  if (pendingRule.value) pendingRule.value = { ...pendingRule.value, category }
+  ruleSaveCategory.value = category
 }
 
 async function confirmRule() {
@@ -77,7 +83,7 @@ async function confirmRule() {
   ruleAttempted.value = true
   if (validateRulePattern(rulePattern.value)) return
   try {
-    const count = await saveRuleAndApply(rulePattern.value, pendingRule.value.category)
+    const count = await saveRuleAndApply(rulePattern.value, ruleSaveCategory.value)
     ruleMessage.value = t('transactions.ruleSaved', {
       merchant: pendingRule.value.merchant,
       count,
@@ -130,9 +136,10 @@ function cancelRule() {
             />
           </label>
           <CategorySelect
-            v-model="pendingRule.category"
+            :model-value="pendingRule.category"
             :categories="categories"
             class="border-border bg-surface rounded-lg border px-3 py-2"
+            @update:model-value="onRuleCategoryChange"
           />
           <button
             type="button"
