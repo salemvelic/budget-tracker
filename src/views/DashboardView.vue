@@ -16,7 +16,8 @@ import { db, type Category, type Txn, type TxnSource } from '@/db'
 import { latestImportDates } from '@/db/txns'
 import { rollupTotals, spendingCategories, topLevelId } from '@/domain/categories'
 import { isSameMerchant } from '@/domain/categorize'
-import { backupDue } from '@/domain/backup'
+import { readBackupData } from '@/db/backup'
+import { backupDue, buildBackup } from '@/domain/backup'
 import { monthCoverage } from '@/domain/coverage'
 import { formatEur } from '@/domain/money'
 import {
@@ -30,6 +31,7 @@ import {
 import { monthPlan } from '@/domain/plan'
 import { categoryTrends, previousMonthTotals } from '@/domain/trends'
 import { totalsByCategory, totalsByMerchant } from '@/domain/transactions'
+import { saveBackupToFile } from '@/services/backupFile'
 import { useSettingsStore } from '@/stores/settings'
 
 const { t, locale } = useI18n()
@@ -176,6 +178,13 @@ const remainingClass = computed(() => {
   if (remainingCents < 0) return 'text-danger'
   return remainingCents < limitCents * 0.1 ? 'text-warning' : 'text-success'
 })
+
+async function backupNow() {
+  const json = JSON.stringify(buildBackup(await readBackupData()), null, 2)
+  await saveBackupToFile(json)
+  await settingsStore.save({ lastBackupAt: Date.now() })
+  backupBannerDismissed.value = true
+}
 </script>
 
 <template>
@@ -189,6 +198,9 @@ const remainingClass = computed(() => {
     >
       <p class="min-w-0 flex-1">
         {{ t('dashboard.backupDue') }}
+        <button type="button" class="text-brand ml-1 underline" @click="backupNow">
+          {{ t('dashboard.backupNow') }}
+        </button>
         <RouterLink to="/settings" class="text-brand ml-1 underline">{{
           t('dashboard.backupDueLink')
         }}</RouterLink>

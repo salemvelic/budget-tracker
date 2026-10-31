@@ -3,32 +3,57 @@ import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { readBackupData, restoreBackupData } from '@/db/backup'
-import { backupFileName, buildBackup, parseBackup } from '@/domain/backup'
+import { buildBackup, parseBackup } from '@/domain/backup'
+import {
+  backupFileLabel,
+  chooseBackupFile,
+  saveBackupToFile,
+  supportsBackupFilePicker,
+} from '@/services/backupFile'
 import { useSettingsStore } from '@/stores/settings'
 
 const { t } = useI18n()
 const settingsStore = useSettingsStore()
 
 const persisted = ref<boolean | null>(null)
-const message = ref<{ kind: 'success' | 'danger'; key: string } | null>(null)
+const message = ref<{
+  kind: 'success' | 'danger'
+  key: string
+  params?: Record<string, string>
+} | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
+const targetFile = ref<string | null>(null)
+
+async function refreshFileLabel() {
+  targetFile.value = supportsBackupFilePicker() ? await backupFileLabel() : null
+}
 
 onMounted(async () => {
   persisted.value = (await navigator.storage?.persisted?.()) ?? null
+  await refreshFileLabel()
 })
 
 async function exportBackup() {
-  const file = buildBackup(await readBackupData())
-  const url = URL.createObjectURL(
-    new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' }),
-  )
-  const link = document.createElement('a')
-  link.href = url
-  link.download = backupFileName()
-  link.click()
-  URL.revokeObjectURL(url)
+  const json = JSON.stringify(buildBackup(await readBackupData()), null, 2)
+  const mode = await saveBackupToFile(json)
   await settingsStore.save({ lastBackupAt: Date.now() })
-  message.value = { kind: 'success', key: 'settings.backup.exported' }
+  await refreshFileLabel()
+  message.value = {
+    kind: 'success',
+    key: mode === 'file' ? 'settings.backup.savedToFile' : 'settings.backup.exported',
+    params: mode === 'file' && targetFile.value ? { name: targetFile.value } : undefined,
+  }
+}
+
+async function changeBackupFile() {
+  if (await chooseBackupFile()) {
+    await refreshFileLabel()
+    message.value = {
+      kind: 'success',
+      key: 'settings.backup.fileTarget',
+      params: targetFile.value ? { name: targetFile.value } : undefined,
+    }
+  }
 }
 
 async function onRestoreFile(event: Event) {
@@ -54,6 +79,12 @@ async function onRestoreFile(event: Event) {
     <div>
       <h2 class="font-semibold">{{ t('settings.backup.heading') }}</h2>
       <p class="text-muted mt-1 text-sm">{{ t('settings.backup.help') }}</p>
+      <p v-if="targetFile" class="text-muted mt-1 text-xs">
+        {{ t('settings.backup.fileTarget', { name: targetFile }) }}
+        <button type="button" class="text-brand ml-1 underline" @click="changeBackupFile">
+          {{ t('settings.backup.changeFile') }}
+        </button>
+      </p>
     </div>
     <div class="flex flex-wrap gap-3">
       <button
@@ -83,7 +114,7 @@ async function onRestoreFile(event: Event) {
       class="text-sm"
       :class="message.kind === 'success' ? 'text-success' : 'text-danger'"
     >
-      {{ t(message.key) }}
+      {{ message.params ? t(message.key, message.params) : t(message.key) }}
     </p>
     <p v-if="persisted != null" class="text-muted text-xs">
       {{ persisted ? t('settings.backup.persisted') : t('settings.backup.notPersisted') }}
