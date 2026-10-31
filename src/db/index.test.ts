@@ -93,4 +93,33 @@ describe('schema upgrades', () => {
     expect(await db.categories.get('bars')).toMatchObject({ parentId: 'going_out' })
     expect(await db.categories.get('food')).toMatchObject({ budgetCents: 30000 })
   })
+
+  it('recategorizes other rows when upgrading through v8', async () => {
+    db.close()
+    await Dexie.delete('budget-tracker')
+    const v6 = new Dexie('budget-tracker')
+    v6.version(6).stores({
+      txns: '++id, date, category, source, &importHash',
+      rules: '++id, pattern',
+      categories: '&id',
+      settings: '&key',
+      ignoredImports: '&importHash',
+    })
+    await v6.open()
+    await v6.table('categories').bulkAdd([
+      { id: 'other', nameKey: 'categories.other' },
+      { id: 'travel', nameKey: 'categories.travel' },
+    ])
+    await v6.table('txns').add({
+      date: '2026-10-01',
+      amountCents: 500,
+      merchant: 'STB Bucuresti',
+      source: 'revolut',
+      category: 'other',
+    })
+    v6.close()
+
+    await db.open()
+    expect((await db.txns.toArray())[0]?.category).toBe('travel')
+  })
 })

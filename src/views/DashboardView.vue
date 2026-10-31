@@ -143,8 +143,18 @@ const remainingClass = computed(() => {
           <span class="text-foreground tabular-nums">{{ formatEur(plan.flexibleLeftCents) }}</span>
         </p>
         <p v-if="isCurrentMonth" class="mt-2 text-sm text-muted">
-          {{ t('dashboard.dailyAllowance') }}:
-          <span class="text-foreground tabular-nums">{{ formatEur(dailyCents) }}</span>
+          <template v-if="plan.limitCents === 0">
+            {{ t('dashboard.noLimitHint') }}
+          </template>
+          <template v-else-if="plan.flexibleLeftCents < 0">
+            <span class="text-danger">
+              {{ t('dashboard.variableOver', { amount: formatEur(Math.abs(plan.flexibleLeftCents)) }) }}
+            </span>
+          </template>
+          <template v-else>
+            {{ t('dashboard.dailyAllowance') }}:
+            <span class="text-foreground tabular-nums">{{ formatEur(dailyCents) }}</span>
+          </template>
         </p>
       </article>
     </section>

@@ -113,6 +113,17 @@ class BudgetDatabase extends Dexie {
             if (next) txn.category = next
           })
       })
+    this.version(8)
+      .stores({})
+      .upgrade(async (tx) => {
+        await tx
+          .table<Txn, number>('txns')
+          .toCollection()
+          .modify((txn) => {
+            const next = subcategoryUpgrade(txn)
+            if (next) txn.category = next
+          })
+      })
   }
 }
 

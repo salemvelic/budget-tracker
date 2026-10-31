@@ -71,4 +71,8 @@ describe('dailyAllowanceCents', () => {
   it('never divides by zero', () => {
     expect(dailyAllowanceCents(10_000, 5_000, new Date(2026, 9, 31))).toBe(5_000)
   })
+
+  it('returns zero when overspent', () => {
+    expect(dailyAllowanceCents(10_000, 15_000, new Date(2026, 9, 15))).toBe(0)
+  })
 })
