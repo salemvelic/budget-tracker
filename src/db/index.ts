@@ -48,12 +48,19 @@ export interface IgnoredImport {
   importHash: string
 }
 
+/** Persisted File System Access handle for incremental backup writes. */
+export interface StoredFileHandle {
+  key: string
+  handle: FileSystemFileHandle
+}
+
 class BudgetDatabase extends Dexie {
   txns!: Table<Txn, number>
   rules!: Table<CategoryRule, number>
   categories!: Table<Category, string>
   settings!: Table<SettingRow, string>
   ignoredImports!: Table<IgnoredImport, string>
+  fileHandles!: Table<StoredFileHandle, string>
 
   constructor() {
     super('budget-tracker')
@@ -147,6 +154,9 @@ class BudgetDatabase extends Dexie {
           })
         }
       })
+    this.version(11).stores({
+      fileHandles: '&key',
+    })
   }
 }
 
