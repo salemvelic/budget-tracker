@@ -26,6 +26,8 @@ const LINES: TextLine[] = [
   card,
   [c(43, '4. lis 2026.'), c(125, 'Demo Taxi'), c(417, '2,40€'), c(526, '78,38€')],
   card,
+  [c(43, '4. lis 2026.'), c(125, 'ATM Demo Bank'), c(417, '20,00€'), c(526, '98,38€')],
+  card,
   [c(43, '5. lis 2026.'), c(125, 'Naknada za Premium plan'), c(335, '9,99€'), c(531, '67,92€')],
   [c(43, '6. lis 2026.'), c(125, 'Demo Shop 7,92€'), c(531, '60,00€')],
   card,
@@ -44,18 +46,19 @@ describe('isRevolutStatement', () => {
 describe('parseRevolutPdfLines', () => {
   const { rows, skipped } = parseRevolutPdfLines(LINES)
 
-  it('imports card spend, card refunds and plan fees', () => {
-    expect(rows.map((r) => [r.date, r.merchant, r.amountCents])).toEqual([
-      ['2026-10-02', 'Demo Grocers', 101250],
-      ['2026-10-04', 'Demo Taxi', -240],
-      ['2026-10-05', 'Naknada za Premium plan', 999],
-      ['2026-10-06', 'Demo Shop', 792],
+  it('imports card spend, cash withdrawals, card refunds and plan fees', () => {
+    expect(rows.map((r) => [r.date, r.merchant, r.amountCents, r.category])).toEqual([
+      ['2026-10-02', 'Demo Grocers', 101250, 'food'],
+      ['2026-10-03', 'Podizanje gotovine na lokaciji: Demo 1', 5100, 'cash'],
+      ['2026-10-04', 'Demo Taxi', -240, 'transport'],
+      ['2026-10-04', 'ATM Demo Bank', -2000, 'cash'],
+      ['2026-10-05', 'Naknada za Premium plan', 999, 'subscriptions'],
+      ['2026-10-06', 'Demo Shop', 792, 'other'],
     ])
-    expect(rows[2]?.category).toBe('subscriptions')
     expect(rows[0]?.source).toBe('revolut')
   })
 
-  it('skips top-ups, investments, cash, pending and reversed rows', () => {
-    expect(skipped).toEqual({ pending: 1, transfer: 2, cash: 1, reversed: 1 })
+  it('skips top-ups, investments, pending and reversed rows', () => {
+    expect(skipped).toEqual({ pending: 1, transfer: 2, reversed: 1 })
   })
 })

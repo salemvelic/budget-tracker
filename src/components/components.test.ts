@@ -58,11 +58,11 @@ describe('TransactionList', () => {
 describe('ImportPreview', () => {
   it('lists skip reasons with counts', () => {
     const wrapper = mount(ImportPreview, {
-      props: { preview: [], skipped: { transfer: 4, cash: 2, pending: 0 }, importing: false },
+      props: { preview: [], skipped: { transfer: 4, payment: 2, pending: 0 }, importing: false },
       global,
     })
     expect(wrapper.text()).toContain('Nadoplate, prijenosi i ulaganja: 4')
-    expect(wrapper.text()).toContain('Podizanje gotovine: 2')
+    expect(wrapper.text()).toContain('Uplate za karticu: 2')
     expect(wrapper.text()).not.toContain('Na čekanju')
   })
 })

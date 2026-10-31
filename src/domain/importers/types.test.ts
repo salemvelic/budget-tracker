@@ -35,8 +35,8 @@ describe('dedupeWithinBatch', () => {
 describe('countSkip', () => {
   it('increments per reason', () => {
     const skipped: ImportSkipped = {}
-    countSkip(skipped, 'cash')
-    countSkip(skipped, 'cash')
-    expect(skipped).toEqual({ cash: 2 })
+    countSkip(skipped, 'transfer')
+    countSkip(skipped, 'transfer')
+    expect(skipped).toEqual({ transfer: 2 })
   })
 })

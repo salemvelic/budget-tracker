@@ -24,6 +24,7 @@
     "utilities": "Režije",
     "shopping": "Kupovine",
     "subscriptions": "Pretplate",
+    "cash": "Gotovina",
     "other": "Ostalo"
   },
   "dashboard": {
@@ -70,7 +71,6 @@
     }
   },
   "import": {
-    "sourceLegend": "Vrsta datoteke",
     "fileLabel": "Odaberi datoteku",
     "reading": "Čitam datoteku…",
     "allAlreadyImported": "Sve transakcije iz datoteke su već u bazi.",
@@ -79,34 +79,22 @@
     "importButton": "Uvezi u bazu",
     "done": "Uvezeno {count} transakcija.",
     "skippedHeading": "Nije uvezeno",
-    "sources": {
-      "pdf": "PDF izvod (Erste kartica ili Revolut)",
-      "csv": "Revolut CSV"
-    },
     "detected": {
       "erste": "Erste obavijest o troškovima",
       "revolut": "Revolut izvadak"
     },
-    "help": {
-      "pdf": "Odaberi Erste obavijest o troškovima kartice ili Revolut izvadak računa. Vrsta se prepoznaje automatski. Uvoze se kartična plaćanja, naknade i povrati. Nadoplate, prijenosi, ulaganja, podizanje gotovine i uplate za karticu se preskaču.",
-      "csv": "Revolut CSV izvoz. Uvoze se kartična plaćanja, naknade i povrati u eurima; prijenosi i nadoplate se preskaču."
-    },
+    "help": "Odaberi PDF: Erste obavijest o troškovima kartice ili Revolut izvadak računa. Vrsta se prepoznaje automatski. Uvoze se kartična plaćanja, podizanje gotovine (kategorija Gotovina), naknade i povrati. Nadoplate, prijenosi, ulaganja i uplate za karticu se preskaču.",
     "skipReasons": {
       "pending": "Na čekanju",
       "reversed": "Stornirano",
       "foreignCurrency": "Računi u drugim valutama",
       "transfer": "Nadoplate, prijenosi i ulaganja",
-      "cash": "Podizanje gotovine",
       "payment": "Uplate za karticu",
       "unparseable": "Neprepoznati redci"
     },
     "errors": {
       "invalid": "Datoteka nije valjana.",
       "empty": "Nema transakcija za uvoz iz ove datoteke.",
-      "csv": {
-        "invalid": "CSV nije valjan.",
-        "notRevolut": "Datoteka nije Revolut CSV izvoz."
-      },
       "import": { "failed": "Uvoz nije uspio. Pokušaj ponovno." },
       "pdf": {
         "noText": "PDF nema tekstualni sloj (sken). Uvoz nije moguć.",
