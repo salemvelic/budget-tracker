@@ -56,6 +56,7 @@
     "noExpenses": "Nema troškova u ovoj kategoriji.",
     "backupDue": "Nema sigurnosne kopije u zadnjih 30 dana.",
     "backupDueLink": "Izvezi u Postavkama",
+    "backupDueDismiss": "Zatvori upozorenje",
     "incomeHeading": "Priljevi i štednja",
     "incomeTotal": "Priljevi",
     "incomeSpent": "Potrošeno",

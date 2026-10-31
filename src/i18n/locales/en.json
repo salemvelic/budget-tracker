@@ -56,6 +56,7 @@
     "noExpenses": "No expenses in this category.",
     "backupDue": "No backup in the last 30 days.",
     "backupDueLink": "Export in Settings",
+    "backupDueDismiss": "Dismiss warning",
     "incomeHeading": "Income & savings",
     "incomeTotal": "Income",
     "incomeSpent": "Spent",

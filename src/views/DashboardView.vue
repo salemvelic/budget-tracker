@@ -38,6 +38,7 @@ const expandedId = ref<string | null>(null)
 const openListId = ref<string | null>(null)
 const savingsOpen = ref(false)
 const openSavingsMerchant = ref<string | null>(null)
+const backupBannerDismissed = ref(false)
 const isCurrentMonth = computed(() => selectedMonth.value === monthKey())
 
 watch(selectedMonth, () => {
@@ -191,15 +192,26 @@ const remainingClass = computed(() => {
   <div class="space-y-6">
     <MonthPicker v-model="selectedMonth" />
 
-    <p
-      v-if="showBackupDue"
-      class="text-warning border-warning/30 bg-surface-muted rounded-xl border p-4 text-sm"
+    <div
+      v-if="showBackupDue && !backupBannerDismissed"
+      class="text-warning border-warning/30 bg-surface-muted flex gap-3 rounded-xl border p-4 text-sm"
+      role="status"
     >
-      {{ t('dashboard.backupDue') }}
-      <RouterLink to="/settings" class="text-brand ml-1 underline">{{
-        t('dashboard.backupDueLink')
-      }}</RouterLink>
-    </p>
+      <p class="min-w-0 flex-1">
+        {{ t('dashboard.backupDue') }}
+        <RouterLink to="/settings" class="text-brand ml-1 underline">{{
+          t('dashboard.backupDueLink')
+        }}</RouterLink>
+      </p>
+      <button
+        type="button"
+        class="text-muted hover:text-foreground shrink-0 rounded p-1 leading-none"
+        :aria-label="t('dashboard.backupDueDismiss')"
+        @click="backupBannerDismissed = true"
+      >
+        ×
+      </button>
+    </div>
 
     <SummaryCards
       :plan="plan"
