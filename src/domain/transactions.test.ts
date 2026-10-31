@@ -24,7 +24,7 @@ describe('validateTxnInput', () => {
         source: 'gotovina',
         category: 'other',
       }),
-    ).toThrow('Invalid date')
+    ).toThrow('date.invalid')
   })
 })
 

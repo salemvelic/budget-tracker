@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { dailyAllowanceCents, daysLeftInMonth, monthKey, monthRange, shiftMonth } from './month'
+import { dailyAllowanceCents, daysLeftInMonth, monthKey, monthRange, shiftMonth, todayIso } from './month'
 
 describe('monthKey', () => {
   it('returns yyyy-mm', () => {
@@ -15,6 +15,12 @@ describe('monthRange', () => {
 
   it('handles leap year February', () => {
     expect(monthRange('2024-02')).toEqual({ start: '2024-02-01', end: '2024-02-29' })
+  })
+})
+
+describe('todayIso', () => {
+  it('uses local calendar date', () => {
+    expect(todayIso(new Date(2026, 9, 31, 23, 59, 0))).toBe('2026-10-31')
   })
 })
 

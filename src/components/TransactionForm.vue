@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { Category, Txn, TxnSource } from '@/db'
-import { formatEur, parseHrAmount } from '@/domain/money'
+import { formatAmountInput, parseHrAmount } from '@/domain/money'
+import { todayIso } from '@/domain/month'
 import { validateTxnInput, type TxnInput } from '@/domain/transactions'
 
 const props = defineProps<{
@@ -16,18 +17,25 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
-const { t } = useI18n()
+const { t, te } = useI18n()
+
+const submitAttempted = ref(false)
+const touched = reactive({
+  date: false,
+  amount: false,
+  merchant: false,
+})
 
 const form = reactive({
-  date: props.initial?.date ?? new Date().toISOString().slice(0, 10),
-  amount: props.initial ? formatEur(props.initial.amountCents).replace(/\s/g, ' ') : '',
+  date: props.initial?.date ?? todayIso(),
+  amount: props.initial ? formatAmountInput(props.initial.amountCents) : '',
   merchant: props.initial?.merchant ?? '',
   source: (props.initial?.source ?? 'kartica') as TxnSource,
   category: props.initial?.category ?? 'food',
   note: props.initial?.note ?? '',
 })
 
-const error = computed(() => {
+function validationCode(): string {
   try {
     validateTxnInput({
       date: form.date,
@@ -39,15 +47,33 @@ const error = computed(() => {
     })
     return ''
   } catch (e) {
-    return e instanceof Error ? e.message : t('transactions.form.invalid')
+    return e instanceof Error ? e.message : 'form.invalid'
   }
+}
+
+const validationError = computed(() => validationCode())
+
+const visibleError = computed(() => {
+  if (!validationError.value) return ''
+  const show =
+    submitAttempted.value || touched.date || touched.amount || touched.merchant
+  if (!show) return ''
+  const code = validationError.value
+  const key = `transactions.errors.${code}`
+  return te(key) ? t(key) : t('transactions.form.invalid')
 })
+
+const canSubmit = computed(() => validationError.value === '')
 
 watch(
   () => props.initial,
   (txn) => {
-    form.date = txn?.date ?? new Date().toISOString().slice(0, 10)
-    form.amount = txn ? formatEur(txn.amountCents) : ''
+    submitAttempted.value = false
+    touched.date = false
+    touched.amount = false
+    touched.merchant = false
+    form.date = txn?.date ?? todayIso()
+    form.amount = txn ? formatAmountInput(txn.amountCents) : ''
     form.merchant = txn?.merchant ?? ''
     form.source = txn?.source ?? 'kartica'
     form.category = txn?.category ?? 'food'
@@ -56,6 +82,8 @@ watch(
 )
 
 function submit() {
+  submitAttempted.value = true
+  if (!canSubmit.value) return
   const input = validateTxnInput({
     date: form.date,
     amountCents: parseHrAmount(form.amount),
@@ -73,7 +101,12 @@ function submit() {
     <div class="grid gap-4 sm:grid-cols-2">
       <label class="block space-y-1 text-sm">
         <span class="text-muted">{{ t('transactions.form.date') }}</span>
-        <input v-model="form.date" type="date" class="w-full rounded-lg border border-border bg-surface px-3 py-2" />
+        <input
+          v-model="form.date"
+          type="date"
+          class="w-full rounded-lg border border-border bg-surface px-3 py-2"
+          @blur="touched.date = true"
+        />
       </label>
       <label class="block space-y-1 text-sm">
         <span class="text-muted">{{ t('transactions.form.amount') }}</span>
@@ -83,11 +116,17 @@ function submit() {
           inputmode="decimal"
           class="w-full rounded-lg border border-border bg-surface px-3 py-2 tabular-nums"
           :placeholder="t('transactions.form.amountPlaceholder')"
+          @blur="touched.amount = true"
         />
       </label>
       <label class="block space-y-1 text-sm sm:col-span-2">
         <span class="text-muted">{{ t('transactions.form.merchant') }}</span>
-        <input v-model="form.merchant" type="text" class="w-full rounded-lg border border-border bg-surface px-3 py-2" />
+        <input
+          v-model="form.merchant"
+          type="text"
+          class="w-full rounded-lg border border-border bg-surface px-3 py-2"
+          @blur="touched.merchant = true"
+        />
       </label>
       <label class="block space-y-1 text-sm">
         <span class="text-muted">{{ t('transactions.form.source') }}</span>
@@ -111,13 +150,13 @@ function submit() {
       </label>
     </div>
 
-    <p v-if="error" class="text-sm text-danger">{{ error }}</p>
+    <p v-if="visibleError" class="text-sm text-danger">{{ visibleError }}</p>
 
     <div class="flex flex-wrap gap-2">
       <button
         type="submit"
         class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-foreground disabled:opacity-50"
-        :disabled="Boolean(error)"
+        :disabled="!canSubmit"
       >
         {{ initial ? t('transactions.form.update') : t('transactions.form.add') }}
       </button>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatEur, parseHrAmount } from './money'
+import { formatAmountInput, formatEur, parseHrAmount } from './money'
 
 describe('formatEur', () => {
   it('formats cents as HR currency', () => {
@@ -9,6 +9,13 @@ describe('formatEur', () => {
 
   it('formats zero', () => {
     expect(formatEur(0)).toMatch(/0,00/)
+  })
+})
+
+describe('formatAmountInput', () => {
+  it('formats without currency symbol', () => {
+    expect(formatAmountInput(1250)).toBe('12,50')
+    expect(formatAmountInput(123456)).toBe('1.234,56')
   })
 })
 
@@ -25,7 +32,17 @@ describe('parseHrAmount', () => {
     expect(parseHrAmount('-12,5')).toBe(-1250)
   })
 
-  it('throws on empty input', () => {
-    expect(() => parseHrAmount('')).toThrow('Empty amount')
+  it('parses optional euro sign and spaces', () => {
+    expect(parseHrAmount('12,50 €')).toBe(1250)
+  })
+
+  it('throws amount.empty on empty input', () => {
+    expect(() => parseHrAmount('')).toThrow('amount.empty')
+    expect(() => parseHrAmount('€')).toThrow('amount.empty')
+  })
+
+  it('rejects junk suffixes', () => {
+    expect(() => parseHrAmount('12abc')).toThrow('amount.invalid')
+    expect(() => parseHrAmount('1,2,3')).toThrow('amount.invalid')
   })
 })

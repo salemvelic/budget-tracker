@@ -54,6 +54,14 @@
       "add": "Dodaj",
       "update": "Spremi promjene",
       "invalid": "Provjeri unos."
+    },
+    "errors": {
+      "amount.empty": "Unesi iznos.",
+      "amount.invalid": "Iznos nije valjan.",
+      "date.invalid": "Datum nije valjan.",
+      "merchant.empty": "Unesi trgovca ili opis.",
+      "category.empty": "Odaberi kategoriju.",
+      "form.invalid": "Provjeri unos."
     }
   },
   "settings": {

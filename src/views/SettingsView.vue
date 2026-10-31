@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { formatEur, parseHrAmount } from '@/domain/money'
+import { formatAmountInput, parseHrAmount } from '@/domain/money'
 import { useSettingsStore } from '@/stores/settings'
 
 const { t } = useI18n()
@@ -18,9 +18,9 @@ const form = reactive({
 
 onMounted(() => {
   void settingsStore.load().then(() => {
-    form.monthlyLimit = formatEur(settingsStore.settings.monthlyLimitCents)
-    form.emergencyTarget = formatEur(settingsStore.settings.emergencyTargetCents)
-    form.emergencySaved = formatEur(settingsStore.settings.emergencySavedCents)
+    form.monthlyLimit = formatAmountInput(settingsStore.settings.monthlyLimitCents)
+    form.emergencyTarget = formatAmountInput(settingsStore.settings.emergencyTargetCents)
+    form.emergencySaved = formatAmountInput(settingsStore.settings.emergencySavedCents)
     form.statementCloseDay = String(settingsStore.settings.statementCloseDay)
   })
 })

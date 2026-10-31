@@ -5,12 +5,14 @@ import { useI18n } from 'vue-i18n'
 import { monthRange, shiftMonth } from '@/domain/month'
 
 const model = defineModel<string>({ required: true })
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+const monthLocale = computed(() => (locale.value === 'hr' ? 'hr-HR' : 'en-GB'))
 
 const label = computed(() => {
   const { start } = monthRange(model.value)
   const date = new Date(`${start}T12:00:00`)
-  return new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' }).format(date)
+  return new Intl.DateTimeFormat(monthLocale.value, { month: 'long', year: 'numeric' }).format(date)
 })
 
 function previousMonth() {
