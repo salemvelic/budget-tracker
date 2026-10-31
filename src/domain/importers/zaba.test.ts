@@ -39,7 +39,7 @@ const LINES: TextLine[] = [
   ...header,
   [c(51, '05.10.2026.'), c(102, 'N100000000000005 OSOBNO PRIMANJE ISPLAĆENO U CIJELOSTI Demo d.o.o.'), c(462, '1.500,00')],
   [c(51, '06.10.2026.'), c(102, 'M100000000000006 Kreditni transfer nacionalni u eurima on-line bankarstvom (m-zaba)'), c(540, '40,00')],
-  [c(102, '- instant DEMO KLUB HR0000000000000000003 HR00 0000-1 Članarina 2026')],
+  [c(102, '- instant DEMO KLUB HR0000000000000000003 HR00 0000-1 Ulaznica Hajduk')],
   [c(51, '07.10.2026.'), c(102, 'B100000000000007 Podizanje gotovog novca - debitnom karticom na bankomatu Banke'), c(540, '50,00')],
   [c(102, `DEMO TRG 1 ZAGREB ${HOLDER}`)],
   [c(51, '08.10.2026.'), c(102, `B100000000000008 Kupovina DEMO RESTORAN SPLIT HR ${HOLDER}`), c(477, '8,00')],
@@ -66,11 +66,11 @@ describe('parseZabaLines', () => {
 
   it('imports current-account spending and ignores loan sub-accounts', () => {
     expect(rows.map((r) => [r.date, r.merchant, r.amountCents, r.category, r.note])).toEqual([
-      ['2026-10-01', 'DEMO GROCERS Zagreb', 1230, 'food', undefined],
+      ['2026-10-01', 'DEMO GROCERS Zagreb', 1230, 'groceries', undefined],
       ['2026-10-03', 'Demo Shop online Zagreb', 2500, 'other', 'rata 2/6'],
-      ['2026-10-06', 'DEMO KLUB', 4000, 'other', 'Članarina 2026'],
+      ['2026-10-06', 'DEMO KLUB', 4000, 'entertainment', 'Ulaznica Hajduk'],
       ['2026-10-07', 'Bankomat Banke DEMO TRG 1 ZAGREB', 5000, 'cash', undefined],
-      ['2026-10-08', 'DEMO RESTORAN SPLIT', -800, 'food', undefined],
+      ['2026-10-08', 'DEMO RESTORAN SPLIT', -800, 'restaurants', undefined],
       ['2026-10-15', 'Otplata kredita', 30000, 'loans', 'stambeni kredit'],
       ['2026-10-16', 'Naknada za vođenje računa', 300, 'subscriptions', undefined],
     ])

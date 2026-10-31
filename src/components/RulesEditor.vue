@@ -2,6 +2,8 @@
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import CategorySelect from '@/components/CategorySelect.vue'
+import { useCategoryLabel } from '@/composables/useCategoryLabel'
 import { useLiveQuery } from '@/composables/useLiveQuery'
 import { db, type Category, type CategoryRule } from '@/db'
 import { DEFAULT_CATEGORY_RULES, recategorizeOther, validateRulePattern } from '@/domain/categorize'
@@ -18,10 +20,7 @@ const applied = ref<number | null>(null)
 const errorCode = computed(() => validateRulePattern(form.pattern))
 const visibleError = computed(() => (attempted.value && errorCode.value ? t(`settings.rules.errors.${errorCode.value}`) : ''))
 
-function categoryLabel(id: string) {
-  const category = categories.value.find((c) => c.id === id)
-  return category ? t(category.nameKey) : id
-}
+const categoryLabel = useCategoryLabel(categories)
 
 async function addRule() {
   attempted.value = true
@@ -72,15 +71,12 @@ async function applyToOther() {
         :aria-label="t('settings.rules.pattern')"
         class="rounded-lg border border-border bg-surface px-3 py-2 text-sm"
       />
-      <select
+      <CategorySelect
         v-model="form.category"
+        :categories="categories"
         :aria-label="t('transactions.form.category')"
         class="rounded-lg border border-border bg-surface px-3 py-2 text-sm"
-      >
-        <option v-for="category in categories" :key="category.id" :value="category.id">
-          {{ t(category.nameKey) }}
-        </option>
-      </select>
+      />
       <button type="submit" class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-foreground">
         {{ t('settings.rules.add') }}
       </button>

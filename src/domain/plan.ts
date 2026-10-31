@@ -1,4 +1,5 @@
 import type { Category } from '@/db'
+import { rollupTotals, topLevelCategories } from '@/domain/categories'
 
 export interface MonthPlan {
   /** Sum of category limits when any are set, otherwise the global monthly limit. */
@@ -16,32 +17,35 @@ export interface MonthPlan {
   savedCents: number
 }
 
+/** Limits and kinds live on top-level categories; subcategory totals count toward their parent. */
 export function monthPlan(
   categories: Category[],
   totalsByCategory: Record<string, number>,
   monthlyLimitCents: number,
 ): MonthPlan {
-  const byId = new Map(categories.map((category) => [category.id, category]))
+  const tops = topLevelCategories(categories)
+  const byId = new Map(tops.map((category) => [category.id, category]))
+  const totals = rollupTotals(totalsByCategory, categories)
 
   let fixedSpentCents = 0
   let variableSpentCents = 0
   let savedCents = 0
-  for (const [id, cents] of Object.entries(totalsByCategory)) {
+  for (const [id, cents] of Object.entries(totals)) {
     const kind = byId.get(id)?.kind
     if (kind === 'savings') savedCents += cents
     else if (kind === 'fixed') fixedSpentCents += cents
     else variableSpentCents += cents
   }
 
-  const budgetSum = categories
+  const budgetSum = tops
     .filter((category) => category.kind !== 'savings')
     .reduce((sum, category) => sum + (category.budgetCents ?? 0), 0)
   const usesCategoryBudgets = budgetSum > 0
   const limitCents = usesCategoryBudgets ? budgetSum : monthlyLimitCents
 
-  const fixedReservedCents = categories
+  const fixedReservedCents = tops
     .filter((category) => category.kind === 'fixed')
-    .reduce((sum, category) => sum + Math.max(category.budgetCents ?? 0, totalsByCategory[category.id] ?? 0), 0)
+    .reduce((sum, category) => sum + Math.max(category.budgetCents ?? 0, totals[category.id] ?? 0), 0)
 
   const spentCents = fixedSpentCents + variableSpentCents
   return {

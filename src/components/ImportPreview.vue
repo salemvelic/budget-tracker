@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import CategorySelect from '@/components/CategorySelect.vue'
 import { useLiveQuery } from '@/composables/useLiveQuery'
 import { db, type Category } from '@/db'
 import { formatEur } from '@/domain/money'
@@ -27,9 +28,6 @@ const skippedEntries = computed(() =>
   (Object.entries(props.skipped) as [SkipReason, number][]).filter(([, count]) => count > 0),
 )
 
-function onCategoryChange(index: number, event: Event) {
-  emit('setCategory', index, (event.target as HTMLSelectElement).value)
-}
 </script>
 
 <template>
@@ -50,16 +48,13 @@ function onCategoryChange(index: number, event: Event) {
           <span v-if="row.note" class="text-muted">({{ row.note }})</span>
         </span>
         <span class="flex shrink-0 items-center gap-2">
-          <select
-            :value="row.category"
+          <CategorySelect
+            :model-value="row.category"
+            :categories="categories"
             :aria-label="t('transactions.categoryFor', { merchant: row.merchant })"
             class="rounded-lg border border-border bg-surface-muted px-2 py-1 text-sm"
-            @change="onCategoryChange(index, $event)"
-          >
-            <option v-for="category in categories" :key="category.id" :value="category.id">
-              {{ t(category.nameKey) }}
-            </option>
-          </select>
+            @update:model-value="emit('setCategory', index, $event)"
+          />
           <span class="w-24 text-right font-medium tabular-nums">{{ formatEur(row.amountCents) }}</span>
         </span>
       </li>

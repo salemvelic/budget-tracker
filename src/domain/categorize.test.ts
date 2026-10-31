@@ -6,6 +6,7 @@ import {
   matchesCategoryPattern,
   merchantRulePattern,
   recategorizeOther,
+  subcategoryUpgrade,
   validateRulePattern,
 } from './categorize'
 
@@ -45,12 +46,28 @@ describe('matchesCategoryPattern', () => {
 
 describe('categorizeDescription', () => {
   it.each([
-    ['Orchard Grocers', 'food'],
-    ['KONZUM P-100 Grad', 'food'],
+    ['Orchard Grocers', 'groceries'],
+    ['KONZUM P-100 Grad', 'groceries'],
+    ['TRGOVINA KRK P100 Grad', 'groceries'],
+    ['RESTORAN DEMO Grad', 'restaurants'],
+    ['Demopizza/kiosk', 'restaurants'],
+    ['Demo Street Food Bar Grad', 'restaurants'],
+    ['Demo Beer Store Grad', 'bars'],
+    ['Democafe', 'bars'],
+    ['Pay cuga Grad', 'bars'],
+    ['Demo Music Pub', 'bars'],
+    ['CINESTAR GRAD WALLET', 'entertainment'],
+    ['Demo osoba Hajduk', 'entertainment'],
+    ['RYANAIR DUBLIN', 'travel'],
+    ['Demo Railways Ecommerce', 'travel'],
+    ['Demo.gov.kg', 'travel'],
     ['Metro Fuel station', 'fuel'],
+    ['Ktc 15 B.p.', 'fuel'],
     ['Demo Taxi Ride', 'transport'],
     ['Pay rezije Grad', 'utilities'],
     ['Amazon', 'shopping'],
+    ['SANCTA DOMENICA WEB (1/3)', 'shopping'],
+    ['MyHeritage', 'subscriptions'],
     ['Naknada za Premium plan', 'subscriptions'],
     ['Unknown vendor', 'other'],
   ])('%s → %s', (description, category) => {
@@ -72,6 +89,21 @@ describe('validateRulePattern', () => {
     expect(validateRulePattern('(')).toBe('rule.invalid')
     expect(validateRulePattern('demo|')).toBe('rule.invalid')
     expect(validateRulePattern('a||b')).toBe('rule.invalid')
+  })
+})
+
+describe('subcategoryUpgrade', () => {
+  it.each([
+    [{ merchant: 'Demo Beer Store', category: 'other' }, 'bars'],
+    [{ merchant: 'Demo osoba', note: 'Hajduk', category: 'other' }, 'entertainment'],
+    [{ merchant: 'LIDL P-1 Grad', category: 'food' }, 'groceries'],
+    [{ merchant: 'Democafe', category: 'food' }, 'bars'],
+    [{ merchant: 'RYANAIR DUBLIN', category: 'transport' }, 'travel'],
+    [{ merchant: 'Unknown', category: 'food' }, null],
+    [{ merchant: 'LIDL P-1 Grad', category: 'shopping' }, null],
+    [{ merchant: 'Bolt', category: 'transport' }, null],
+  ])('%o → %s', (txn, expected) => {
+    expect(subcategoryUpgrade(txn)).toBe(expected)
   })
 })
 

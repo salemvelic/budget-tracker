@@ -1,6 +1,7 @@
 import Dexie, { type Table } from 'dexie'
 
 import { DEFAULT_CATEGORIES } from '@/domain/categories'
+import { subcategoryUpgrade } from '@/domain/categorize'
 import { DEFAULT_SETTINGS, settingsToRows } from '@/domain/settings'
 
 export type TxnSource = 'kartica' | 'revolut' | 'zaba' | 'gotovina'
@@ -30,6 +31,8 @@ export interface Category {
   nameKey: string
   budgetCents?: number
   kind?: CategoryKind
+  /** Subcategory of this top-level category; limits and kind live on the parent. */
+  parentId?: string
 }
 
 export interface SettingRow {
@@ -92,6 +95,23 @@ class BudgetDatabase extends Dexie {
         if (!(await categories.get('savings'))) {
           await categories.add({ id: 'savings', nameKey: 'categories.savings', kind: 'savings' })
         }
+      })
+    this.version(7)
+      .stores({})
+      .upgrade(async (tx) => {
+        const categories = tx.table<Category, string>('categories')
+        const known = new Set(await categories.toCollection().primaryKeys())
+        const added = ['groceries', 'restaurants', 'going_out', 'bars', 'entertainment', 'travel']
+        await categories.bulkAdd(
+          DEFAULT_CATEGORIES.filter((category) => added.includes(category.id) && !known.has(category.id)),
+        )
+        await tx
+          .table<Txn, number>('txns')
+          .toCollection()
+          .modify((txn) => {
+            const next = subcategoryUpgrade(txn)
+            if (next) txn.category = next
+          })
       })
   }
 }

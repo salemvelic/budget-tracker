@@ -50,4 +50,47 @@ describe('schema upgrades', () => {
     expect(await db.categories.get('loans')).toMatchObject({ kind: 'fixed', budgetCents: 80000 })
     expect(await db.categories.get('savings')).toMatchObject({ kind: 'savings' })
   })
+
+  it('adds subcategories and moves default placements when upgrading from v6', async () => {
+    db.close()
+    await Dexie.delete('budget-tracker')
+    const v6 = new Dexie('budget-tracker')
+    v6.version(6).stores({
+      txns: '++id, date, category, source, &importHash',
+      rules: '++id, pattern',
+      categories: '&id',
+      settings: '&key',
+      ignoredImports: '&importHash',
+    })
+    await v6.open()
+    await v6.table('categories').bulkAdd([
+      { id: 'food', nameKey: 'categories.food', budgetCents: 30000 },
+      { id: 'transport', nameKey: 'categories.transport' },
+      { id: 'other', nameKey: 'categories.other' },
+    ])
+    const base = { date: '2026-10-01', amountCents: 100, source: 'revolut' }
+    await v6.table('txns').bulkAdd([
+      { ...base, merchant: 'LIDL P-1 Grad', category: 'food' },
+      { ...base, merchant: 'Democafe', category: 'food' },
+      { ...base, merchant: 'Demo Beer Store', category: 'other' },
+      { ...base, merchant: 'Demo osoba', note: 'Hajduk', category: 'other', source: 'zaba' },
+      { ...base, merchant: 'RYANAIR DUBLIN', category: 'transport' },
+      { ...base, merchant: 'LIDL P-2 Grad', category: 'shopping' },
+      { ...base, merchant: 'Unknown', category: 'other' },
+    ])
+    v6.close()
+
+    await db.open()
+    expect((await db.txns.orderBy('id').toArray()).map((t) => t.category)).toEqual([
+      'groceries',
+      'bars',
+      'bars',
+      'entertainment',
+      'travel',
+      'shopping',
+      'other',
+    ])
+    expect(await db.categories.get('bars')).toMatchObject({ parentId: 'going_out' })
+    expect(await db.categories.get('food')).toMatchObject({ budgetCents: 30000 })
+  })
 })

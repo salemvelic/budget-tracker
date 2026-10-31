@@ -2,6 +2,7 @@
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import CategorySelect from '@/components/CategorySelect.vue'
 import type { Category, Txn, TxnSource } from '@/db'
 import { formatAmountInput, parseHrAmount } from '@/domain/money'
 import { todayIso } from '@/domain/month'
@@ -139,11 +140,11 @@ function submit() {
       </label>
       <label class="block space-y-1 text-sm">
         <span class="text-muted">{{ t('transactions.form.category') }}</span>
-        <select v-model="form.category" class="w-full rounded-lg border border-border bg-surface px-3 py-2">
-          <option v-for="category in categories" :key="category.id" :value="category.id">
-            {{ t(category.nameKey) }}
-          </option>
-        </select>
+        <CategorySelect
+          v-model="form.category"
+          :categories="categories"
+          class="w-full rounded-lg border border-border bg-surface px-3 py-2"
+        />
       </label>
       <label class="block space-y-1 text-sm sm:col-span-2">
         <span class="text-muted">{{ t('transactions.form.note') }}</span>
