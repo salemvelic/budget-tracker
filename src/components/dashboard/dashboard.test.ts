@@ -26,7 +26,17 @@ const basePlan: MonthPlan = {
 
 beforeEach(() => {
   i18n.global.locale.value = 'hr'
+  try {
+    localStorage.removeItem('budget-tracker:collapsed:income')
+    localStorage.removeItem('budget-tracker:collapsed:byCategory')
+  } catch {
+    /* ignore */
+  }
 })
+
+function sectionToggleButton(wrapper: ReturnType<typeof mount>) {
+  return wrapper.find('article button, h2 button')
+}
 
 describe('CategoryBreakdown', () => {
   it('shows trend line under a category row', () => {
@@ -57,8 +67,31 @@ describe('CategoryBreakdown', () => {
       },
       global,
     })
-    await wrapper.find('button').trigger('click')
+    await wrapper.findAll('button')[1]!.trigger('click')
     expect(wrapper.emitted('categoryClick')?.[0]?.[0]).toMatchObject({ id: 'food' })
+  })
+
+  it('collapses and expands from the section header', async () => {
+    const wrapper = mount(CategoryBreakdown, {
+      props: {
+        rows: [{ id: 'food', cents: 12000, children: [] }],
+        trends: {},
+        categories: DEFAULT_CATEGORIES,
+        txns: [],
+        expandedId: null,
+        openListId: null,
+      },
+      global,
+    })
+    expect(wrapper.text()).toContain('Hrana')
+    const header = sectionToggleButton(wrapper)
+    expect(header.attributes('aria-expanded')).toBe('true')
+    await header.trigger('click')
+    expect(header.attributes('aria-expanded')).toBe('false')
+    expect(wrapper.text()).not.toContain('Hrana')
+    await header.trigger('click')
+    expect(header.attributes('aria-expanded')).toBe('true')
+    expect(wrapper.text()).toContain('Hrana')
   })
 })
 
@@ -80,6 +113,23 @@ describe('IncomeCard', () => {
       global,
     })
     expect(wrapper.text()).not.toContain('Stopa štednje')
+  })
+
+  it('collapses and expands from the section header', async () => {
+    const wrapper = mount(IncomeCard, {
+      props: {
+        plan: { ...basePlan, incomeCents: 100000, savingsRate: 0.05 },
+      },
+      global,
+    })
+    expect(wrapper.text()).toContain('Priljevi')
+    const header = sectionToggleButton(wrapper)
+    expect(header.attributes('aria-expanded')).toBe('true')
+    await header.trigger('click')
+    expect(header.attributes('aria-expanded')).toBe('false')
+    expect(wrapper.text()).not.toContain('Stopa štednje')
+    await header.trigger('click')
+    expect(wrapper.text()).toContain('Stopa štednje')
   })
 })
 
