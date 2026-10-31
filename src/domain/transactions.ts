@@ -36,7 +36,9 @@ export function monthTotalCents(txns: Pick<Txn, 'amountCents'>[]): number {
   return txns.reduce((sum, txn) => sum + txn.amountCents, 0)
 }
 
-export function totalsByCategory(txns: Pick<Txn, 'amountCents' | 'category'>[]): Record<string, number> {
+export function totalsByCategory(
+  txns: Pick<Txn, 'amountCents' | 'category'>[],
+): Record<string, number> {
   const totals: Record<string, number> = {}
   for (const txn of txns) {
     totals[txn.category] = (totals[txn.category] ?? 0) + txn.amountCents
@@ -53,7 +55,10 @@ export function txnsInCategory(
     .sort((a, b) => b.date.localeCompare(a.date) || (b.id ?? 0) - (a.id ?? 0))
 }
 
-type TxnMerchantSlice = Pick<Txn, 'id' | 'date' | 'amountCents' | 'merchant' | 'source' | 'category' | 'note'>
+type TxnMerchantSlice = Pick<
+  Txn,
+  'id' | 'date' | 'amountCents' | 'merchant' | 'source' | 'category' | 'note'
+>
 
 export interface MerchantTotal {
   merchant: string

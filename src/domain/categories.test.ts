@@ -15,7 +15,9 @@ describe('DEFAULT_CATEGORIES', () => {
   it('has unique ids and only known parents', () => {
     const ids = DEFAULT_CATEGORIES.map((category) => category.id)
     expect(new Set(ids).size).toBe(ids.length)
-    const parents = DEFAULT_CATEGORIES.flatMap((category) => (category.parentId ? [category.parentId] : []))
+    const parents = DEFAULT_CATEGORIES.flatMap((category) =>
+      category.parentId ? [category.parentId] : [],
+    )
     expect(parents.every((parent) => ids.includes(parent))).toBe(true)
   })
 })
@@ -45,7 +47,12 @@ describe('hierarchy', () => {
   })
 
   it('rolls subcategory totals into their parent', () => {
-    expect(rollupTotals({ groceries: 100, restaurants: 50, food: 5, bars: 20, other: 1 }, DEFAULT_CATEGORIES)).toEqual({
+    expect(
+      rollupTotals(
+        { groceries: 100, restaurants: 50, food: 5, bars: 20, other: 1 },
+        DEFAULT_CATEGORIES,
+      ),
+    ).toEqual({
       food: 155,
       going_out: 20,
       other: 1,
@@ -54,7 +61,9 @@ describe('hierarchy', () => {
 
   it('orders children right after their parent, whatever the stored order', () => {
     const stored = [...DEFAULT_CATEGORIES].sort((a, b) => a.id.localeCompare(b.id))
-    const order = orderedCategories(stored).map(({ category, parent }) => `${parent?.id ?? ''}/${category.id}`)
+    const order = orderedCategories(stored).map(
+      ({ category, parent }) => `${parent?.id ?? ''}/${category.id}`,
+    )
     expect(order.slice(0, 6)).toEqual([
       '/food',
       'food/groceries',

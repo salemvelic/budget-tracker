@@ -56,8 +56,7 @@ const validationError = computed(() => validationCode())
 
 const visibleError = computed(() => {
   if (!validationError.value) return ''
-  const show =
-    submitAttempted.value || touched.date || touched.amount || touched.merchant
+  const show = submitAttempted.value || touched.date || touched.amount || touched.merchant
   if (!show) return ''
   const code = validationError.value
   const key = `transactions.errors.${code}`
@@ -98,14 +97,17 @@ function submit() {
 </script>
 
 <template>
-  <form class="space-y-4 rounded-xl border border-border bg-surface-muted p-4" @submit.prevent="submit">
+  <form
+    class="border-border bg-surface-muted space-y-4 rounded-xl border p-4"
+    @submit.prevent="submit"
+  >
     <div class="grid gap-4 sm:grid-cols-2">
       <label class="block space-y-1 text-sm">
         <span class="text-muted">{{ t('transactions.form.date') }}</span>
         <input
           v-model="form.date"
           type="date"
-          class="w-full rounded-lg border border-border bg-surface px-3 py-2"
+          class="border-border bg-surface w-full rounded-lg border px-3 py-2"
           @blur="touched.date = true"
         />
       </label>
@@ -115,7 +117,7 @@ function submit() {
           v-model="form.amount"
           type="text"
           inputmode="decimal"
-          class="w-full rounded-lg border border-border bg-surface px-3 py-2 tabular-nums"
+          class="border-border bg-surface w-full rounded-lg border px-3 py-2 tabular-nums"
           :placeholder="t('transactions.form.amountPlaceholder')"
           @blur="touched.amount = true"
         />
@@ -125,13 +127,16 @@ function submit() {
         <input
           v-model="form.merchant"
           type="text"
-          class="w-full rounded-lg border border-border bg-surface px-3 py-2"
+          class="border-border bg-surface w-full rounded-lg border px-3 py-2"
           @blur="touched.merchant = true"
         />
       </label>
       <label class="block space-y-1 text-sm">
         <span class="text-muted">{{ t('transactions.form.source') }}</span>
-        <select v-model="form.source" class="w-full rounded-lg border border-border bg-surface px-3 py-2">
+        <select
+          v-model="form.source"
+          class="border-border bg-surface w-full rounded-lg border px-3 py-2"
+        >
           <option value="kartica">{{ t('transactions.sources.kartica') }}</option>
           <option value="revolut">{{ t('transactions.sources.revolut') }}</option>
           <option value="zaba">{{ t('transactions.sources.zaba') }}</option>
@@ -143,21 +148,25 @@ function submit() {
         <CategorySelect
           v-model="form.category"
           :categories="categories"
-          class="w-full rounded-lg border border-border bg-surface px-3 py-2"
+          class="border-border bg-surface w-full rounded-lg border px-3 py-2"
         />
       </label>
       <label class="block space-y-1 text-sm sm:col-span-2">
         <span class="text-muted">{{ t('transactions.form.note') }}</span>
-        <input v-model="form.note" type="text" class="w-full rounded-lg border border-border bg-surface px-3 py-2" />
+        <input
+          v-model="form.note"
+          type="text"
+          class="border-border bg-surface w-full rounded-lg border px-3 py-2"
+        />
       </label>
     </div>
 
-    <p v-if="visibleError" class="text-sm text-danger">{{ visibleError }}</p>
+    <p v-if="visibleError" class="text-danger text-sm">{{ visibleError }}</p>
 
     <div class="flex flex-wrap gap-2">
       <button
         type="submit"
-        class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-foreground disabled:opacity-50"
+        class="bg-brand text-brand-foreground rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50"
         :disabled="!canSubmit"
       >
         {{ initial ? t('transactions.form.update') : t('transactions.form.add') }}
@@ -165,7 +174,7 @@ function submit() {
       <button
         v-if="initial"
         type="button"
-        class="rounded-lg border border-border px-4 py-2 text-sm font-medium"
+        class="border-border rounded-lg border px-4 py-2 text-sm font-medium"
         @click="emit('cancel')"
       >
         {{ t('common.cancel') }}

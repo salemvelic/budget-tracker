@@ -25,10 +25,12 @@ function nextMonth() {
 </script>
 
 <template>
-  <div class="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-muted p-3">
+  <div
+    class="border-border bg-surface-muted flex items-center justify-between gap-3 rounded-xl border p-3"
+  >
     <button
       type="button"
-      class="rounded-lg border border-border px-3 py-2 text-sm font-medium hover:bg-surface"
+      class="border-border hover:bg-surface rounded-lg border px-3 py-2 text-sm font-medium"
       :aria-label="t('common.previousMonth')"
       @click="previousMonth"
     >
@@ -37,7 +39,7 @@ function nextMonth() {
     <p class="text-sm font-semibold capitalize">{{ label }}</p>
     <button
       type="button"
-      class="rounded-lg border border-border px-3 py-2 text-sm font-medium hover:bg-surface"
+      class="border-border hover:bg-surface rounded-lg border px-3 py-2 text-sm font-medium"
       :aria-label="t('common.nextMonth')"
       @click="nextMonth"
     >

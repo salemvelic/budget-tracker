@@ -27,4 +27,3 @@ export async function restoreBackupData(data: BackupData): Promise<void> {
     await db.ignoredImports.bulkAdd(data.ignoredImports)
   })
 }
-

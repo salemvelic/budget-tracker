@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { assignImportHashes, countSkip, dedupeWithinBatch, mergeSkipped, type ImportSkipped } from './types'
+import {
+  assignImportHashes,
+  countSkip,
+  dedupeWithinBatch,
+  mergeSkipped,
+  type ImportSkipped,
+} from './types'
 
 const draft = {
   date: '2026-10-01',

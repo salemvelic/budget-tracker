@@ -44,7 +44,10 @@ export function spendingCategories(categories: Category[]): Category[] {
 }
 
 /** Totals per top-level category, with subcategory amounts added to their parent. */
-export function rollupTotals(totals: Record<string, number>, categories: Category[]): Record<string, number> {
+export function rollupTotals(
+  totals: Record<string, number>,
+  categories: Category[],
+): Record<string, number> {
   const rolled: Record<string, number> = {}
   for (const [id, cents] of Object.entries(totals)) {
     const top = topLevelId(id, categories)
@@ -61,7 +64,8 @@ export interface CategoryOption {
 const DEFAULT_ORDER = new Map(DEFAULT_CATEGORIES.map((category, index) => [category.id, index]))
 
 function byDefaultOrder(a: Category, b: Category): number {
-  const rank = (category: Category) => DEFAULT_ORDER.get(category.id) ?? DEFAULT_CATEGORIES.length - 1.5
+  const rank = (category: Category) =>
+    DEFAULT_ORDER.get(category.id) ?? DEFAULT_CATEGORIES.length - 1.5
   return rank(a) - rank(b) || a.id.localeCompare(b.id)
 }
 
@@ -72,6 +76,8 @@ export function orderedCategories(categories: Category[]): CategoryOption[] {
   const tops = sorted.filter((category) => !category.parentId || !ids.has(category.parentId))
   return tops.flatMap((parent) => [
     { category: parent },
-    ...sorted.filter((child) => child.parentId === parent.id).map((child) => ({ category: child, parent })),
+    ...sorted
+      .filter((child) => child.parentId === parent.id)
+      .map((child) => ({ category: child, parent })),
   ])
 }

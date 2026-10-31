@@ -12,7 +12,12 @@ describe('budgetStatus', () => {
   const [food, fuel, other] = budgetStatus(categories, { food: 5000, fuel: 6000, other: 1234 })
 
   it('computes remaining and percent', () => {
-    expect(food).toMatchObject({ spentCents: 5000, remainingCents: 15000, percent: 25, over: false })
+    expect(food).toMatchObject({
+      spentCents: 5000,
+      remainingCents: 15000,
+      percent: 25,
+      over: false,
+    })
   })
 
   it('flags overspend and caps percent', () => {
@@ -20,7 +25,12 @@ describe('budgetStatus', () => {
   })
 
   it('handles categories without a budget', () => {
-    expect(other).toMatchObject({ budgetCents: null, remainingCents: null, percent: 0, spentCents: 1234 })
+    expect(other).toMatchObject({
+      budgetCents: null,
+      remainingCents: null,
+      percent: 0,
+      spentCents: 1234,
+    })
   })
 
   it('does not go negative on net refunds', () => {

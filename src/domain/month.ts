@@ -9,7 +9,9 @@ export function todayIso(date: Date = new Date()): string {
 /** Display an ISO `yyyy-mm-dd` date in the given locale, e.g. `31. 10. 2026.` for hr. */
 export function formatIsoDate(iso: string, locale: string): string {
   const [y, m, d] = iso.split('-').map(Number)
-  return new Intl.DateTimeFormat(locale, { timeZone: 'UTC' }).format(new Date(Date.UTC(y!, m! - 1, d!)))
+  return new Intl.DateTimeFormat(locale, { timeZone: 'UTC' }).format(
+    new Date(Date.UTC(y!, m! - 1, d!)),
+  )
 }
 
 /** Calendar month key `yyyy-mm`. */

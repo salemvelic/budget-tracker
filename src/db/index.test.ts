@@ -15,7 +15,12 @@ describe('schema upgrades', () => {
     db.close()
     await Dexie.delete('budget-tracker')
     const v1 = new Dexie('budget-tracker')
-    v1.version(1).stores({ txns: '++id, date, category, source, &importHash', rules: '++id, pattern', categories: '&id', settings: '&key' })
+    v1.version(1).stores({
+      txns: '++id, date, category, source, &importHash',
+      rules: '++id, pattern',
+      categories: '&id',
+      settings: '&key',
+    })
     await v1.open()
     await v1.table('categories').bulkAdd([
       { id: 'food', nameKey: 'categories.food' },

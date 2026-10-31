@@ -101,7 +101,12 @@ describe('importParsedRows', () => {
   })
 
   it('changes only one transaction without remember', async () => {
-    const base = { amountCents: 300, source: 'revolut' as const, category: 'other', merchant: 'Demo Bar' }
+    const base = {
+      amountCents: 300,
+      source: 'revolut' as const,
+      category: 'other',
+      merchant: 'Demo Bar',
+    }
     const first = await db.txns.add({ ...base, date: '2026-10-01' })
     await db.txns.add({ ...base, date: '2026-10-02' })
 
@@ -117,7 +122,13 @@ describe('importParsedRows', () => {
       { date: '2026-10-12', amountCents: 100, merchant: 'C', source: 'revolut', category: 'other' },
     ])
     await importParsedRows(rows)
-    await db.txns.add({ date: '2026-10-30', amountCents: 100, merchant: 'Manual', source: 'kartica', category: 'other' })
+    await db.txns.add({
+      date: '2026-10-30',
+      amountCents: 100,
+      merchant: 'Manual',
+      source: 'kartica',
+      category: 'other',
+    })
 
     expect(await latestImportDates()).toEqual({ kartica: '2026-10-05', revolut: '2026-10-20' })
   })

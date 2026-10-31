@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { monthTotalCents, totalsByCategory, totalsByMerchant, txnsInCategory, validateTxnInput } from './transactions'
+import {
+  monthTotalCents,
+  totalsByCategory,
+  totalsByMerchant,
+  txnsInCategory,
+  validateTxnInput,
+} from './transactions'
 
 describe('validateTxnInput', () => {
   it('accepts valid input', () => {
@@ -31,11 +37,7 @@ describe('validateTxnInput', () => {
 describe('monthTotalCents', () => {
   it('sums transaction amounts', () => {
     expect(
-      monthTotalCents([
-        { amountCents: 1000 },
-        { amountCents: 2500 },
-        { amountCents: -500 },
-      ]),
+      monthTotalCents([{ amountCents: 1000 }, { amountCents: 2500 }, { amountCents: -500 }]),
     ).toBe(3000)
   })
 })

@@ -7,12 +7,20 @@ import hr from './locales/hr.json'
 
 function keys(obj: object, prefix = ''): string[] {
   return Object.entries(obj).flatMap(([key, value]) =>
-    typeof value === 'object' && value != null ? keys(value, `${prefix}${key}.`) : [`${prefix}${key}`],
+    typeof value === 'object' && value != null
+      ? keys(value, `${prefix}${key}.`)
+      : [`${prefix}${key}`],
   )
 }
 
 const ERROR_CODES = {
-  transactions: ['amount.empty', 'amount.invalid', 'date.invalid', 'merchant.empty', 'category.empty'],
+  transactions: [
+    'amount.empty',
+    'amount.invalid',
+    'date.invalid',
+    'merchant.empty',
+    'category.empty',
+  ],
   import: ['import.failed', 'pdf.noText', 'pdf.unknown', 'empty'],
   'settings.rules': ['rule.empty', 'rule.invalid'],
 }

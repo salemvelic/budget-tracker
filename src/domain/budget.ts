@@ -11,12 +11,19 @@ export interface CategoryBudgetStatus {
   over: boolean
 }
 
-export function budgetStatus(categories: Category[], spentByCategory: Record<string, number>): CategoryBudgetStatus[] {
+export function budgetStatus(
+  categories: Category[],
+  spentByCategory: Record<string, number>,
+): CategoryBudgetStatus[] {
   return categories.map((category) => {
     const spentCents = spentByCategory[category.id] ?? 0
-    const budgetCents = category.budgetCents && category.budgetCents > 0 ? category.budgetCents : null
+    const budgetCents =
+      category.budgetCents && category.budgetCents > 0 ? category.budgetCents : null
     const remainingCents = budgetCents == null ? null : budgetCents - spentCents
-    const percent = budgetCents == null ? 0 : Math.min(100, Math.max(0, Math.round((spentCents / budgetCents) * 100)))
+    const percent =
+      budgetCents == null
+        ? 0
+        : Math.min(100, Math.max(0, Math.round((spentCents / budgetCents) * 100)))
     return {
       id: category.id,
       nameKey: category.nameKey,

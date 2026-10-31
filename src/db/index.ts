@@ -103,7 +103,9 @@ class BudgetDatabase extends Dexie {
         const known = new Set(await categories.toCollection().primaryKeys())
         const added = ['groceries', 'restaurants', 'going_out', 'bars', 'entertainment', 'travel']
         await categories.bulkAdd(
-          DEFAULT_CATEGORIES.filter((category) => added.includes(category.id) && !known.has(category.id)),
+          DEFAULT_CATEGORIES.filter(
+            (category) => added.includes(category.id) && !known.has(category.id),
+          ),
         )
         await tx
           .table<Txn, number>('txns')

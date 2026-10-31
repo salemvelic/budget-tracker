@@ -16,13 +16,7 @@ export type ParsedImportRowDraft = Omit<ParsedImportRow, 'importHash'> & {
 }
 
 export type SkipReason =
-  | 'pending'
-  | 'reversed'
-  | 'foreignCurrency'
-  | 'transfer'
-  | 'payment'
-  | 'income'
-  | 'unparseable'
+  'pending' | 'reversed' | 'foreignCurrency' | 'transfer' | 'payment' | 'income' | 'unparseable'
 
 export type ImportSkipped = Partial<Record<SkipReason, number>>
 

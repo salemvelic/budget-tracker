@@ -45,7 +45,10 @@ export function monthPlan(
 
   const fixedReservedCents = tops
     .filter((category) => category.kind === 'fixed')
-    .reduce((sum, category) => sum + Math.max(category.budgetCents ?? 0, totals[category.id] ?? 0), 0)
+    .reduce(
+      (sum, category) => sum + Math.max(category.budgetCents ?? 0, totals[category.id] ?? 0),
+      0,
+    )
 
   const spentCents = fixedSpentCents + variableSpentCents
   return {

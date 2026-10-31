@@ -20,7 +20,10 @@ const emit = defineEmits<{
 const { t, locale } = useI18n()
 
 function confirmRemove(txn: Txn) {
-  if (txn.id != null && window.confirm(t('transactions.confirmDelete', { merchant: txn.merchant }))) {
+  if (
+    txn.id != null &&
+    window.confirm(t('transactions.confirmDelete', { merchant: txn.merchant }))
+  ) {
     emit('remove', txn.id)
   }
 }
@@ -31,10 +34,16 @@ function onCategoryChange(txn: Txn, category: string) {
 </script>
 
 <template>
-  <div v-if="txns.length === 0" class="rounded-xl border border-dashed border-border p-6 text-sm text-muted">
+  <div
+    v-if="txns.length === 0"
+    class="border-border text-muted rounded-xl border border-dashed p-6 text-sm"
+  >
     {{ t('transactions.empty') }}
   </div>
-  <ul v-else class="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface-muted">
+  <ul
+    v-else
+    class="divide-border border-border bg-surface-muted divide-y overflow-hidden rounded-xl border"
+  >
     <li
       v-for="txn in txns"
       :key="txn.id"
@@ -42,7 +51,7 @@ function onCategoryChange(txn: Txn, category: string) {
     >
       <div class="min-w-0 space-y-1">
         <p class="font-medium break-words">{{ txn.merchant }}</p>
-        <p class="text-sm text-muted">
+        <p class="text-muted text-sm">
           {{ formatIsoDate(txn.date, locale) }} · {{ t(`transactions.sources.${txn.source}`) }}
           <span v-if="txn.note"> · {{ txn.note }}</span>
         </p>
@@ -50,7 +59,7 @@ function onCategoryChange(txn: Txn, category: string) {
           :model-value="txn.category"
           :categories="categories"
           :aria-label="t('transactions.categoryFor', { merchant: txn.merchant })"
-          class="rounded-lg border border-border bg-surface px-2 py-1 text-sm"
+          class="border-border bg-surface rounded-lg border px-2 py-1 text-sm"
           @update:model-value="onCategoryChange(txn, $event)"
         />
       </div>
@@ -58,14 +67,14 @@ function onCategoryChange(txn: Txn, category: string) {
         <span class="font-semibold tabular-nums">{{ formatEur(txn.amountCents) }}</span>
         <button
           type="button"
-          class="rounded-lg border border-border px-3 py-1.5 text-sm"
+          class="border-border rounded-lg border px-3 py-1.5 text-sm"
           @click="emit('edit', txn)"
         >
           {{ t('common.edit') }}
         </button>
         <button
           type="button"
-          class="rounded-lg border border-border px-3 py-1.5 text-sm text-danger"
+          class="border-border text-danger rounded-lg border px-3 py-1.5 text-sm"
           @click="confirmRemove(txn)"
         >
           {{ t('common.delete') }}

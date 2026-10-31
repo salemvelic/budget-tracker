@@ -31,7 +31,10 @@ describe('TransactionForm', () => {
     await wrapper.findAll('input[type="text"]')[1]!.setValue('Demo shop')
     await wrapper.find('form').trigger('submit')
 
-    expect(wrapper.emitted('save')?.[0]?.[0]).toMatchObject({ amountCents: 1250, merchant: 'Demo shop' })
+    expect(wrapper.emitted('save')?.[0]?.[0]).toMatchObject({
+      amountCents: 1250,
+      merchant: 'Demo shop',
+    })
   })
 })
 
@@ -40,7 +43,16 @@ describe('TransactionList', () => {
 
   const props = {
     categories: DEFAULT_CATEGORIES,
-    txns: [{ id: 3, date: '2026-10-01', amountCents: 100, merchant: 'Demo', source: 'kartica' as const, category: 'food' }],
+    txns: [
+      {
+        id: 3,
+        date: '2026-10-01',
+        amountCents: 100,
+        merchant: 'Demo',
+        source: 'kartica' as const,
+        category: 'food',
+      },
+    ],
   }
 
   it('asks before deleting', async () => {
@@ -83,7 +95,10 @@ describe('ImportPreview', () => {
       category: 'other',
       importHash: 'zaba|id:B1',
     }
-    const wrapper = mount(ImportPreview, { props: { preview: [row], skipped: {}, importing: false }, global })
+    const wrapper = mount(ImportPreview, {
+      props: { preview: [row], skipped: {}, importing: false },
+      global,
+    })
     await vi.waitFor(() => expect(wrapper.findAll('option').length).toBe(DEFAULT_CATEGORIES.length))
     await wrapper.find('select').setValue('food')
     expect(wrapper.emitted('setCategory')?.[0]).toEqual([0, 'food'])

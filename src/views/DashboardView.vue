@@ -48,7 +48,9 @@ const categories = useLiveQuery(() => db.categories.toArray(), [] as Category[])
 const latest = useLiveQuery(latestImportDates, {} as Partial<Record<TxnSource, string>>)
 
 const totals = computed(() => totalsByCategory(txns.value))
-const plan = computed(() => monthPlan(categories.value, totals.value, settingsStore.settings.monthlyLimitCents))
+const plan = computed(() =>
+  monthPlan(categories.value, totals.value, settingsStore.settings.monthlyLimitCents),
+)
 const dailyCents = computed(() => dailyAllowanceCents(plan.value.flexibleLeftCents, 0))
 const coverage = computed(() => monthCoverage(latest.value, selectedMonth.value, todayIso()))
 
@@ -67,7 +69,9 @@ const nonSpendingCategoryIds = computed(
     ),
 )
 
-const savingsTxns = computed(() => txns.value.filter((txn) => nonSpendingCategoryIds.value.has(txn.category)))
+const savingsTxns = computed(() =>
+  txns.value.filter((txn) => nonSpendingCategoryIds.value.has(txn.category)),
+)
 const savingsGroups = computed(() => totalsByMerchant(savingsTxns.value))
 
 const categoryTotals = computed(() => {
@@ -131,7 +135,9 @@ function onSavingsClick() {
 
 function onSavingsGroupClick(merchant: string) {
   openSavingsMerchant.value =
-    openSavingsMerchant.value && isSameMerchant(openSavingsMerchant.value, merchant) ? null : merchant
+    openSavingsMerchant.value && isSameMerchant(openSavingsMerchant.value, merchant)
+      ? null
+      : merchant
 }
 
 function isOpenSavingsGroup(merchant: string) {
@@ -150,34 +156,37 @@ const remainingClass = computed(() => {
     <MonthPicker v-model="selectedMonth" />
 
     <section class="grid gap-4 sm:grid-cols-2">
-      <article class="rounded-xl border border-border bg-surface-muted p-4">
-        <p class="text-sm text-muted">{{ t('dashboard.monthSpend') }}</p>
+      <article class="border-border bg-surface-muted rounded-xl border p-4">
+        <p class="text-muted text-sm">{{ t('dashboard.monthSpend') }}</p>
         <p class="mt-1 text-2xl font-semibold tabular-nums">{{ formatEur(plan.spentCents) }}</p>
-        <p v-if="plan.fixedSpentCents" class="mt-1 text-sm text-muted">
-          {{ t('dashboard.fixedPart') }}: <span class="tabular-nums">{{ formatEur(plan.fixedSpentCents) }}</span>
+        <p v-if="plan.fixedSpentCents" class="text-muted mt-1 text-sm">
+          {{ t('dashboard.fixedPart') }}:
+          <span class="tabular-nums">{{ formatEur(plan.fixedSpentCents) }}</span>
         </p>
-        <p class="mt-2 text-sm text-muted">
+        <p class="text-muted mt-2 text-sm">
           {{ t('dashboard.monthLimit') }}:
           <span class="text-foreground tabular-nums">{{ formatEur(plan.limitCents) }}</span>
           <span v-if="plan.usesCategoryBudgets"> ({{ t('dashboard.limitFromBudgets') }})</span>
         </p>
       </article>
-      <article class="rounded-xl border border-border bg-surface-muted p-4">
-        <p class="text-sm text-muted">{{ t('dashboard.remaining') }}</p>
+      <article class="border-border bg-surface-muted rounded-xl border p-4">
+        <p class="text-muted text-sm">{{ t('dashboard.remaining') }}</p>
         <p class="mt-1 text-2xl font-semibold tabular-nums" :class="remainingClass">
           {{ formatEur(plan.remainingCents) }}
         </p>
-        <p v-if="plan.fixedReservedCents" class="mt-1 text-sm text-muted">
+        <p v-if="plan.fixedReservedCents" class="text-muted mt-1 text-sm">
           {{ t('dashboard.flexibleLeft') }}:
           <span class="text-foreground tabular-nums">{{ formatEur(plan.flexibleLeftCents) }}</span>
         </p>
-        <p v-if="isCurrentMonth" class="mt-2 text-sm text-muted">
+        <p v-if="isCurrentMonth" class="text-muted mt-2 text-sm">
           <template v-if="plan.limitCents === 0">
             {{ t('dashboard.noLimitHint') }}
           </template>
           <template v-else-if="plan.flexibleLeftCents < 0">
             <span class="text-danger">
-              {{ t('dashboard.variableOver', { amount: formatEur(Math.abs(plan.flexibleLeftCents)) }) }}
+              {{
+                t('dashboard.variableOver', { amount: formatEur(Math.abs(plan.flexibleLeftCents)) })
+              }}
             </span>
           </template>
           <template v-else>
@@ -188,42 +197,51 @@ const remainingClass = computed(() => {
       </article>
     </section>
 
-    <section v-if="coverage.length" class="rounded-xl border border-border bg-surface-muted p-4 text-sm">
+    <section
+      v-if="coverage.length"
+      class="border-border bg-surface-muted rounded-xl border p-4 text-sm"
+    >
       <p class="font-medium">{{ t('dashboard.coverageHeading') }}</p>
       <ul class="mt-2 flex flex-wrap gap-x-6 gap-y-1">
-        <li v-for="item in coverage" :key="item.source" :class="item.missingEnd ? 'text-warning' : 'text-muted'">
+        <li
+          v-for="item in coverage"
+          :key="item.source"
+          :class="item.missingEnd ? 'text-warning' : 'text-muted'"
+        >
           {{ t(`transactions.sources.${item.source}`) }}:
           <span class="tabular-nums">{{ formatIsoDate(item.lastDate, locale) }}</span>
         </li>
       </ul>
-      <p v-if="coverage.some((item) => item.missingEnd)" class="mt-2 text-xs text-warning">
+      <p v-if="coverage.some((item) => item.missingEnd)" class="text-warning mt-2 text-xs">
         {{ t('dashboard.coverageIncomplete') }}
       </p>
     </section>
 
     <section class="grid gap-4 sm:grid-cols-2">
-      <article class="rounded-xl border border-border bg-surface-muted p-4">
+      <article class="border-border bg-surface-muted rounded-xl border p-4">
         <component
           :is="savingsGroups.length ? 'button' : 'div'"
           :type="savingsGroups.length ? 'button' : undefined"
           class="w-full text-left"
-          :class="savingsGroups.length ? 'rounded-lg hover:bg-surface' : ''"
+          :class="savingsGroups.length ? 'hover:bg-surface rounded-lg' : ''"
           :aria-expanded="savingsGroups.length ? savingsOpen : undefined"
           :aria-label="savingsGroups.length ? t('dashboard.showSavings') : undefined"
           @click="savingsGroups.length ? onSavingsClick() : undefined"
         >
-          <p class="text-sm text-muted">{{ t('dashboard.savedThisMonth') }}</p>
+          <p class="text-muted text-sm">{{ t('dashboard.savedThisMonth') }}</p>
           <div class="mt-1 flex items-center justify-between gap-2">
             <span class="flex min-w-0 items-center gap-1">
               <span
                 v-if="savingsGroups.length"
-                class="inline-block w-4 shrink-0 text-muted transition-transform"
+                class="text-muted inline-block w-4 shrink-0 transition-transform"
                 :class="savingsOpen ? 'rotate-90' : ''"
                 aria-hidden="true"
               >
                 ›
               </span>
-              <span class="text-2xl font-semibold tabular-nums">{{ formatEur(plan.savedCents) }}</span>
+              <span class="text-2xl font-semibold tabular-nums">{{
+                formatEur(plan.savedCents)
+              }}</span>
             </span>
           </div>
         </component>
@@ -231,7 +249,7 @@ const remainingClass = computed(() => {
           <li v-for="group in savingsGroups" :key="group.merchant">
             <button
               type="button"
-              class="flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left text-muted hover:bg-surface"
+              class="text-muted hover:bg-surface flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left"
               :aria-expanded="isOpenSavingsGroup(group.merchant)"
               :aria-label="t('dashboard.showExpenses', { category: group.merchant })"
               @click="onSavingsGroupClick(group.merchant)"
@@ -239,14 +257,18 @@ const remainingClass = computed(() => {
               <span class="min-w-0 break-words">{{ group.merchant }}</span>
               <span class="shrink-0 tabular-nums">{{ formatEur(group.cents) }}</span>
             </button>
-            <DashboardExpenseList v-if="isOpenSavingsGroup(group.merchant)" :txns="group.txns" variant="indented" />
+            <DashboardExpenseList
+              v-if="isOpenSavingsGroup(group.merchant)"
+              :txns="group.txns"
+              variant="indented"
+            />
           </li>
         </ul>
       </article>
-      <article class="rounded-xl border border-border bg-surface-muted p-4">
+      <article class="border-border bg-surface-muted rounded-xl border p-4">
         <div class="flex items-center justify-between gap-3">
-          <p class="text-sm text-muted">{{ t('dashboard.emergencyFund') }}</p>
-          <p class="text-sm text-muted tabular-nums">
+          <p class="text-muted text-sm">{{ t('dashboard.emergencyFund') }}</p>
+          <p class="text-muted text-sm tabular-nums">
             {{
               t('dashboard.emergencyProgress', {
                 saved: formatEur(settingsStore.settings.emergencySavedCents),
@@ -255,19 +277,22 @@ const remainingClass = computed(() => {
             }}
           </p>
         </div>
-        <div class="mt-3 h-3 overflow-hidden rounded-full bg-surface">
-          <div class="h-full rounded-full bg-brand transition-all" :style="{ width: `${emergencyProgress}%` }" />
+        <div class="bg-surface mt-3 h-3 overflow-hidden rounded-full">
+          <div
+            class="bg-brand h-full rounded-full transition-all"
+            :style="{ width: `${emergencyProgress}%` }"
+          />
         </div>
       </article>
     </section>
 
-    <section class="rounded-xl border border-border bg-surface-muted p-4">
+    <section class="border-border bg-surface-muted rounded-xl border p-4">
       <h2 class="mb-3 font-medium">{{ t('dashboard.byCategory') }}</h2>
       <ul v-if="categoryTotals.length" class="space-y-2">
         <li v-for="row in categoryTotals" :key="row.id" class="text-sm">
           <button
             type="button"
-            class="flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left hover:bg-surface"
+            class="hover:bg-surface flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left"
             :aria-expanded="categoryHasSubrows(row) ? expandedId === row.id : openListId === row.id"
             :aria-label="
               categoryHasSubrows(row)
@@ -279,7 +304,7 @@ const remainingClass = computed(() => {
             <span class="flex min-w-0 items-center gap-1">
               <span
                 v-if="categoryHasSubrows(row)"
-                class="inline-block w-4 shrink-0 text-muted transition-transform"
+                class="text-muted inline-block w-4 shrink-0 transition-transform"
                 :class="expandedId === row.id ? 'rotate-90' : ''"
                 aria-hidden="true"
               >
@@ -299,7 +324,7 @@ const remainingClass = computed(() => {
             <li v-for="[childId, cents] in row.children" :key="childId">
               <button
                 type="button"
-                class="flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left text-muted hover:bg-surface"
+                class="text-muted hover:bg-surface flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left"
                 :aria-expanded="openListId === childId"
                 :aria-label="t('dashboard.showExpenses', { category: nameOf(childId) })"
                 @click="onSubcategoryClick(childId)"
@@ -319,7 +344,7 @@ const remainingClass = computed(() => {
           </ul>
         </li>
       </ul>
-      <p v-else class="text-sm text-muted">{{ t('dashboard.noSpend') }}</p>
+      <p v-else class="text-muted text-sm">{{ t('dashboard.noSpend') }}</p>
     </section>
   </div>
 </template>
