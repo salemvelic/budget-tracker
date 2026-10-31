@@ -16,6 +16,7 @@ exports/
 !**/__fixtures__/*.csv
 *.xlsx
 *.xls
+*.pdf
 *-backup*.json
 budget-export*.json
 

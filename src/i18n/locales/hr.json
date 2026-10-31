@@ -56,45 +56,59 @@
       "invalid": "Provjeri unos."
     },
     "errors": {
-      "amount.empty": "Unesi iznos.",
-      "amount.invalid": "Iznos nije valjan.",
-      "date.invalid": "Datum nije valjan.",
-      "merchant.empty": "Unesi trgovca ili opis.",
-      "category.empty": "Odaberi kategoriju.",
-      "form.invalid": "Provjeri unos."
+      "amount": {
+        "empty": "Unesi iznos.",
+        "invalid": "Iznos nije valjan."
+      },
+      "date": { "invalid": "Datum nije valjan." },
+      "merchant": { "empty": "Unesi trgovca ili opis." },
+      "category": { "empty": "Odaberi kategoriju." },
+      "form": { "invalid": "Provjeri unos." }
     }
   },
   "import": {
-    "sourceLegend": "Izvor podataka",
+    "sourceLegend": "Vrsta datoteke",
     "fileLabel": "Odaberi datoteku",
+    "reading": "Čitam datoteku…",
     "allAlreadyImported": "Sve transakcije iz datoteke su već u bazi.",
     "previewCount": "{count} novih transakcija za uvoz",
     "moreRows": "… i još {count} redaka",
     "importButton": "Uvezi u bazu",
     "done": "Uvezeno {count} transakcija.",
+    "skippedHeading": "Nije uvezeno",
     "sources": {
-      "revolut": "Revolut CSV",
-      "ersteCardClub": "Erste Card Club PDF"
+      "pdf": "PDF izvod (Erste kartica ili Revolut)",
+      "csv": "Revolut CSV"
+    },
+    "detected": {
+      "erste": "Erste obavijest o troškovima",
+      "revolut": "Revolut izvadak"
+    },
+    "help": {
+      "pdf": "Odaberi Erste obavijest o troškovima kartice ili Revolut izvadak računa. Vrsta se prepoznaje automatski. Uvoze se kartična plaćanja, naknade i povrati. Nadoplate, prijenosi, ulaganja, podizanje gotovine i uplate za karticu se preskaču.",
+      "csv": "Revolut CSV izvoz. Uvoze se kartična plaćanja, naknade i povrati u eurima; prijenosi i nadoplate se preskaču."
+    },
+    "skipReasons": {
+      "pending": "Na čekanju",
+      "reversed": "Stornirano",
+      "foreignCurrency": "Računi u drugim valutama",
+      "transfer": "Nadoplate, prijenosi i ulaganja",
+      "cash": "Podizanje gotovine",
+      "payment": "Uplate za karticu",
+      "unparseable": "Neprepoznati redci"
     },
     "errors": {
       "invalid": "Datoteka nije valjana.",
-      "csv.invalid": "CSV nije valjan.",
-      "csv.notRevolut": "Datoteka nije Revolut CSV izvoz.",
-      "import.failed": "Uvoz nije uspio. Pokušaj ponovno.",
       "empty": "Nema transakcija za uvoz iz ove datoteke.",
-      "pdf.noText": "PDF nema tekstualni sloj (sken). Uvoz nije moguć."
-    },
-    "revolut": {
-      "help": "Uvezi Revolut CSV izvoz. Uvozimo CARD_PAYMENT, FEE i CARD_REFUND (EUR, completed). Prijenosi i uplate se preskaču.",
-      "previewCount": "{count} novih transakcija za uvoz",
-      "moreRows": "… i još {count} redaka",
-      "skipped": "Preskočeno: {pending} na čekanju, {other} ostalih tipova, {fx} strana valuta.",
-      "importButton": "Uvezi u bazu",
-      "done": "Uvezeno {count} transakcija."
-    },
-    "ersteCardClub": {
-      "help": "Uvezi PDF izvod Erste Card Club kartice. Podržani su samo PDF-ovi s tekstualnim slojem.",
-      "skipped": "Preskočeno: {other} ostalih redaka, {payment} uplata, {bad} neprepoznatih."
+      "csv": {
+        "invalid": "CSV nije valjan.",
+        "notRevolut": "Datoteka nije Revolut CSV izvoz."
+      },
+      "import": { "failed": "Uvoz nije uspio. Pokušaj ponovno." },
+      "pdf": {
+        "noText": "PDF nema tekstualni sloj (sken). Uvoz nije moguć.",
+        "unknown": "Izvod nije prepoznat. Podržani su Erste obavijest o troškovima i Revolut izvadak."
+      }
     }
   },
   "settings": {
@@ -112,8 +126,7 @@
       "heading": "Transakcije"
     },
     "import": {
-      "heading": "Uvoz",
-      "placeholder": "Uvoz CSV izvoda iz banke i Revoluta."
+      "heading": "Uvoz"
     },
     "budget": {
       "heading": "Budžet",

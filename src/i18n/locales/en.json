@@ -56,45 +56,59 @@
       "invalid": "Check your input."
     },
     "errors": {
-      "amount.empty": "Enter an amount.",
-      "amount.invalid": "Amount is not valid.",
-      "date.invalid": "Date is not valid.",
-      "merchant.empty": "Enter a merchant or description.",
-      "category.empty": "Choose a category.",
-      "form.invalid": "Check your input."
+      "amount": {
+        "empty": "Enter an amount.",
+        "invalid": "Amount is not valid."
+      },
+      "date": { "invalid": "Date is not valid." },
+      "merchant": { "empty": "Enter a merchant or description." },
+      "category": { "empty": "Choose a category." },
+      "form": { "invalid": "Check your input." }
     }
   },
   "import": {
-    "sourceLegend": "Data source",
+    "sourceLegend": "File type",
     "fileLabel": "Choose file",
+    "reading": "Reading file…",
     "allAlreadyImported": "All transactions from this file are already imported.",
     "previewCount": "{count} new transactions to import",
     "moreRows": "… and {count} more rows",
     "importButton": "Import into database",
     "done": "Imported {count} transactions.",
+    "skippedHeading": "Not imported",
     "sources": {
-      "revolut": "Revolut CSV",
-      "ersteCardClub": "Erste Card Club PDF"
+      "pdf": "PDF statement (Erste card or Revolut)",
+      "csv": "Revolut CSV"
+    },
+    "detected": {
+      "erste": "Erste card statement",
+      "revolut": "Revolut statement"
+    },
+    "help": {
+      "pdf": "Choose an Erste card statement or a Revolut account statement PDF; the type is detected automatically. Card payments, fees and refunds are imported. Top-ups, transfers, investments, cash withdrawals and card bill payments are skipped.",
+      "csv": "Revolut CSV export. Imports card payments, fees and refunds in EUR; transfers and top-ups are skipped."
+    },
+    "skipReasons": {
+      "pending": "Pending",
+      "reversed": "Reversed",
+      "foreignCurrency": "Other currency accounts",
+      "transfer": "Top-ups, transfers and investments",
+      "cash": "Cash withdrawals",
+      "payment": "Card bill payments",
+      "unparseable": "Unrecognised rows"
     },
     "errors": {
       "invalid": "The file is not valid.",
-      "csv.invalid": "Invalid CSV.",
-      "csv.notRevolut": "Not a Revolut CSV export.",
-      "import.failed": "Import failed. Try again.",
       "empty": "No transactions to import from this file.",
-      "pdf.noText": "PDF has no text layer (scan). Import is not possible."
-    },
-    "revolut": {
-      "help": "Import Revolut CSV. Imports CARD_PAYMENT, FEE, and CARD_REFUND (EUR, completed). Transfers and top-ups are skipped.",
-      "previewCount": "{count} new transactions to import",
-      "moreRows": "… and {count} more rows",
-      "skipped": "Skipped: {pending} pending, {other} other types, {fx} foreign currency.",
-      "importButton": "Import into database",
-      "done": "Imported {count} transactions."
-    },
-    "ersteCardClub": {
-      "help": "Import Erste Card Club card statement PDF. Only PDFs with a text layer are supported.",
-      "skipped": "Skipped: {other} other lines, {payment} payments, {bad} unparseable."
+      "csv": {
+        "invalid": "Invalid CSV.",
+        "notRevolut": "Not a Revolut CSV export."
+      },
+      "import": { "failed": "Import failed. Try again." },
+      "pdf": {
+        "noText": "PDF has no text layer (scan). Import is not possible.",
+        "unknown": "Unrecognised statement. Supported: Erste card statement and Revolut statement."
+      }
     }
   },
   "settings": {
@@ -112,8 +126,7 @@
       "heading": "Transactions"
     },
     "import": {
-      "heading": "Import",
-      "placeholder": "Import CSV statements from your bank and Revolut."
+      "heading": "Import"
     },
     "budget": {
       "heading": "Budget",

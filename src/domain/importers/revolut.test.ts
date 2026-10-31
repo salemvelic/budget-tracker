@@ -20,9 +20,7 @@ describe('parseRevolutCsv', () => {
     expect(rows[0]!.importHash).toMatch(/\|#0$/)
     expect(rows[2]!.importHash).toMatch(/\|#1$/)
     expect(rows.find((r) => r.amountCents === -500)).toBeTruthy()
-    expect(skipped.otherType).toBeGreaterThanOrEqual(2)
-    expect(skipped.foreignCurrency).toBe(1)
-    expect(skipped.notCompleted).toBe(1)
+    expect(skipped).toEqual({ transfer: 2, foreignCurrency: 1, pending: 1 })
   })
 
   it('throws when headers are not Revolut', () => {

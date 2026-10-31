@@ -4,6 +4,7 @@ import { assignImportHashes } from '@/domain/importers/types'
 
 import { db } from './index'
 import { filterNewImportRows, importParsedRows } from './importRows'
+import { deleteTxn } from './txns'
 
 describe('importParsedRows', () => {
   beforeEach(async () => {
@@ -41,5 +42,37 @@ describe('importParsedRows', () => {
 
     expect(await importParsedRows([row, row])).toBe(1)
     expect(await db.txns.count()).toBe(1)
+  })
+
+  it('does not re-import a transaction the user deleted', async () => {
+    const row = assignImportHashes([
+      {
+        date: '2026-10-02',
+        amountCents: 900,
+        merchant: 'Deleted later',
+        source: 'kartica',
+        category: 'other',
+        externalId: 'D1',
+      },
+    ])[0]!
+
+    await importParsedRows([row])
+    const stored = await db.txns.where('importHash').equals(row.importHash).first()
+    await deleteTxn(stored!.id!)
+
+    expect(await db.txns.count()).toBe(0)
+    expect(await importParsedRows([row])).toBe(0)
+  })
+
+  it('deletes manual transactions without leaving a tombstone', async () => {
+    const id = await db.txns.add({
+      date: '2026-10-03',
+      amountCents: 100,
+      merchant: 'Manual',
+      source: 'gotovina',
+      category: 'other',
+    })
+    await deleteTxn(id)
+    expect(await db.ignoredImports.count()).toBe(0)
   })
 })
