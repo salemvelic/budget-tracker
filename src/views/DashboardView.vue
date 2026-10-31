@@ -3,6 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import MonthPicker from '@/components/MonthPicker.vue'
+import DashboardExpenseList from '@/components/DashboardExpenseList.vue'
 import { useLiveQuery } from '@/composables/useLiveQuery'
 import { db, type Category, type Txn, type TxnSource } from '@/db'
 import { latestImportDates } from '@/db/txns'
@@ -66,7 +67,6 @@ const categoryTotals = computed(() => {
       children: Object.entries(totals.value)
         .filter(([childId]) => childId !== id && topLevelId(childId, categories.value) === id)
         .sort((a, b) => b[1] - a[1]),
-      ownCents: totals.value[id] ?? 0,
     }))
 })
 
@@ -80,7 +80,11 @@ const openListTxns = computed(() =>
 )
 
 function categoryHasSubrows(row: (typeof categoryTotals.value)[number]) {
-  return row.children.length > 0 || row.ownCents > 0
+  return row.children.length > 0
+}
+
+function expensesFor(categoryId: string) {
+  return txnsInCategory(txns.value, categoryId)
 }
 
 function onCategoryClick(row: (typeof categoryTotals.value)[number]) {
@@ -210,20 +214,11 @@ const remainingClass = computed(() => {
             </span>
             <span class="shrink-0 font-medium tabular-nums">{{ formatEur(row.cents) }}</span>
           </button>
-          <ul
+          <DashboardExpenseList
             v-if="openListId === row.id && !categoryHasSubrows(row)"
-            class="mt-1 space-y-1 border-l border-border pl-6 text-xs"
-          >
-            <li v-if="!openListTxns.length" class="text-muted">{{ t('dashboard.noExpenses') }}</li>
-            <li v-for="txn in openListTxns" :key="txn.id" class="flex justify-between gap-3 py-0.5">
-              <span class="min-w-0 break-words text-muted">
-                {{ formatIsoDate(txn.date, locale) }} · {{ txn.merchant }}
-                <span v-if="txn.note"> · {{ txn.note }}</span>
-                · {{ t(`transactions.sources.${txn.source}`) }}
-              </span>
-              <span class="shrink-0 tabular-nums">{{ formatEur(txn.amountCents) }}</span>
-            </li>
-          </ul>
+            :txns="openListTxns"
+            variant="leaf"
+          />
           <ul v-if="expandedId === row.id" class="mt-1 space-y-0.5 pl-4 text-xs">
             <li v-for="[childId, cents] in row.children" :key="childId">
               <button
@@ -236,40 +231,14 @@ const remainingClass = computed(() => {
                 <span>{{ nameOf(childId) }}</span>
                 <span class="tabular-nums">{{ formatEur(cents) }}</span>
               </button>
-              <ul v-if="openListId === childId" class="mt-1 space-y-1 border-l border-border pl-4 text-muted">
-                <li v-if="!openListTxns.length" class="text-muted">{{ t('dashboard.noExpenses') }}</li>
-                <li v-for="txn in openListTxns" :key="txn.id" class="flex justify-between gap-3 py-0.5">
-                  <span class="min-w-0 break-words">
-                    {{ formatIsoDate(txn.date, locale) }} · {{ txn.merchant }}
-                    <span v-if="txn.note"> · {{ txn.note }}</span>
-                    · {{ t(`transactions.sources.${txn.source}`) }}
-                  </span>
-                  <span class="shrink-0 tabular-nums text-foreground">{{ formatEur(txn.amountCents) }}</span>
-                </li>
-              </ul>
+              <DashboardExpenseList
+                v-if="openListId === childId"
+                :txns="openListTxns"
+                variant="indented"
+              />
             </li>
-            <li v-if="row.ownCents">
-              <button
-                type="button"
-                class="flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left text-muted hover:bg-surface"
-                :aria-expanded="openListId === row.id"
-                :aria-label="t('dashboard.showExpenses', { category: nameOf(row.id) })"
-                @click="onSubcategoryClick(row.id)"
-              >
-                <span>{{ t('dashboard.unassigned') }}</span>
-                <span class="tabular-nums">{{ formatEur(row.ownCents) }}</span>
-              </button>
-              <ul v-if="openListId === row.id" class="mt-1 space-y-1 border-l border-border pl-4 text-muted">
-                <li v-if="!openListTxns.length" class="text-muted">{{ t('dashboard.noExpenses') }}</li>
-                <li v-for="txn in openListTxns" :key="txn.id" class="flex justify-between gap-3 py-0.5">
-                  <span class="min-w-0 break-words">
-                    {{ formatIsoDate(txn.date, locale) }} · {{ txn.merchant }}
-                    <span v-if="txn.note"> · {{ txn.note }}</span>
-                    · {{ t(`transactions.sources.${txn.source}`) }}
-                  </span>
-                  <span class="shrink-0 tabular-nums text-foreground">{{ formatEur(txn.amountCents) }}</span>
-                </li>
-              </ul>
+            <li v-if="expensesFor(row.id).length">
+              <DashboardExpenseList :txns="expensesFor(row.id)" variant="indented" />
             </li>
           </ul>
         </li>

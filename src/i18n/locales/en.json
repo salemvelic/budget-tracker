@@ -50,7 +50,6 @@
     "emergencyFund": "Emergency fund",
     "emergencyProgress": "{saved} / {target}",
     "byCategory": "By category",
-    "unassigned": "no subcategory",
     "showSubcategories": "Show subcategories: {category}",
     "showExpenses": "Show expenses: {category}",
     "noExpenses": "No expenses in this category."
