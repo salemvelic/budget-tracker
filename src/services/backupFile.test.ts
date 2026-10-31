@@ -12,14 +12,15 @@ function mockHandle(name = 'demo-backup.json') {
     name,
     queryPermission: vi.fn<[], PermissionState>(async () => 'granted'),
     requestPermission: vi.fn<[], PermissionState>(async () => 'granted'),
-    createWritable: vi.fn<[], Promise<{ write: (data: string) => Promise<void>; close: () => Promise<void> }>>(
-      async () => ({
+    createWritable: vi.fn<
+      [],
+      Promise<{ write: (data: string) => Promise<void>; close: () => Promise<void> }>
+    >(async () => ({
       write: async (data: string) => {
         writes.push(data)
       },
       close: async () => undefined,
-      }),
-    ),
+    })),
     writes,
   }
 }
@@ -56,8 +57,8 @@ describe('saveBackupToFile', () => {
 
   it('reuses a stored handle on the second save', async () => {
     const handle = mockHandle()
-    window.showSaveFilePicker = vi.fn<[], Promise<FileSystemFileHandle>>(async () =>
-      handle as unknown as FileSystemFileHandle,
+    window.showSaveFilePicker = vi.fn<[], Promise<FileSystemFileHandle>>(
+      async () => handle as unknown as FileSystemFileHandle,
     )
     expect(await saveBackupToFile('{"a":1}')).toBe('file')
     expect(await saveBackupToFile('{"b":2}')).toBe('file')
@@ -91,8 +92,8 @@ describe('chooseBackupFile', () => {
 
   it('stores a newly picked handle', async () => {
     const handle = mockHandle()
-    window.showSaveFilePicker = vi.fn<[], Promise<FileSystemFileHandle>>(async () =>
-      handle as unknown as FileSystemFileHandle,
+    window.showSaveFilePicker = vi.fn<[], Promise<FileSystemFileHandle>>(
+      async () => handle as unknown as FileSystemFileHandle,
     )
     expect(await chooseBackupFile()).toBe(true)
     expect(await hasBackupFile()).toBe(true)
