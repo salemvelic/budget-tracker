@@ -21,6 +21,7 @@ export type SkipReason =
   | 'foreignCurrency'
   | 'transfer'
   | 'payment'
+  | 'income'
   | 'unparseable'
 
 export type ImportSkipped = Partial<Record<SkipReason, number>>

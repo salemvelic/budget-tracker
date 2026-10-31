@@ -17,7 +17,7 @@ export interface BackupFile extends BackupData {
   exportedAt: string
 }
 
-const SOURCES: TxnSource[] = ['kartica', 'revolut', 'gotovina']
+const SOURCES: TxnSource[] = ['kartica', 'revolut', 'zaba', 'gotovina']
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
 
 export function buildBackup(data: BackupData, now: Date = new Date()): BackupFile {

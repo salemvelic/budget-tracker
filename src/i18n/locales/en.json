@@ -25,6 +25,7 @@
     "shopping": "Shopping",
     "subscriptions": "Subscriptions",
     "cash": "Cash",
+    "loans": "Loans",
     "other": "Other"
   },
   "dashboard": {
@@ -43,7 +44,8 @@
     "addHeading": "New transaction",
     "editHeading": "Edit transaction",
     "sources": {
-      "kartica": "Card",
+      "kartica": "Erste card",
+      "zaba": "ZABA account",
       "revolut": "Revolut",
       "gotovina": "Cash"
     },
@@ -81,15 +83,17 @@
     "skippedHeading": "Not imported",
     "detected": {
       "erste": "Erste card statement",
-      "revolut": "Revolut statement"
+      "revolut": "Revolut statement",
+      "zaba": "Zagrebačka banka statement"
     },
-    "help": "Choose a PDF: an Erste card statement or a Revolut account statement; the type is detected automatically. Card payments, cash withdrawals (Cash category), fees and refunds are imported. Top-ups, transfers, investments and card bill payments are skipped.",
+    "help": "Choose a PDF: an Erste card statement, a Revolut account statement or a Zagrebačka banka statement (Jedinstveni izvadak građana); the type is detected automatically. Card payments, cash withdrawals (Cash category), loan instalments (Loans), bills, fees and refunds are imported. Salary and other incoming payments, Revolut top-ups, Erste card bill payments, transfers and investments are skipped.",
     "skipReasons": {
       "pending": "Pending",
       "reversed": "Reversed",
       "foreignCurrency": "Other currency accounts",
       "transfer": "Top-ups, transfers and investments",
       "payment": "Card bill payments",
+      "income": "Incoming payments (salary etc.)",
       "unparseable": "Unrecognised rows"
     },
     "errors": {
@@ -98,7 +102,7 @@
       "import": { "failed": "Import failed. Try again." },
       "pdf": {
         "noText": "PDF has no text layer (scan). Import is not possible.",
-        "unknown": "Unrecognised statement. Supported: Erste card statement and Revolut statement."
+        "unknown": "Unrecognised statement. Supported: Erste card statement, Revolut statement and Zagrebačka banka statement."
       }
     }
   },

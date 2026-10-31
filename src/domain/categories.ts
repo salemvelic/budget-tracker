@@ -8,6 +8,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'shopping', nameKey: 'categories.shopping' },
   { id: 'subscriptions', nameKey: 'categories.subscriptions' },
   { id: 'cash', nameKey: 'categories.cash' },
+  { id: 'loans', nameKey: 'categories.loans' },
   { id: 'other', nameKey: 'categories.other' },
 ]
 

@@ -3,7 +3,7 @@ import Dexie, { type Table } from 'dexie'
 import { DEFAULT_CATEGORIES } from '@/domain/categories'
 import { DEFAULT_SETTINGS, settingsToRows } from '@/domain/settings'
 
-export type TxnSource = 'kartica' | 'revolut' | 'gotovina'
+export type TxnSource = 'kartica' | 'revolut' | 'zaba' | 'gotovina'
 
 export interface Txn {
   id?: number
@@ -69,6 +69,14 @@ class BudgetDatabase extends Dexie {
         const categories = tx.table<Category, string>('categories')
         if (!(await categories.get('cash'))) {
           await categories.add({ id: 'cash', nameKey: 'categories.cash' })
+        }
+      })
+    this.version(5)
+      .stores({})
+      .upgrade(async (tx) => {
+        const categories = tx.table<Category, string>('categories')
+        if (!(await categories.get('loans'))) {
+          await categories.add({ id: 'loans', nameKey: 'categories.loans' })
         }
       })
   }

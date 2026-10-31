@@ -25,6 +25,7 @@
     "shopping": "Kupovine",
     "subscriptions": "Pretplate",
     "cash": "Gotovina",
+    "loans": "Krediti",
     "other": "Ostalo"
   },
   "dashboard": {
@@ -43,8 +44,9 @@
     "addHeading": "Nova transakcija",
     "editHeading": "Uredi transakciju",
     "sources": {
-      "kartica": "Kartica",
+      "kartica": "Erste kartica",
       "revolut": "Revolut",
+      "zaba": "ZABA račun",
       "gotovina": "Gotovina"
     },
     "form": {
@@ -81,15 +83,17 @@
     "skippedHeading": "Nije uvezeno",
     "detected": {
       "erste": "Erste obavijest o troškovima",
-      "revolut": "Revolut izvadak"
+      "revolut": "Revolut izvadak",
+      "zaba": "Izvadak Zagrebačke banke"
     },
-    "help": "Odaberi PDF: Erste obavijest o troškovima kartice ili Revolut izvadak računa. Vrsta se prepoznaje automatski. Uvoze se kartična plaćanja, podizanje gotovine (kategorija Gotovina), naknade i povrati. Nadoplate, prijenosi, ulaganja i uplate za karticu se preskaču.",
+    "help": "Odaberi PDF: Erste obavijest o troškovima kartice, Revolut izvadak računa ili jedinstveni izvadak građana Zagrebačke banke. Vrsta se prepoznaje automatski. Uvoze se kartična plaćanja, podizanje gotovine (kategorija Gotovina), rate kredita (Krediti), računi, naknade i povrati. Plaća i ostali priljevi, nadoplate Revoluta, plaćanje Erste kartice, prijenosi i ulaganja se preskaču.",
     "skipReasons": {
       "pending": "Na čekanju",
       "reversed": "Stornirano",
       "foreignCurrency": "Računi u drugim valutama",
       "transfer": "Nadoplate, prijenosi i ulaganja",
       "payment": "Uplate za karticu",
+      "income": "Priljevi (plaća i uplate)",
       "unparseable": "Neprepoznati redci"
     },
     "errors": {
@@ -98,7 +102,7 @@
       "import": { "failed": "Uvoz nije uspio. Pokušaj ponovno." },
       "pdf": {
         "noText": "PDF nema tekstualni sloj (sken). Uvoz nije moguć.",
-        "unknown": "Izvod nije prepoznat. Podržani su Erste obavijest o troškovima i Revolut izvadak."
+        "unknown": "Izvod nije prepoznat. Podržani su Erste obavijest o troškovima, Revolut izvadak i izvadak Zagrebačke banke."
       }
     }
   },
