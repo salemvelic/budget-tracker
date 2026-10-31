@@ -50,7 +50,7 @@
     "coverageHeading": "Uvezeni podaci do",
     "coverageIncomplete": "Za neke izvore nedostaje kraj mjeseca – uvezi sljedeći izvod.",
     "savedThisMonth": "Štednja i ulaganja u mjesecu",
-    "emergencyFund": "Hitni fond",
+    "emergencyFund": "Štedni cilj",
     "emergencyProgress": "{saved} / {target}",
     "byCategory": "Po kategorijama",
     "noExpenses": "Nema troškova u ovoj kategoriji.",
@@ -143,11 +143,11 @@
     }
   },
   "settings": {
-    "limitsHeading": "Limit i hitni fond",
+    "limitsHeading": "Limit i štedni cilj",
     "monthlyLimit": "Mjesečni limit potrošnje",
     "monthlyLimitHint": "Koristi se samo ako na stranici Budžet nije postavljen nijedan limit po kategoriji.",
-    "emergencyTarget": "Cilj hitnog fonda",
-    "emergencySaved": "Trenutno u hitnom fondu",
+    "emergencyTarget": "Cilj štednje",
+    "emergencySaved": "Trenutno ušteđeno prema cilju",
     "saved": "Postavke su spremljene.",
     "saveFailed": "Spremanje nije uspjelo. Pokušaj ponovno.",
     "rules": {

@@ -50,7 +50,7 @@
     "coverageHeading": "Imported data up to",
     "coverageIncomplete": "Some sources are missing the end of the month – import the next statement.",
     "savedThisMonth": "Savings & investments this month",
-    "emergencyFund": "Emergency fund",
+    "emergencyFund": "Savings goal",
     "emergencyProgress": "{saved} / {target}",
     "byCategory": "By category",
     "noExpenses": "No expenses in this category.",
@@ -143,11 +143,11 @@
     }
   },
   "settings": {
-    "limitsHeading": "Limit and emergency fund",
+    "limitsHeading": "Limit and savings goal",
     "monthlyLimit": "Monthly spending limit",
     "monthlyLimitHint": "Used only when no category limit is set on the Budget page.",
-    "emergencyTarget": "Emergency fund target",
-    "emergencySaved": "Emergency fund saved",
+    "emergencyTarget": "Savings goal target",
+    "emergencySaved": "Saved toward goal",
     "saved": "Settings saved.",
     "saveFailed": "Saving failed. Try again.",
     "rules": {
