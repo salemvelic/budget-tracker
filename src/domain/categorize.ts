@@ -7,13 +7,21 @@ export const DEFAULT_CATEGORY_RULES: Pick<CategoryRule, 'pattern' | 'category'>[
   { pattern: 'netflix|spotify|disney|apple', category: 'subscriptions' },
 ]
 
+export function matchesCategoryPattern(pattern: string, description: string): boolean {
+  try {
+    const bounded = `(^|\\W)(?:${pattern})(\\W|$)`
+    return new RegExp(bounded, 'i').test(description)
+  } catch {
+    return false
+  }
+}
+
 export function categorizeDescription(
   description: string,
   rules: Pick<CategoryRule, 'pattern' | 'category'>[] = DEFAULT_CATEGORY_RULES,
 ): string {
-  const text = description.toLowerCase()
   for (const rule of rules) {
-    if (new RegExp(rule.pattern, 'i').test(text)) {
+    if (matchesCategoryPattern(rule.pattern, description)) {
       return rule.category
     }
   }
