@@ -20,13 +20,15 @@
   "categories": {
     "food": "Hrana",
     "fuel": "Gorivo",
+    "transport": "Prijevoz",
     "utilities": "Režije",
     "shopping": "Kupovine",
     "subscriptions": "Pretplate",
     "other": "Ostalo"
   },
   "dashboard": {
-    "monthSpend": "Potrošeno ovaj mjesec",
+    "monthSpend": "Potrošeno u mjesecu",
+    "noSpend": "Nema potrošnje u ovom mjesecu.",
     "monthLimit": "Mjesečni limit",
     "remaining": "Preostalo",
     "dailyAllowance": "Dnevno do kraja mjeseca",
@@ -36,6 +38,7 @@
   },
   "transactions": {
     "empty": "Nema transakcija za odabrani mjesec.",
+    "confirmDelete": "Obrisati transakciju „{merchant}”?",
     "addHeading": "Nova transakcija",
     "editHeading": "Uredi transakciju",
     "sources": {
@@ -112,11 +115,52 @@
     }
   },
   "settings": {
+    "limitsHeading": "Limit i hitni fond",
     "monthlyLimit": "Mjesečni limit potrošnje",
     "emergencyTarget": "Cilj hitnog fonda",
     "emergencySaved": "Trenutno u hitnom fondu",
-    "statementCloseDay": "Dan zatvaranja izvoda kartice",
-    "saved": "Postavke su spremljene."
+    "saved": "Postavke su spremljene.",
+    "saveFailed": "Spremanje nije uspjelo. Pokušaj ponovno.",
+    "rules": {
+      "heading": "Pravila kategorija",
+      "help": "Riječ ili više riječi odvojenih znakom |, npr. „pekara|kafić”. Tvoja pravila imaju prednost pred ugrađenima i primjenjuju se pri uvozu.",
+      "empty": "Još nemaš vlastitih pravila.",
+      "pattern": "Uzorak",
+      "patternPlaceholder": "npr. pekara|kafić",
+      "add": "Dodaj pravilo",
+      "applyToOther": "Primijeni na transakcije u kategoriji Ostalo",
+      "applied": "Prekategorizirano transakcija: {count}.",
+      "errors": {
+        "rule": {
+          "empty": "Unesi uzorak.",
+          "invalid": "Uzorak nije valjan."
+        }
+      }
+    },
+    "backup": {
+      "heading": "Sigurnosna kopija",
+      "help": "Podaci postoje samo u ovom pregledniku. Redovito izvezi kopiju i spremi je na sigurno mjesto (ne u git).",
+      "export": "Izvezi kopiju (JSON)",
+      "restore": "Vrati iz kopije",
+      "exported": "Kopija je preuzeta.",
+      "restored": "Podaci su vraćeni iz kopije.",
+      "confirmRestore": "Vraćanje briše sve trenutne podatke i zamjenjuje ih kopijom ({count} transakcija). Nastaviti?",
+      "persisted": "Preglednik je odobrio trajnu pohranu.",
+      "notPersisted": "Preglednik nije odobrio trajnu pohranu: podaci se mogu obrisati pri čišćenju preglednika. Izvozi kopiju.",
+      "errors": {
+        "invalid": "Datoteka nije valjana sigurnosna kopija.",
+        "version": "Kopija je iz novije verzije aplikacije."
+      }
+    }
+  },
+  "budget": {
+    "help": "Mjesečni limit po kategoriji. Prazno znači bez limita.",
+    "total": "Ukupno planirano",
+    "limit": "Limit",
+    "noLimit": "bez limita",
+    "spent": "Potrošeno",
+    "left": "preostalo",
+    "over": "prekoračeno za"
   },
   "views": {
     "dashboard": {
@@ -129,8 +173,7 @@
       "heading": "Uvoz"
     },
     "budget": {
-      "heading": "Budžet",
-      "placeholder": "Mjesečni limiti po kategorijama."
+      "heading": "Budžet"
     },
     "settings": {
       "heading": "Postavke"

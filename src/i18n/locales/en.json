@@ -20,13 +20,15 @@
   "categories": {
     "food": "Food",
     "fuel": "Fuel",
+    "transport": "Transport",
     "utilities": "Utilities",
     "shopping": "Shopping",
     "subscriptions": "Subscriptions",
     "other": "Other"
   },
   "dashboard": {
-    "monthSpend": "Spent this month",
+    "monthSpend": "Spent in month",
+    "noSpend": "No spending this month.",
     "monthLimit": "Monthly limit",
     "remaining": "Remaining",
     "dailyAllowance": "Daily until month end",
@@ -36,6 +38,7 @@
   },
   "transactions": {
     "empty": "No transactions for the selected month.",
+    "confirmDelete": "Delete transaction “{merchant}”?",
     "addHeading": "New transaction",
     "editHeading": "Edit transaction",
     "sources": {
@@ -112,11 +115,52 @@
     }
   },
   "settings": {
+    "limitsHeading": "Limit and emergency fund",
     "monthlyLimit": "Monthly spending limit",
     "emergencyTarget": "Emergency fund target",
     "emergencySaved": "Emergency fund saved",
-    "statementCloseDay": "Card statement close day",
-    "saved": "Settings saved."
+    "saved": "Settings saved.",
+    "saveFailed": "Saving failed. Try again.",
+    "rules": {
+      "heading": "Category rules",
+      "help": "One word or several separated by |, e.g. “bakery|cafe”. Your rules take priority over the built-in ones and are applied on import.",
+      "empty": "No custom rules yet.",
+      "pattern": "Pattern",
+      "patternPlaceholder": "e.g. bakery|cafe",
+      "add": "Add rule",
+      "applyToOther": "Apply to transactions in Other",
+      "applied": "Transactions recategorised: {count}.",
+      "errors": {
+        "rule": {
+          "empty": "Enter a pattern.",
+          "invalid": "The pattern is not valid."
+        }
+      }
+    },
+    "backup": {
+      "heading": "Backup",
+      "help": "Data only exists in this browser. Export a backup regularly and keep it somewhere safe (not in git).",
+      "export": "Export backup (JSON)",
+      "restore": "Restore from backup",
+      "exported": "Backup downloaded.",
+      "restored": "Data restored from backup.",
+      "confirmRestore": "Restoring deletes all current data and replaces it with the backup ({count} transactions). Continue?",
+      "persisted": "The browser granted persistent storage.",
+      "notPersisted": "The browser did not grant persistent storage: data may be removed when browser data is cleared. Export backups.",
+      "errors": {
+        "invalid": "The file is not a valid backup.",
+        "version": "The backup comes from a newer app version."
+      }
+    }
+  },
+  "budget": {
+    "help": "Monthly limit per category. Empty means no limit.",
+    "total": "Total planned",
+    "limit": "Limit",
+    "noLimit": "no limit",
+    "spent": "Spent",
+    "left": "left",
+    "over": "over by"
   },
   "views": {
     "dashboard": {
@@ -129,8 +173,7 @@
       "heading": "Import"
     },
     "budget": {
-      "heading": "Budget",
-      "placeholder": "Monthly limits per category."
+      "heading": "Budget"
     },
     "settings": {
       "heading": "Settings"

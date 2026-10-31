@@ -1,11 +1,23 @@
 import { describe, expect, it } from 'vitest'
 
-import { categorizeDescription, DEFAULT_CATEGORY_RULES, matchesCategoryPattern } from './categorize'
+import {
+  categorizeDescription,
+  matchesCategoryPattern,
+  recategorizeOther,
+  validateRulePattern,
+} from './categorize'
 
 describe('matchesCategoryPattern', () => {
-  it('does not match substrings inside words', () => {
+  it('does not match inside other words', () => {
     expect(matchesCategoryPattern('ina', 'Marina shop')).toBe(false)
+    expect(matchesCategoryPattern('apple', 'Pineapple bar')).toBe(false)
+  })
+
+  it('matches whole words next to digits or punctuation', () => {
     expect(matchesCategoryPattern('ina', 'INA Zagreb')).toBe(true)
+    expect(matchesCategoryPattern('studenac', 'STUDENAC1234 Grad')).toBe(true)
+    expect(matchesCategoryPattern('bolt', 'BOLT.EU O 123')).toBe(true)
+    expect(matchesCategoryPattern('režije', 'Pay režije Grad')).toBe(true)
   })
 
   it('returns false for invalid regex patterns', () => {
@@ -14,15 +26,47 @@ describe('matchesCategoryPattern', () => {
 })
 
 describe('categorizeDescription', () => {
-  it('matches food patterns', () => {
-    expect(categorizeDescription('Orchard Grocers', DEFAULT_CATEGORY_RULES)).toBe('food')
+  it.each([
+    ['Orchard Grocers', 'food'],
+    ['KONZUM P-100 Grad', 'food'],
+    ['Metro Fuel station', 'fuel'],
+    ['Demo Taxi Ride', 'transport'],
+    ['Pay rezije Grad', 'utilities'],
+    ['Amazon', 'shopping'],
+    ['Naknada za Premium plan', 'subscriptions'],
+    ['Unknown vendor', 'other'],
+  ])('%s → %s', (description, category) => {
+    expect(categorizeDescription(description)).toBe(category)
   })
 
-  it('matches fuel patterns', () => {
-    expect(categorizeDescription('Metro Fuel station', DEFAULT_CATEGORY_RULES)).toBe('fuel')
+  it('lets earlier (user) rules win', () => {
+    expect(categorizeDescription('Amazon', [{ pattern: 'amazon', category: 'other' }])).toBe('other')
+  })
+})
+
+describe('validateRulePattern', () => {
+  it('accepts plain and alternative patterns', () => {
+    expect(validateRulePattern('demo shop|demo cafe')).toBe('')
   })
 
-  it('falls back to other', () => {
-    expect(categorizeDescription('Unknown vendor', DEFAULT_CATEGORY_RULES)).toBe('other')
+  it('rejects empty, broken and match-everything patterns', () => {
+    expect(validateRulePattern('  ')).toBe('rule.empty')
+    expect(validateRulePattern('(')).toBe('rule.invalid')
+    expect(validateRulePattern('demo|')).toBe('rule.invalid')
+    expect(validateRulePattern('a||b')).toBe('rule.invalid')
+  })
+})
+
+describe('recategorizeOther', () => {
+  it('only moves transactions out of other', () => {
+    const changes = recategorizeOther(
+      [
+        { id: 1, merchant: 'Demo Cafe', category: 'other' },
+        { id: 2, merchant: 'Demo Cafe', category: 'shopping' },
+        { id: 3, merchant: 'Nothing', category: 'other' },
+      ],
+      [{ pattern: 'demo cafe', category: 'food' }],
+    )
+    expect(changes).toEqual([{ id: 1, category: 'food' }])
   })
 })

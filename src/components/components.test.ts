@@ -1,0 +1,68 @@
+import { mount } from '@vue/test-utils'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { DEFAULT_CATEGORIES } from '@/domain/categories'
+import { i18n } from '@/i18n'
+
+import ImportPreview from './ImportPreview.vue'
+import TransactionForm from './TransactionForm.vue'
+import TransactionList from './TransactionList.vue'
+
+const global = { plugins: [i18n] }
+
+beforeEach(() => {
+  i18n.global.locale.value = 'hr'
+})
+
+describe('TransactionForm', () => {
+  it('shows the specific validation message and does not emit', async () => {
+    const wrapper = mount(TransactionForm, { props: { categories: DEFAULT_CATEGORIES }, global })
+    await wrapper.find('input[inputmode="decimal"]').setValue('12,5x')
+    await wrapper.find('form').trigger('submit')
+
+    expect(wrapper.text()).toContain('Iznos nije valjan.')
+    expect(wrapper.emitted('save')).toBeUndefined()
+  })
+
+  it('emits cents for a valid entry', async () => {
+    const wrapper = mount(TransactionForm, { props: { categories: DEFAULT_CATEGORIES }, global })
+    await wrapper.find('input[inputmode="decimal"]').setValue('12,50')
+    await wrapper.findAll('input[type="text"]')[1]!.setValue('Demo shop')
+    await wrapper.find('form').trigger('submit')
+
+    expect(wrapper.emitted('save')?.[0]?.[0]).toMatchObject({ amountCents: 1250, merchant: 'Demo shop' })
+  })
+})
+
+describe('TransactionList', () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  const props = {
+    categories: DEFAULT_CATEGORIES,
+    txns: [{ id: 3, date: '2026-10-01', amountCents: 100, merchant: 'Demo', source: 'kartica' as const, category: 'food' }],
+  }
+
+  it('asks before deleting', async () => {
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
+    const wrapper = mount(TransactionList, { props, global })
+    await wrapper.findAll('button')[1]!.trigger('click')
+    expect(confirm).toHaveBeenCalledOnce()
+    expect(wrapper.emitted('remove')).toBeUndefined()
+
+    confirm.mockReturnValue(true)
+    await wrapper.findAll('button')[1]!.trigger('click')
+    expect(wrapper.emitted('remove')?.[0]).toEqual([3])
+  })
+})
+
+describe('ImportPreview', () => {
+  it('lists skip reasons with counts', () => {
+    const wrapper = mount(ImportPreview, {
+      props: { preview: [], skipped: { transfer: 4, cash: 2, pending: 0 }, importing: false },
+      global,
+    })
+    expect(wrapper.text()).toContain('Nadoplate, prijenosi i ulaganja: 4')
+    expect(wrapper.text()).toContain('Podizanje gotovine: 2')
+    expect(wrapper.text()).not.toContain('Na čekanju')
+  })
+})
