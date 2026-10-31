@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { RouterLink } from 'vue-router'
 
 import ImportPreview from '@/components/ImportPreview.vue'
 import { useLiveQuery } from '@/composables/useLiveQuery'
@@ -8,7 +9,12 @@ import { filterNewImportRows, importParsedRows } from '@/db/importRows'
 import { db, type CategoryRule } from '@/db'
 import { categorizeDescription, DEFAULT_CATEGORY_RULES } from '@/domain/categorize'
 import { parsePdfStatement, type PdfStatementKind } from '@/domain/importers/pdfStatement'
-import { mergeSkipped, type ImportSkipped, type ParsedImportRow } from '@/domain/importers/types'
+import {
+  mergeSkipped,
+  possibleDuplicates,
+  type ImportSkipped,
+  type ParsedImportRow,
+} from '@/domain/importers/types'
 
 interface FileResult {
   name: string
@@ -22,6 +28,8 @@ const errorCode = ref('')
 const files = ref<FileResult[]>([])
 const preview = ref<ParsedImportRow[]>([])
 const skipped = ref<ImportSkipped>({})
+const excluded = ref(new Set<string>())
+const duplicateHints = ref(new Map<string, string>())
 const importedCount = ref<number | null>(null)
 const allAlreadyImported = ref(false)
 const busy = ref(false)
@@ -43,6 +51,8 @@ function reset() {
   files.value = []
   preview.value = []
   skipped.value = {}
+  excluded.value = new Set()
+  duplicateHints.value = new Map()
   importedCount.value = null
   allAlreadyImported.value = false
 }
@@ -76,6 +86,15 @@ async function onFileChange(event: Event) {
     const fresh = await filterNewImportRows(rows)
     preview.value = fresh.sort((a, b) => a.date.localeCompare(b.date))
     if (rows.length > 0 && preview.value.length === 0) allAlreadyImported.value = true
+
+    if (fresh.length > 0) {
+      const dates = fresh.map((row) => row.date).sort()
+      const start = dates[0]!
+      const end = dates[dates.length - 1]!
+      const existing = await db.txns.where('date').between(start, end, true, true).toArray()
+      duplicateHints.value = possibleDuplicates(fresh, existing)
+      excluded.value = new Set(duplicateHints.value.keys())
+    }
   } catch (e) {
     errorCode.value = e instanceof Error ? e.message : 'invalid'
   } finally {
@@ -89,14 +108,24 @@ function setCategory(index: number, category: string) {
   if (row) row.category = category
 }
 
+function toggleInclude(importHash: string, include: boolean) {
+  const next = new Set(excluded.value)
+  if (include) next.delete(importHash)
+  else next.add(importHash)
+  excluded.value = next
+}
+
 async function runImport() {
-  if (preview.value.length === 0) return
+  const rows = preview.value.filter((row) => !excluded.value.has(row.importHash))
+  if (rows.length === 0) return
   busy.value = true
   errorCode.value = ''
   try {
-    importedCount.value = await importParsedRows(preview.value)
+    importedCount.value = await importParsedRows(rows)
     preview.value = []
     skipped.value = {}
+    excluded.value = new Set()
+    duplicateHints.value = new Map()
   } catch {
     errorCode.value = 'import.failed'
   } finally {
@@ -147,12 +176,18 @@ async function runImport() {
       :preview="preview"
       :skipped="skipped"
       :importing="busy"
+      :excluded="excluded"
+      :duplicate-hints="duplicateHints"
       @import="runImport"
       @set-category="setCategory"
+      @toggle-include="toggleInclude"
     />
 
     <p v-if="importedCount != null" class="text-success text-sm">
       {{ t('import.done', { count: importedCount }) }}
+      <RouterLink to="/settings" class="text-brand ml-1 underline">
+        {{ t('import.backupReminder') }}
+      </RouterLink>
     </p>
   </div>
 </template>

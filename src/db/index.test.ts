@@ -127,4 +127,26 @@ describe('schema upgrades', () => {
     await db.open()
     expect((await db.txns.toArray())[0]?.category).toBe('travel')
   })
+
+  it('resets untouched default monthly limit when upgrading to v9', async () => {
+    db.close()
+    await Dexie.delete('budget-tracker')
+    const v8 = new Dexie('budget-tracker')
+    v8.version(8).stores({
+      txns: '++id, date, category, source, &importHash',
+      rules: '++id, pattern',
+      categories: '&id',
+      settings: '&key',
+      ignoredImports: '&importHash',
+    })
+    await v8.open()
+    await v8.table('settings').put({ key: 'monthlyLimitCents', value: '60000' })
+    v8.close()
+
+    await db.open()
+    expect(await db.settings.get('monthlyLimitCents')).toEqual({
+      key: 'monthlyLimitCents',
+      value: '0',
+    })
+  })
 })

@@ -3,6 +3,7 @@ import Dexie, { type Table } from 'dexie'
 import { DEFAULT_CATEGORIES } from '@/domain/categories'
 import { subcategoryUpgrade } from '@/domain/categorize'
 import { DEFAULT_SETTINGS, settingsToRows } from '@/domain/settings'
+import { applyDataFixes, resetUntouchedDefaultLimit } from '@/db/migrations'
 
 export type TxnSource = 'kartica' | 'revolut' | 'zaba' | 'gotovina'
 
@@ -125,6 +126,12 @@ class BudgetDatabase extends Dexie {
             const next = subcategoryUpgrade(txn)
             if (next) txn.category = next
           })
+      })
+    this.version(9)
+      .stores({})
+      .upgrade(async (tx) => {
+        await applyDataFixes(tx)
+        await resetUntouchedDefaultLimit(tx)
       })
   }
 }

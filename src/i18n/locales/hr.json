@@ -55,7 +55,9 @@
     "byCategory": "Po kategorijama",
     "showSubcategories": "Prikaži podkategorije: {category}",
     "showExpenses": "Prikaži troškove: {category}",
-    "noExpenses": "Nema troškova u ovoj kategoriji."
+    "noExpenses": "Nema troškova u ovoj kategoriji.",
+    "backupDue": "Nema sigurnosne kopije u zadnjih 30 dana.",
+    "backupDueLink": "Izvezi u Postavkama"
   },
   "transactions": {
     "empty": "Nema transakcija za odabrani mjesec.",
@@ -102,6 +104,9 @@
     "previewHelp": "Kategoriju možeš promijeniti prije uvoza.",
     "fileResult": "{name}: {kind}",
     "importButton": "Uvezi u bazu",
+    "includeRow": "Uvezi",
+    "possibleDuplicate": "Moguć duplikat: {merchant}",
+    "backupReminder": "Napravi sigurnosnu kopiju.",
     "done": "Uvezeno {count} transakcija.",
     "skippedHeading": "Nije uvezeno",
     "detected": {

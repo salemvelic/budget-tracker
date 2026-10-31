@@ -5,6 +5,7 @@ import { DEFAULT_SETTINGS, rowsToSettings, settingsToRows, validateSettings } fr
 describe('validateSettings', () => {
   it('returns defaults when partial input is empty', () => {
     expect(validateSettings({})).toEqual(DEFAULT_SETTINGS)
+    expect(DEFAULT_SETTINGS.monthlyLimitCents).toBe(0)
   })
 
   it('rejects negative or fractional amounts', () => {

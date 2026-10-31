@@ -73,3 +73,30 @@ export function dedupeWithinBatch(rows: ParsedImportRow[]): ParsedImportRow[] {
     return true
   })
 }
+
+export interface ExistingTxnMatch {
+  importHash?: string
+  source: TxnSource
+  date: string
+  amountCents: number
+  merchant: string
+}
+
+/** Maps new row importHash to an existing merchant when source, date and amount match. */
+export function possibleDuplicates(
+  rows: ParsedImportRow[],
+  existing: ExistingTxnMatch[],
+): Map<string, string> {
+  const hints = new Map<string, string>()
+  for (const row of rows) {
+    const match = existing.find(
+      (txn) =>
+        txn.importHash !== row.importHash &&
+        txn.source === row.source &&
+        txn.date === row.date &&
+        txn.amountCents === row.amountCents,
+    )
+    if (match) hints.set(row.importHash, match.merchant)
+  }
+  return hints
+}

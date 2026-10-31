@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { backupFileName, buildBackup, parseBackup, type BackupData } from './backup'
+import { backupDue, backupFileName, buildBackup, parseBackup, type BackupData } from './backup'
 
 const data: BackupData = {
   txns: [
@@ -48,5 +48,25 @@ describe('backup', () => {
     expect(backupFileName(new Date('2026-10-31T10:00:00Z'))).toBe(
       'budget-tracker-backup-2026-10-31.json',
     )
+  })
+})
+
+describe('backupDue', () => {
+  const now = Date.parse('2026-10-31T12:00:00Z')
+
+  it('is false with no transactions', () => {
+    expect(backupDue(0, 0, now)).toBe(false)
+  })
+
+  it('is true when never backed up but data exists', () => {
+    expect(backupDue(0, 5, now)).toBe(true)
+  })
+
+  it('is false within 30 days', () => {
+    expect(backupDue(now - 10 * 86400000, 5, now)).toBe(false)
+  })
+
+  it('is true after 30 days', () => {
+    expect(backupDue(now - 31 * 86400000, 5, now)).toBe(true)
   })
 })

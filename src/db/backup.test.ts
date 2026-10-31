@@ -51,4 +51,27 @@ describe('backup restore', () => {
     expect(await db.categories.get('cash')).toBeDefined()
     expect(await db.categories.get('loans')).toBeDefined()
   })
+
+  it('runs data fixes after restore', async () => {
+    await restoreBackupData({
+      txns: [
+        {
+          date: '2026-10-01',
+          amountCents: 100,
+          merchant: 'LIDL P-1 Grad',
+          source: 'revolut',
+          category: 'food',
+        },
+      ],
+      rules: [],
+      categories: [
+        { id: 'food', nameKey: 'categories.food' },
+        { id: 'other', nameKey: 'categories.other' },
+      ],
+      settings: [],
+      ignoredImports: [],
+    })
+    expect((await db.txns.toArray())[0]?.category).toBe('groceries')
+    expect(await db.categories.get('groceries')).toBeDefined()
+  })
 })

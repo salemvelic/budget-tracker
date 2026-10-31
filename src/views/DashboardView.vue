@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { RouterLink } from 'vue-router'
 
 import MonthPicker from '@/components/MonthPicker.vue'
 import DashboardExpenseList from '@/components/DashboardExpenseList.vue'
@@ -9,6 +10,7 @@ import { db, type Category, type Txn, type TxnSource } from '@/db'
 import { latestImportDates } from '@/db/txns'
 import { rollupTotals, spendingCategories, topLevelId } from '@/domain/categories'
 import { isSameMerchant } from '@/domain/categorize'
+import { backupDue } from '@/domain/backup'
 import { monthCoverage } from '@/domain/coverage'
 import { formatEur } from '@/domain/money'
 import { dailyAllowanceCents, formatIsoDate, monthKey, monthRange, todayIso } from '@/domain/month'
@@ -46,6 +48,13 @@ const txns = useLiveQuery(
 )
 const categories = useLiveQuery(() => db.categories.toArray(), [] as Category[])
 const latest = useLiveQuery(latestImportDates, {} as Partial<Record<TxnSource, string>>)
+const allTxnCount = useLiveQuery(async () => db.txns.count(), 0)
+
+const showBackupDue = computed(
+  () =>
+    settingsStore.loaded &&
+    backupDue(settingsStore.settings.lastBackupAt, allTxnCount.value),
+)
 
 const totals = computed(() => totalsByCategory(txns.value))
 const plan = computed(() =>
@@ -154,6 +163,13 @@ const remainingClass = computed(() => {
 <template>
   <div class="space-y-6">
     <MonthPicker v-model="selectedMonth" />
+
+    <p v-if="showBackupDue" class="text-warning border-warning/30 bg-surface-muted rounded-xl border p-4 text-sm">
+      {{ t('dashboard.backupDue') }}
+      <RouterLink to="/settings" class="text-brand ml-1 underline">{{
+        t('dashboard.backupDueLink')
+      }}</RouterLink>
+    </p>
 
     <section class="grid gap-4 sm:grid-cols-2">
       <article class="border-border bg-surface-muted rounded-xl border p-4">

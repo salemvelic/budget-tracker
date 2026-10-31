@@ -75,9 +75,18 @@ describe('TransactionList', () => {
 })
 
 describe('ImportPreview', () => {
+  const emptyExcluded = new Set<string>()
+  const emptyHints = new Map<string, string>()
+
   it('lists skip reasons with counts', () => {
     const wrapper = mount(ImportPreview, {
-      props: { preview: [], skipped: { transfer: 4, payment: 2, pending: 0 }, importing: false },
+      props: {
+        preview: [],
+        skipped: { transfer: 4, payment: 2, pending: 0 },
+        importing: false,
+        excluded: emptyExcluded,
+        duplicateHints: emptyHints,
+      },
       global,
     })
     expect(wrapper.text()).toContain('Nadoplate i prijenosi: 4')
@@ -96,7 +105,13 @@ describe('ImportPreview', () => {
       importHash: 'zaba|id:B1',
     }
     const wrapper = mount(ImportPreview, {
-      props: { preview: [row], skipped: {}, importing: false },
+      props: {
+        preview: [row],
+        skipped: {},
+        importing: false,
+        excluded: emptyExcluded,
+        duplicateHints: emptyHints,
+      },
       global,
     })
     await vi.waitFor(() => expect(wrapper.findAll('option').length).toBe(DEFAULT_CATEGORIES.length))
