@@ -49,6 +49,7 @@
     "coverageHeading": "Imported data up to",
     "coverageIncomplete": "Some sources are missing the end of the month – import the next statement.",
     "savedThisMonth": "Savings & investments this month",
+    "showSavings": "Show savings breakdown",
     "emergencyFund": "Emergency fund",
     "emergencyProgress": "{saved} / {target}",
     "byCategory": "By category",

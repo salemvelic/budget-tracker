@@ -8,11 +8,12 @@ import { useLiveQuery } from '@/composables/useLiveQuery'
 import { db, type Category, type Txn, type TxnSource } from '@/db'
 import { latestImportDates } from '@/db/txns'
 import { rollupTotals, spendingCategories, topLevelId } from '@/domain/categories'
+import { isSameMerchant } from '@/domain/categorize'
 import { monthCoverage } from '@/domain/coverage'
 import { formatEur } from '@/domain/money'
 import { dailyAllowanceCents, formatIsoDate, monthKey, monthRange, todayIso } from '@/domain/month'
 import { monthPlan } from '@/domain/plan'
-import { totalsByCategory, txnsInCategory } from '@/domain/transactions'
+import { totalsByCategory, totalsByMerchant, txnsInCategory } from '@/domain/transactions'
 import { useSettingsStore } from '@/stores/settings'
 
 const { t, locale } = useI18n()
@@ -20,11 +21,15 @@ const settingsStore = useSettingsStore()
 const selectedMonth = ref(monthKey())
 const expandedId = ref<string | null>(null)
 const openListId = ref<string | null>(null)
+const savingsOpen = ref(false)
+const openSavingsMerchant = ref<string | null>(null)
 const isCurrentMonth = computed(() => selectedMonth.value === monthKey())
 
 watch(selectedMonth, () => {
   expandedId.value = null
   openListId.value = null
+  savingsOpen.value = false
+  openSavingsMerchant.value = null
 })
 
 onMounted(() => {
@@ -53,13 +58,22 @@ const emergencyProgress = computed(() => {
   return Math.min(100, Math.round((settingsStore.settings.emergencySavedCents / target) * 100))
 })
 
+const nonSpendingCategoryIds = computed(
+  () =>
+    new Set(
+      categories.value
+        .filter((category) => !spendingCategories(categories.value).includes(category))
+        .map((c) => c.id),
+    ),
+)
+
+const savingsTxns = computed(() => txns.value.filter((txn) => nonSpendingCategoryIds.value.has(txn.category)))
+const savingsGroups = computed(() => totalsByMerchant(savingsTxns.value))
+
 const categoryTotals = computed(() => {
-  const savingsIds = new Set(
-    categories.value.filter((category) => !spendingCategories(categories.value).includes(category)).map((c) => c.id),
-  )
   const rolled = rollupTotals(totals.value, categories.value)
   return Object.entries(rolled)
-    .filter(([id]) => !savingsIds.has(id))
+    .filter(([id]) => !nonSpendingCategoryIds.value.has(id))
     .sort((a, b) => b[1] - a[1])
     .map(([id, cents]) => ({
       id,
@@ -107,6 +121,21 @@ function onCategoryClick(row: (typeof categoryTotals.value)[number]) {
 
 function onSubcategoryClick(categoryId: string) {
   openListId.value = openListId.value === categoryId ? null : categoryId
+}
+
+function onSavingsClick() {
+  if (!savingsGroups.value.length) return
+  savingsOpen.value = !savingsOpen.value
+  if (!savingsOpen.value) openSavingsMerchant.value = null
+}
+
+function onSavingsGroupClick(merchant: string) {
+  openSavingsMerchant.value =
+    openSavingsMerchant.value && isSameMerchant(openSavingsMerchant.value, merchant) ? null : merchant
+}
+
+function isOpenSavingsGroup(merchant: string) {
+  return openSavingsMerchant.value != null && isSameMerchant(openSavingsMerchant.value, merchant)
 }
 
 const remainingClass = computed(() => {
@@ -174,8 +203,45 @@ const remainingClass = computed(() => {
 
     <section class="grid gap-4 sm:grid-cols-2">
       <article class="rounded-xl border border-border bg-surface-muted p-4">
-        <p class="text-sm text-muted">{{ t('dashboard.savedThisMonth') }}</p>
-        <p class="mt-1 text-2xl font-semibold tabular-nums">{{ formatEur(plan.savedCents) }}</p>
+        <component
+          :is="savingsGroups.length ? 'button' : 'div'"
+          :type="savingsGroups.length ? 'button' : undefined"
+          class="w-full text-left"
+          :class="savingsGroups.length ? 'rounded-lg hover:bg-surface' : ''"
+          :aria-expanded="savingsGroups.length ? savingsOpen : undefined"
+          :aria-label="savingsGroups.length ? t('dashboard.showSavings') : undefined"
+          @click="savingsGroups.length ? onSavingsClick() : undefined"
+        >
+          <p class="text-sm text-muted">{{ t('dashboard.savedThisMonth') }}</p>
+          <div class="mt-1 flex items-center justify-between gap-2">
+            <span class="flex min-w-0 items-center gap-1">
+              <span
+                v-if="savingsGroups.length"
+                class="inline-block w-4 shrink-0 text-muted transition-transform"
+                :class="savingsOpen ? 'rotate-90' : ''"
+                aria-hidden="true"
+              >
+                ›
+              </span>
+              <span class="text-2xl font-semibold tabular-nums">{{ formatEur(plan.savedCents) }}</span>
+            </span>
+          </div>
+        </component>
+        <ul v-if="savingsOpen && savingsGroups.length" class="mt-2 space-y-0.5 text-sm">
+          <li v-for="group in savingsGroups" :key="group.merchant">
+            <button
+              type="button"
+              class="flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left text-muted hover:bg-surface"
+              :aria-expanded="isOpenSavingsGroup(group.merchant)"
+              :aria-label="t('dashboard.showExpenses', { category: group.merchant })"
+              @click="onSavingsGroupClick(group.merchant)"
+            >
+              <span class="min-w-0 break-words">{{ group.merchant }}</span>
+              <span class="shrink-0 tabular-nums">{{ formatEur(group.cents) }}</span>
+            </button>
+            <DashboardExpenseList v-if="isOpenSavingsGroup(group.merchant)" :txns="group.txns" variant="indented" />
+          </li>
+        </ul>
       </article>
       <article class="rounded-xl border border-border bg-surface-muted p-4">
         <div class="flex items-center justify-between gap-3">
