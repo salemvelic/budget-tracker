@@ -12,6 +12,17 @@ const categories: Category[] = [
 ]
 
 describe('monthPlan', () => {
+  it('computes savings rate from income and savings totals', () => {
+    const withIncome: Category[] = [
+      ...categories,
+      { id: 'income', nameKey: 'categories.income', kind: 'income' },
+    ]
+    const plan = monthPlan(withIncome, { food: 10000, savings: 3000, income: 50000 }, 60000)
+    expect(plan.incomeCents).toBe(50000)
+    expect(plan.savingsRate).toBeCloseTo(0.06)
+    expect(plan.spentCents).toBe(10000)
+  })
+
   it('uses the sum of category limits and reserves fixed costs before they are debited', () => {
     const plan = monthPlan(categories, { food: 10000, other: 5000, savings: 3000 }, 60000)
     expect(plan).toMatchObject({

@@ -26,8 +26,8 @@ export interface CategoryRule {
   category: string
 }
 
-/** `fixed`: counted as spending but reserved up front; `savings`: not spending at all. */
-export type CategoryKind = 'fixed' | 'savings'
+/** `fixed`: counted as spending but reserved up front; `savings`: not spending at all; `income`: not spending. */
+export type CategoryKind = 'fixed' | 'savings' | 'income'
 
 export interface Category {
   id: string
@@ -134,6 +134,18 @@ class BudgetDatabase extends Dexie {
       .upgrade(async (tx) => {
         await applyDataFixes(tx)
         await resetUntouchedDefaultLimit(tx)
+      })
+    this.version(10)
+      .stores({})
+      .upgrade(async (tx) => {
+        const table = tx.table<Category, string>('categories')
+        if (!(await table.get('income'))) {
+          await table.add({
+            id: 'income',
+            nameKey: 'categories.income',
+            kind: 'income',
+          })
+        }
       })
   }
 }

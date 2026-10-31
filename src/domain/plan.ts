@@ -15,6 +15,9 @@ export interface MonthPlan {
   /** What is left for variable spending after fixed costs are set aside. */
   flexibleLeftCents: number
   savedCents: number
+  incomeCents: number
+  /** Share of income saved this month, or null when there is no income. */
+  savingsRate: number | null
 }
 
 /** Limits and kinds live on top-level categories; subcategory totals count toward their parent. */
@@ -30,15 +33,17 @@ export function monthPlan(
   let fixedSpentCents = 0
   let variableSpentCents = 0
   let savedCents = 0
+  let incomeCents = 0
   for (const [id, cents] of Object.entries(totals)) {
     const kind = byId.get(id)?.kind
-    if (kind === 'savings') savedCents += cents
+    if (kind === 'income') incomeCents += cents
+    else if (kind === 'savings') savedCents += cents
     else if (kind === 'fixed') fixedSpentCents += cents
     else variableSpentCents += cents
   }
 
   const budgetSum = tops
-    .filter((category) => category.kind !== 'savings')
+    .filter((category) => category.kind !== 'savings' && category.kind !== 'income')
     .reduce((sum, category) => sum + (category.budgetCents ?? 0), 0)
   const usesCategoryBudgets = budgetSum > 0
   const limitCents = usesCategoryBudgets ? budgetSum : monthlyLimitCents
@@ -61,5 +66,7 @@ export function monthPlan(
     remainingCents: limitCents - spentCents,
     flexibleLeftCents: limitCents - fixedReservedCents - variableSpentCents,
     savedCents,
+    incomeCents,
+    savingsRate: incomeCents > 0 ? savedCents / incomeCents : null,
   }
 }

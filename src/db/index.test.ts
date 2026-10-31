@@ -149,4 +149,29 @@ describe('schema upgrades', () => {
       value: '0',
     })
   })
+
+  it('adds income category when upgrading to v10', async () => {
+    db.close()
+    await Dexie.delete('budget-tracker')
+    const v9 = new Dexie('budget-tracker')
+    v9.version(9).stores({
+      txns: '++id, date, category, source, &importHash',
+      rules: '++id, pattern',
+      categories: '&id',
+      settings: '&key',
+      ignoredImports: '&importHash',
+    })
+    await v9.open()
+    await v9.table('categories').bulkAdd([
+      { id: 'food', nameKey: 'categories.food' },
+      { id: 'other', nameKey: 'categories.other' },
+    ])
+    v9.close()
+
+    await db.open()
+    expect(await db.categories.get('income')).toMatchObject({
+      kind: 'income',
+      nameKey: 'categories.income',
+    })
+  })
 })

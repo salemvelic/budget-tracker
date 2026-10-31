@@ -77,9 +77,10 @@ describe('hierarchy', () => {
 })
 
 describe('spendingCategories', () => {
-  it('drops savings but keeps fixed categories', () => {
+  it('drops savings and income but keeps fixed categories', () => {
     const ids = spendingCategories(DEFAULT_CATEGORIES).map((category) => category.id)
     expect(ids).toContain('loans')
     expect(ids).not.toContain('savings')
+    expect(ids).not.toContain('income')
   })
 })
