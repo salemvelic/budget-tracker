@@ -44,6 +44,8 @@
     "remaining": "Preostalo",
     "flexibleLeft": "Za promjenjive troškove (nakon fiksnih)",
     "dailyAllowance": "Dnevno za promjenjive troškove",
+    "noLimitHint": "Postavi mjesečni limit ili limite po kategorijama za dnevni iznos.",
+    "variableOver": "Promjenjivi troškovi premašeni za {amount}.",
     "coverageHeading": "Uvezeni podaci do",
     "coverageIncomplete": "Za neke izvore nedostaje kraj mjeseca – uvezi sljedeći izvod.",
     "savedThisMonth": "Štednja i ulaganja u mjesecu",

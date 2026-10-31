@@ -57,5 +57,5 @@ export function dailyAllowanceCents(
   today: Date = new Date(),
 ): number {
   const daysLeft = Math.max(1, daysLeftInMonth(today))
-  return Math.floor((limitCents - spentCents) / daysLeft)
+  return Math.max(0, Math.floor((limitCents - spentCents) / daysLeft))
 }

@@ -16,17 +16,17 @@ export const DEFAULT_CATEGORY_RULES: Rule[] = [
   },
   {
     pattern:
-      'pub|bar|pivnic\\p{L}*|\\p{L}*beer\\p{L}*|\\p{L}*brew\\p{L}*|\\p{L}*caf(?:e|é)|caffe|kafić|kafic|cuga|\\p{L}*gelater\\p{L}*|rakhia|vinoteka',
+      'pub|bar|pivnic\\p{L}*|\\p{L}*beer\\p{L}*|\\p{L}*brew\\p{L}*|\\p{L}*caf(?:e|é)|caffe|kafić|kafic|cuga|\\p{L}*gelater\\p{L}*|rakhia|vinoteka|t5 social',
     category: 'bars',
   },
   {
     pattern:
-      'eventim|entrio|ulaznic\\p{L}*|cinestar|cinema|kino|eventbook|koncert\\p{L}*|concert|kazališt\\p{L}*|teatar|theatre|muzej|museum|hajduk|dinamo|utakmic\\p{L}*|stadion',
+      'eventim|entrio|ulaznic\\p{L}*|cinestar|cinema|kino|eventbook|koncert\\p{L}*|concert|kazališt\\p{L}*|teatar|theatre|muzej|museum|hajduk|dinamo|utakmic\\p{L}*|stadion|ludaku(?:c|ć)a',
     category: 'entertainment',
   },
   {
     pattern:
-      "ryanair|easyjet|wizz ?air|croatia airlines|lufthansa|air ?china|\\p{L}*airlines?|\\p{L}*airways|railways?|temir yo'llari|cfr călători|cfr calatori|hžpp|hž|flixbus|go bus|arriva|booking\\.com|airbnb|hotel|hostel|e-?visa|gov\\.kg|suvenir\\p{L}*",
+      "ryanair|easyjet|wizz ?air|croatia airlines|lufthansa|air ?china|\\p{L}*airlines?|\\p{L}*airways|railways?|temir yo'llari|cfr călători|cfr calatori|hžpp|hž|flixbus|go bus|arriva|booking\\.com|airbnb|hotel|hostel|e-?visa|gov\\.kg|suvenir\\p{L}*|stb bucure\\p{L}*|metrorex",
     category: 'travel',
   },
   { pattern: 'ina|petrol|tifon|crodux|omv|mol|lukoil|shell|fuel|ktc.*?b\\.p\\.', category: 'fuel' },

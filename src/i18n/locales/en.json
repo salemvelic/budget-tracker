@@ -44,6 +44,8 @@
     "remaining": "Remaining",
     "flexibleLeft": "For variable spending (after fixed costs)",
     "dailyAllowance": "Daily for variable spending",
+    "noLimitHint": "Set a monthly limit or category budgets to see a daily allowance.",
+    "variableOver": "Variable spending is over by {amount}.",
     "coverageHeading": "Imported data up to",
     "coverageIncomplete": "Some sources are missing the end of the month – import the next statement.",
     "savedThisMonth": "Savings & investments this month",
