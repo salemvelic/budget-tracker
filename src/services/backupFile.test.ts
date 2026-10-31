@@ -10,14 +10,16 @@ function mockHandle(name = 'demo-backup.json') {
   const writes: string[] = []
   return {
     name,
-    queryPermission: vi.fn(async () => 'granted' as PermissionState),
-    requestPermission: vi.fn(async () => 'granted' as PermissionState),
-    createWritable: vi.fn(async () => ({
+    queryPermission: vi.fn<[], PermissionState>(async () => 'granted'),
+    requestPermission: vi.fn<[], PermissionState>(async () => 'granted'),
+    createWritable: vi.fn<[], Promise<{ write: (data: string) => Promise<void>; close: () => Promise<void> }>>(
+      async () => ({
       write: async (data: string) => {
         writes.push(data)
       },
       close: async () => undefined,
-    })),
+      }),
+    ),
     writes,
   }
 }
@@ -43,7 +45,7 @@ describe('saveBackupToFile', () => {
   })
 
   it('downloads when the File System Access API is missing', async () => {
-    const click = vi.fn()
+    const click = vi.fn<[], void>()
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock')
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined)
     vi.spyOn(document, 'createElement').mockReturnValue({ click } as unknown as HTMLAnchorElement)
@@ -54,7 +56,9 @@ describe('saveBackupToFile', () => {
 
   it('reuses a stored handle on the second save', async () => {
     const handle = mockHandle()
-    window.showSaveFilePicker = vi.fn(async () => handle as unknown as FileSystemFileHandle)
+    window.showSaveFilePicker = vi.fn<[], Promise<FileSystemFileHandle>>(async () =>
+      handle as unknown as FileSystemFileHandle,
+    )
     expect(await saveBackupToFile('{"a":1}')).toBe('file')
     expect(await saveBackupToFile('{"b":2}')).toBe('file')
     expect(window.showSaveFilePicker).toHaveBeenCalledTimes(1)
@@ -65,12 +69,12 @@ describe('saveBackupToFile', () => {
     const first = mockHandle('first.json')
     const second = mockHandle('second.json')
     window.showSaveFilePicker = vi
-      .fn()
+      .fn<[], Promise<FileSystemFileHandle>>()
       .mockResolvedValueOnce(first as unknown as FileSystemFileHandle)
       .mockResolvedValueOnce(second as unknown as FileSystemFileHandle)
     expect(await saveBackupToFile('a')).toBe('file')
-    first.queryPermission = vi.fn(async () => 'denied' as PermissionState)
-    first.requestPermission = vi.fn(async () => 'denied' as PermissionState)
+    first.queryPermission = vi.fn<[], PermissionState>(async () => 'denied')
+    first.requestPermission = vi.fn<[], PermissionState>(async () => 'denied')
     expect(await saveBackupToFile('b')).toBe('file')
     expect(window.showSaveFilePicker).toHaveBeenCalledTimes(2)
   })
@@ -87,7 +91,9 @@ describe('chooseBackupFile', () => {
 
   it('stores a newly picked handle', async () => {
     const handle = mockHandle()
-    window.showSaveFilePicker = vi.fn(async () => handle as unknown as FileSystemFileHandle)
+    window.showSaveFilePicker = vi.fn<[], Promise<FileSystemFileHandle>>(async () =>
+      handle as unknown as FileSystemFileHandle,
+    )
     expect(await chooseBackupFile()).toBe(true)
     expect(await hasBackupFile()).toBe(true)
   })
