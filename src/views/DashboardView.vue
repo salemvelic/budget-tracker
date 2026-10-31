@@ -241,7 +241,6 @@ const remainingClass = computed(() => {
           class="w-full text-left"
           :class="savingsGroups.length ? 'hover:bg-surface rounded-lg' : ''"
           :aria-expanded="savingsGroups.length ? savingsOpen : undefined"
-          :aria-label="savingsGroups.length ? t('dashboard.showSavings') : undefined"
           @click="savingsGroups.length ? onSavingsClick() : undefined"
         >
           <p class="text-muted text-sm">{{ t('dashboard.savedThisMonth') }}</p>
@@ -267,7 +266,6 @@ const remainingClass = computed(() => {
               type="button"
               class="text-muted hover:bg-surface flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left"
               :aria-expanded="isOpenSavingsGroup(group.merchant)"
-              :aria-label="t('dashboard.showExpenses', { category: group.merchant })"
               @click="onSavingsGroupClick(group.merchant)"
             >
               <span class="min-w-0 break-words">{{ group.merchant }}</span>
@@ -310,11 +308,6 @@ const remainingClass = computed(() => {
             type="button"
             class="hover:bg-surface flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left"
             :aria-expanded="categoryHasSubrows(row) ? expandedId === row.id : openListId === row.id"
-            :aria-label="
-              categoryHasSubrows(row)
-                ? t('dashboard.showSubcategories', { category: nameOf(row.id) })
-                : t('dashboard.showExpenses', { category: nameOf(row.id) })
-            "
             @click="onCategoryClick(row)"
           >
             <span class="flex min-w-0 items-center gap-1">
@@ -342,7 +335,6 @@ const remainingClass = computed(() => {
                 type="button"
                 class="text-muted hover:bg-surface flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left"
                 :aria-expanded="openListId === childId"
-                :aria-label="t('dashboard.showExpenses', { category: nameOf(childId) })"
                 @click="onSubcategoryClick(childId)"
               >
                 <span>{{ nameOf(childId) }}</span>

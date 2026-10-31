@@ -49,12 +49,9 @@
     "coverageHeading": "Imported data up to",
     "coverageIncomplete": "Some sources are missing the end of the month – import the next statement.",
     "savedThisMonth": "Savings & investments this month",
-    "showSavings": "Show savings breakdown",
     "emergencyFund": "Emergency fund",
     "emergencyProgress": "{saved} / {target}",
     "byCategory": "By category",
-    "showSubcategories": "Show subcategories: {category}",
-    "showExpenses": "Show expenses: {category}",
     "noExpenses": "No expenses in this category.",
     "backupDue": "No backup in the last 30 days.",
     "backupDueLink": "Export in Settings"
@@ -65,6 +62,8 @@
     "addHeading": "New transaction",
     "editHeading": "Edit transaction",
     "rememberRule": "Remember category changes for the same merchant",
+    "ruleSuggestHeading": "Rule for “{merchant}”:",
+    "saveRule": "Save rule",
     "ruleSaved": "Rule for “{merchant}” saved. {count} more transactions changed.",
     "categoryFor": "Category for {merchant}",
     "sources": {

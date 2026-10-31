@@ -91,6 +91,50 @@ export function merchantRulePattern(merchant: string): string {
   return normalizeMerchant(merchant).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+const CITY_WORDS = new Set([
+  'zagreb',
+  'split',
+  'rijeka',
+  'osijek',
+  'zadar',
+  'pula',
+  'sisak',
+  'karlovac',
+  'varazdin',
+  'varždin',
+  'sibenik',
+  'šibenik',
+  'dubrovnik',
+  'velika',
+  'gorica',
+  'samobor',
+  'krizevci',
+  'križevci',
+  'sveta',
+  'nedelja',
+])
+
+function isSkippableMerchantToken(token: string): boolean {
+  const lower = token.toLowerCase()
+  if (/\d/.test(token)) return true
+  if (CITY_WORDS.has(lower)) return true
+  if (/^[a-z]{2}$/i.test(token)) return true
+  if (/\bd\.?o\.?o\.?\b/i.test(token) || /\bd\.d\.?\b/i.test(token)) return true
+  return false
+}
+
+/** Suggested rule pattern: merchant prefix before store number, city or legal suffix. */
+export function suggestedRulePattern(merchant: string): string {
+  const tokens = normalizeMerchant(merchant).split(' ')
+  const kept: string[] = []
+  for (const token of tokens) {
+    if (isSkippableMerchantToken(token)) break
+    kept.push(token)
+  }
+  const phrase = kept.length > 0 ? kept.join(' ') : (tokens[0] ?? normalizeMerchant(merchant))
+  return phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 /** Text that rules are matched against: merchant plus note (transfer purpose, e.g. a match ticket). */
 export function txnDescription(txn: Pick<Txn, 'merchant' | 'note'>): string {
   return txn.note ? `${txn.merchant} ${txn.note}` : txn.merchant
@@ -107,8 +151,9 @@ const SUBCATEGORY_UPGRADES: Record<string, string[] | '*'> = {
  * Only moves broad or default placements; anything the user picked elsewhere stays.
  */
 export function subcategoryUpgrade(
-  txn: Pick<Txn, 'merchant' | 'note' | 'category'>,
+  txn: Pick<Txn, 'merchant' | 'note' | 'category' | 'categoryLocked'>,
 ): string | null {
+  if (txn.categoryLocked) return null
   const allowed = SUBCATEGORY_UPGRADES[txn.category]
   if (!allowed) return null
   const next = categorizeDescription(txnDescription(txn))
@@ -118,12 +163,12 @@ export function subcategoryUpgrade(
 
 /** New categories for transactions still in `other` that now match a rule. */
 export function recategorizeOther(
-  txns: Pick<Txn, 'id' | 'merchant' | 'note' | 'category'>[],
+  txns: Pick<Txn, 'id' | 'merchant' | 'note' | 'category' | 'categoryLocked'>[],
   rules: Rule[],
 ): { id: number; category: string }[] {
   const changes: { id: number; category: string }[] = []
   for (const txn of txns) {
-    if (txn.category !== 'other' || txn.id == null) continue
+    if (txn.categoryLocked || txn.category !== 'other' || txn.id == null) continue
     const category = categorizeDescription(txnDescription(txn), rules)
     if (category !== 'other') changes.push({ id: txn.id, category })
   }
