@@ -141,7 +141,11 @@ function cancelRule() {
           >
             {{ t('transactions.saveRule') }}
           </button>
-          <button type="button" class="border-border rounded-lg border px-4 py-2" @click="cancelRule">
+          <button
+            type="button"
+            class="border-border rounded-lg border px-4 py-2"
+            @click="cancelRule"
+          >
             {{ t('common.cancel') }}
           </button>
         </div>

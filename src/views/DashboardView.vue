@@ -51,9 +51,7 @@ const latest = useLiveQuery(latestImportDates, {} as Partial<Record<TxnSource, s
 const allTxnCount = useLiveQuery(async () => db.txns.count(), 0)
 
 const showBackupDue = computed(
-  () =>
-    settingsStore.loaded &&
-    backupDue(settingsStore.settings.lastBackupAt, allTxnCount.value),
+  () => settingsStore.loaded && backupDue(settingsStore.settings.lastBackupAt, allTxnCount.value),
 )
 
 const totals = computed(() => totalsByCategory(txns.value))
@@ -164,7 +162,10 @@ const remainingClass = computed(() => {
   <div class="space-y-6">
     <MonthPicker v-model="selectedMonth" />
 
-    <p v-if="showBackupDue" class="text-warning border-warning/30 bg-surface-muted rounded-xl border p-4 text-sm">
+    <p
+      v-if="showBackupDue"
+      class="text-warning border-warning/30 bg-surface-muted rounded-xl border p-4 text-sm"
+    >
       {{ t('dashboard.backupDue') }}
       <RouterLink to="/settings" class="text-brand ml-1 underline">{{
         t('dashboard.backupDueLink')

@@ -1,10 +1,6 @@
 import { db, type Txn, type TxnSource } from '@/db'
 import { IMPORT_SOURCES } from '@/domain/coverage'
-import {
-  matchesCategoryPattern,
-  txnDescription,
-  validateRulePattern,
-} from '@/domain/categorize'
+import { matchesCategoryPattern, txnDescription, validateRulePattern } from '@/domain/categorize'
 
 export async function deleteTxn(id: number): Promise<void> {
   await db.transaction('rw', db.txns, db.ignoredImports, async () => {

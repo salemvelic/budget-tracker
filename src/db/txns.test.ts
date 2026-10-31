@@ -45,7 +45,14 @@ describe('recategorizeTxn', () => {
       category: 'other',
     })
     await recategorizeTxn(
-      { id, merchant: 'Demo', category: 'other', date: '2026-10-01', amountCents: 100, source: 'gotovina' },
+      {
+        id,
+        merchant: 'Demo',
+        category: 'other',
+        date: '2026-10-01',
+        amountCents: 100,
+        source: 'gotovina',
+      },
       'food',
     )
     expect(await db.txns.get(id)).toMatchObject({ category: 'food', categoryLocked: true })
