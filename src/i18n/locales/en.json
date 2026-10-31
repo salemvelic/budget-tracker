@@ -64,6 +64,35 @@
       "form.invalid": "Check your input."
     }
   },
+  "import": {
+    "sourceLegend": "Data source",
+    "fileLabel": "Choose file",
+    "allAlreadyImported": "All transactions from this file are already imported.",
+    "sources": {
+      "revolut": "Revolut CSV",
+      "ersteCardClub": "Erste Card Club PDF"
+    },
+    "errors": {
+      "invalid": "The file is not valid.",
+      "csv.invalid": "Invalid CSV.",
+      "csv.notRevolut": "Not a Revolut CSV export.",
+      "import.failed": "Import failed. Try again.",
+      "empty": "No transactions to import from this file.",
+      "pdf.pending": "PDF import is not ready in this build yet.",
+      "pdf.noText": "PDF has no text layer (scan). Import is not possible."
+    },
+    "revolut": {
+      "help": "Import Revolut CSV. Imports CARD_PAYMENT, FEE, and CARD_REFUND (EUR, completed). Transfers and top-ups are skipped.",
+      "previewCount": "{count} new transactions to import",
+      "moreRows": "… and {count} more rows",
+      "skipped": "Skipped: {pending} pending, {other} other types, {fx} foreign currency.",
+      "importButton": "Import into database",
+      "done": "Imported {count} transactions."
+    },
+    "ersteCardClub": {
+      "help": "Import Erste Card Club card statement PDF. Only PDFs with a text layer are supported."
+    }
+  },
   "settings": {
     "monthlyLimit": "Monthly spending limit",
     "emergencyTarget": "Emergency fund target",
