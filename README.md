@@ -2,7 +2,7 @@
 
 Local-first personal budget tracker for tracking monthly spending, category budgets, and CSV imports. Built as a portfolio project with Vue 3 and TypeScript.
 
-**Live demo:** _add GitHub Pages URL after first deploy_
+**Live demo:** https://salemvelic.github.io/budget-tracker/
 
 ## Features (planned)
 
