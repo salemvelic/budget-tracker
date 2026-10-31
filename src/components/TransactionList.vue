@@ -3,10 +3,11 @@ import { useI18n } from 'vue-i18n'
 
 import CategorySelect from '@/components/CategorySelect.vue'
 import type { Category, Txn } from '@/db'
+import { isIncomeCategory } from '@/domain/categories'
 import { formatEur } from '@/domain/money'
 import { formatIsoDate } from '@/domain/month'
 
-defineProps<{
+const props = defineProps<{
   txns: Txn[]
   categories: Category[]
 }>()
@@ -30,6 +31,12 @@ function confirmRemove(txn: Txn) {
 
 function onCategoryChange(txn: Txn, category: string) {
   if (category !== txn.category) emit('recategorize', txn, category)
+}
+function amountLabel(txn: Txn) {
+  if (isIncomeCategory(txn.category, props.categories)) {
+    return `+${formatEur(txn.amountCents)}`
+  }
+  return formatEur(txn.amountCents)
 }
 </script>
 
@@ -64,7 +71,12 @@ function onCategoryChange(txn: Txn, category: string) {
         />
       </div>
       <div class="flex items-center gap-2">
-        <span class="font-semibold tabular-nums">{{ formatEur(txn.amountCents) }}</span>
+        <span
+          class="font-semibold tabular-nums"
+          :class="isIncomeCategory(txn.category, categories) ? 'text-success' : ''"
+        >
+          {{ amountLabel(txn) }}
+        </span>
         <button
           type="button"
           class="border-border rounded-lg border px-3 py-1.5 text-sm"

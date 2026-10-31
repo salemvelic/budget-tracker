@@ -1,3 +1,8 @@
+import type { Category, Txn } from '@/db'
+import { rollupTotals } from '@/domain/categories'
+import { monthRange, shiftMonth } from '@/domain/month'
+import { totalsByCategory } from '@/domain/transactions'
+
 export interface MonthCategoryTotals {
   totals: Record<string, number>
   hasData: boolean
@@ -6,6 +11,34 @@ export interface MonthCategoryTotals {
 export interface CategoryTrend {
   lastMonthCents: number
   avg3Cents: number
+}
+
+/** Rolled-up totals for the three months before selectedMonth (newest first). */
+export function previousMonthTotals(
+  txns: Pick<Txn, 'date' | 'amountCents' | 'category'>[],
+  selectedMonth: string,
+  categories: Category[],
+  excludeCategoryIds: Set<string>,
+): [MonthCategoryTotals, MonthCategoryTotals, MonthCategoryTotals] {
+  return [
+    shiftMonth(selectedMonth, -1),
+    shiftMonth(selectedMonth, -2),
+    shiftMonth(selectedMonth, -3),
+  ].map((ym) => {
+    const { start, end } = monthRange(ym)
+    const monthTxns = txns.filter((txn) => txn.date >= start && txn.date <= end)
+    const rolled = rollupTotals(totalsByCategory(monthTxns), categories)
+    for (const id of Object.keys(rolled)) {
+      if (excludeCategoryIds.has(id)) delete rolled[id]
+    }
+    return { totals: rolled, hasData: monthTxns.length > 0 }
+  }) as [MonthCategoryTotals, MonthCategoryTotals, MonthCategoryTotals]
+}
+
+/** Round up to the next 10 EUR; 0 when there is no average spend. */
+export function suggestedBudgetCents(avg3Cents: number): number {
+  if (avg3Cents <= 0) return 0
+  return Math.ceil(avg3Cents / 1000) * 1000
 }
 
 /** Compare current month category totals to the previous month and a 3-month average. */

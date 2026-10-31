@@ -190,7 +190,9 @@
     "noLimit": "no limit",
     "spent": "Spent",
     "left": "left",
-    "over": "over by"
+    "over": "over by",
+    "suggested": "Suggested: {amount}",
+    "applySuggestion": "Apply"
   },
   "views": {
     "dashboard": {

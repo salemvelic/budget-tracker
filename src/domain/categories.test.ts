@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_CATEGORIES,
   effectiveKind,
+  isIncomeCategory,
   isKnownCategoryId,
   orderedCategories,
   rollupTotals,
@@ -82,5 +83,12 @@ describe('spendingCategories', () => {
     expect(ids).toContain('loans')
     expect(ids).not.toContain('savings')
     expect(ids).not.toContain('income')
+  })
+})
+
+describe('isIncomeCategory', () => {
+  it('is true only for the income kind', () => {
+    expect(isIncomeCategory('income', DEFAULT_CATEGORIES)).toBe(true)
+    expect(isIncomeCategory('food', DEFAULT_CATEGORIES)).toBe(false)
   })
 })
