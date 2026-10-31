@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { Category } from '@/db'
-import { orderedCategories } from '@/domain/categories'
+import { effectiveKind, orderedCategories } from '@/domain/categories'
 
 const props = defineProps<{
   categories: Category[]
@@ -12,7 +12,16 @@ const props = defineProps<{
 const model = defineModel<string>({ required: true })
 
 const { t } = useI18n()
-const options = computed(() => orderedCategories(props.categories))
+const options = computed(() => {
+  const list = orderedCategories(props.categories)
+  const income = list.filter(
+    ({ category }) => effectiveKind(category.id, props.categories) === 'income',
+  )
+  const rest = list.filter(
+    ({ category }) => effectiveKind(category.id, props.categories) !== 'income',
+  )
+  return [...rest, ...income]
+})
 </script>
 
 <template>

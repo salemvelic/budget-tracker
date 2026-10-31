@@ -190,7 +190,9 @@
     "noLimit": "bez limita",
     "spent": "Potrošeno",
     "left": "preostalo",
-    "over": "prekoračeno za"
+    "over": "prekoračeno za",
+    "suggested": "Prijedlog: {amount}",
+    "applySuggestion": "Primijeni"
   },
   "views": {
     "dashboard": {

@@ -27,7 +27,7 @@ import {
   todayIso,
 } from '@/domain/month'
 import { monthPlan } from '@/domain/plan'
-import { categoryTrends } from '@/domain/trends'
+import { categoryTrends, previousMonthTotals } from '@/domain/trends'
 import { totalsByCategory, totalsByMerchant } from '@/domain/transactions'
 import { useSettingsStore } from '@/stores/settings'
 
@@ -121,23 +121,12 @@ const categoryTrendsById = computed(() => {
   for (const id of Object.keys(current)) {
     if (nonSpendingCategoryIds.value.has(id)) delete current[id]
   }
-  const previous = [
-    shiftMonth(selectedMonth.value, -1),
-    shiftMonth(selectedMonth.value, -2),
-    shiftMonth(selectedMonth.value, -3),
-  ].map((ym) => {
-    const { start, end } = monthRange(ym)
-    const monthTxns = windowTxns.value.filter((txn) => txn.date >= start && txn.date <= end)
-    const rolled = rollupTotals(totalsByCategory(monthTxns), categories.value)
-    for (const id of Object.keys(rolled)) {
-      if (nonSpendingCategoryIds.value.has(id)) delete rolled[id]
-    }
-    return { totals: rolled, hasData: monthTxns.length > 0 }
-  }) as [
-    { totals: Record<string, number>; hasData: boolean },
-    { totals: Record<string, number>; hasData: boolean },
-    { totals: Record<string, number>; hasData: boolean },
-  ]
+  const previous = previousMonthTotals(
+    windowTxns.value,
+    selectedMonth.value,
+    categories.value,
+    nonSpendingCategoryIds.value,
+  )
   return categoryTrends(current, previous)
 })
 

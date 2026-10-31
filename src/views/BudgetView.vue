@@ -8,21 +8,64 @@ import { db, type Category, type Txn } from '@/db'
 import { budgetStatus, totalBudgetCents } from '@/domain/budget'
 import { orderedCategories, rollupTotals, spendingCategories } from '@/domain/categories'
 import { formatAmountInput, formatEur, parseHrAmount } from '@/domain/money'
-import { monthKey, monthRange } from '@/domain/month'
+import { monthKey, monthRange, shiftMonth } from '@/domain/month'
+import { categoryTrends, previousMonthTotals, suggestedBudgetCents } from '@/domain/trends'
 import { totalsByCategory } from '@/domain/transactions'
 
 const { t } = useI18n()
 const selectedMonth = ref(monthKey())
 
 const categories = useLiveQuery(() => db.categories.toArray(), [] as Category[])
-const txns = useLiveQuery(
+const windowTxns = useLiveQuery(
   async () => {
-    const { start, end } = monthRange(selectedMonth.value)
+    const start = monthRange(shiftMonth(selectedMonth.value, -3)).start
+    const end = monthRange(selectedMonth.value).end
     return db.txns.where('date').between(start, end, true, true).toArray()
   },
   [] as Txn[],
   selectedMonth,
 )
+const txns = computed(() => {
+  const { start, end } = monthRange(selectedMonth.value)
+  return windowTxns.value.filter((txn) => txn.date >= start && txn.date <= end)
+})
+
+const nonSpendingCategoryIds = computed(
+  () =>
+    new Set(
+      categories.value
+        .filter((category) => !spendingCategories(categories.value).includes(category))
+        .map((c) => c.id),
+    ),
+)
+
+const avgTrendsByCategory = computed(() =>
+  categoryTrends(
+    {},
+    previousMonthTotals(
+      windowTxns.value,
+      selectedMonth.value,
+      categories.value,
+      nonSpendingCategoryIds.value,
+    ),
+  ),
+)
+
+function budgetSuggestionCents(categoryId: string): number {
+  return suggestedBudgetCents(avgTrendsByCategory.value[categoryId]?.avg3Cents ?? 0)
+}
+
+function showBudgetSuggestion(row: (typeof rows.value)[number]) {
+  const suggested = budgetSuggestionCents(row.id)
+  return suggested > 0 && suggested !== (row.budgetCents ?? 0)
+}
+
+async function applySuggestion(id: string) {
+  const cents = budgetSuggestionCents(id)
+  if (cents <= 0) return
+  inputs[id] = formatAmountInput(cents)
+  await saveBudget(id)
+}
 
 const totals = computed(() => totalsByCategory(txns.value))
 const spending = computed(() =>
@@ -126,6 +169,15 @@ async function saveBudget(id: string) {
               :style="{ width: `${row.percent}%` }"
             />
           </div>
+          <p
+            v-if="showBudgetSuggestion(row)"
+            class="text-muted flex flex-wrap items-center gap-2 text-xs"
+          >
+            {{ t('budget.suggested', { amount: formatEur(budgetSuggestionCents(row.id)) }) }}
+            <button type="button" class="text-brand underline" @click="applySuggestion(row.id)">
+              {{ t('budget.applySuggestion') }}
+            </button>
+          </p>
           <p class="text-muted text-xs tabular-nums">
             {{ t('budget.spent') }} {{ formatEur(row.spentCents) }}
             <template v-if="row.remainingCents != null">

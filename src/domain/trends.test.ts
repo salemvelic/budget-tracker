@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { categoryTrends, spendingAboveAverage } from './trends'
+import { categoryTrends, spendingAboveAverage, suggestedBudgetCents } from './trends'
 
 describe('categoryTrends', () => {
   it('averages only months that have data', () => {
@@ -18,5 +18,13 @@ describe('spendingAboveAverage', () => {
     expect(spendingAboveAverage(13000, 10000)).toBe(true)
     expect(spendingAboveAverage(11000, 10000)).toBe(false)
     expect(spendingAboveAverage(5000, 0)).toBe(false)
+  })
+})
+
+describe('suggestedBudgetCents', () => {
+  it('rounds up to the next 10 EUR', () => {
+    expect(suggestedBudgetCents(0)).toBe(0)
+    expect(suggestedBudgetCents(12300)).toBe(13000)
+    expect(suggestedBudgetCents(10000)).toBe(10000)
   })
 })

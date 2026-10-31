@@ -47,6 +47,10 @@ export function spendingCategories(categories: Category[]): Category[] {
   })
 }
 
+export function isIncomeCategory(id: string, categories: Category[]): boolean {
+  return effectiveKind(id, categories) === 'income'
+}
+
 /** Totals per top-level category, with subcategory amounts added to their parent. */
 export function rollupTotals(
   totals: Record<string, number>,
