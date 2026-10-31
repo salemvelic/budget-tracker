@@ -6,7 +6,7 @@ type Rule = Pick<CategoryRule, 'pattern' | 'category'>
 export const DEFAULT_CATEGORY_RULES: Rule[] = [
   {
     pattern:
-      'konzum|superkonzum|lidl|plodine|spar|interspar|eurospar|kaufland|studenac|tommy|ribola|billa|carrefour|profi|mega image|mlinar|pekara|orchard|grocers|mcdonald\'s|wolt|glovo',
+      'konzum|superkonzum|lidl|plodine|spar|interspar|eurospar|kaufland|studenac|tommy|ribola|billa|carrefour|profi|mega image|mlinar|pekara|orchard|grocers|mcdonald\'s|wolt|glovo|restoran|restaurant|pizzeria|bistro|konoba|caffe|cafe|kafić',
     category: 'food',
   },
   { pattern: 'ina|petrol|tifon|crodux|omv|mol|lukoil|shell|fuel', category: 'fuel' },

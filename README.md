@@ -12,6 +12,7 @@ Local-first personal budget tracker for monthly spending, category budgets and b
 - Statement import, parsed entirely in the browser:
   - **Erste card statement PDF** ("Obavijest o troškovima"): purchases, refunds, installments, membership fee, foreign-currency notes
   - **Revolut statement PDF**: card payments, cash withdrawals (Cash category, Revolut fee included), refunds and plan fees; top-ups, transfers, investments, pending and reversed rows are skipped
+  - **Zagrebačka banka PDF** ("Jedinstveni izvadak građana", current account in EUR): card purchases, installments, cash withdrawals, loan instalments (Loans category), bills, transfers to others, fees and card refunds; salary and other incoming payments, Revolut top-ups and Erste card bill payments are skipped (they are already counted from those statements), loan sub-account sections are ignored
   - Re-importing the same statement adds nothing; deleted imported rows stay deleted
 - Category rules (yours first, then built-in), with one-click recategorisation of "Other"
 - JSON backup export/restore and a persistent-storage request

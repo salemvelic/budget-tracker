@@ -133,6 +133,7 @@ function submit() {
         <select v-model="form.source" class="w-full rounded-lg border border-border bg-surface px-3 py-2">
           <option value="kartica">{{ t('transactions.sources.kartica') }}</option>
           <option value="revolut">{{ t('transactions.sources.revolut') }}</option>
+          <option value="zaba">{{ t('transactions.sources.zaba') }}</option>
           <option value="gotovina">{{ t('transactions.sources.gotovina') }}</option>
         </select>
       </label>
