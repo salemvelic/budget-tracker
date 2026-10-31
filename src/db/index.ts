@@ -22,10 +22,14 @@ export interface CategoryRule {
   category: string
 }
 
+/** `fixed`: counted as spending but reserved up front; `savings`: not spending at all. */
+export type CategoryKind = 'fixed' | 'savings'
+
 export interface Category {
   id: string
   nameKey: string
   budgetCents?: number
+  kind?: CategoryKind
 }
 
 export interface SettingRow {
@@ -77,6 +81,16 @@ class BudgetDatabase extends Dexie {
         const categories = tx.table<Category, string>('categories')
         if (!(await categories.get('loans'))) {
           await categories.add({ id: 'loans', nameKey: 'categories.loans' })
+        }
+      })
+    this.version(6)
+      .stores({})
+      .upgrade(async (tx) => {
+        const categories = tx.table<Category, string>('categories')
+        const loans = await categories.get('loans')
+        if (loans && loans.kind == null) await categories.update('loans', { kind: 'fixed' })
+        if (!(await categories.get('savings'))) {
+          await categories.add({ id: 'savings', nameKey: 'categories.savings', kind: 'savings' })
         }
       })
   }

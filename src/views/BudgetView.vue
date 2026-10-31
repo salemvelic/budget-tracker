@@ -6,6 +6,7 @@ import MonthPicker from '@/components/MonthPicker.vue'
 import { useLiveQuery } from '@/composables/useLiveQuery'
 import { db, type Category, type Txn } from '@/db'
 import { budgetStatus, totalBudgetCents } from '@/domain/budget'
+import { spendingCategories } from '@/domain/categories'
 import { formatAmountInput, formatEur, parseHrAmount } from '@/domain/money'
 import { monthKey, monthRange } from '@/domain/month'
 import { totalsByCategory } from '@/domain/transactions'
@@ -23,8 +24,14 @@ const txns = useLiveQuery(
   selectedMonth,
 )
 
-const rows = computed(() => budgetStatus(categories.value, totalsByCategory(txns.value)))
-const totalBudget = computed(() => totalBudgetCents(categories.value))
+const spending = computed(() => spendingCategories(categories.value))
+const rows = computed(() => budgetStatus(spending.value, totalsByCategory(txns.value)))
+const totalBudget = computed(() => totalBudgetCents(spending.value))
+const fixedIds = computed(() => new Set(spending.value.filter((c) => c.kind === 'fixed').map((c) => c.id)))
+
+async function setFixed(id: string, fixed: boolean) {
+  await db.categories.update(id, { kind: fixed ? 'fixed' : undefined })
+}
 
 const inputs = reactive<Record<string, string>>({})
 const invalid = reactive<Record<string, boolean>>({})
@@ -71,6 +78,14 @@ async function saveBudget(id: string) {
         <li v-for="row in rows" :key="row.id" class="space-y-2">
           <div class="flex flex-wrap items-center justify-between gap-3">
             <span class="font-medium">{{ t(row.nameKey) }}</span>
+            <label class="ml-auto flex items-center gap-2 text-sm text-muted">
+              <input
+                type="checkbox"
+                :checked="fixedIds.has(row.id)"
+                @change="setFixed(row.id, ($event.target as HTMLInputElement).checked)"
+              />
+              {{ t('budget.fixed') }}
+            </label>
             <label class="flex items-center gap-2 text-sm">
               <span class="text-muted">{{ t('budget.limit') }}</span>
               <input

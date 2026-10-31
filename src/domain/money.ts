@@ -42,7 +42,10 @@ function parseNormalizedAmount(normalized: string): number {
   }
 
   let decimal: string
-  if (unsigned.includes(',') && unsigned.includes('.')) {
+  if (/^\d{1,3}(\.\d{3})+$/.test(unsigned)) {
+    // "1.500" is Croatian thousands grouping, not 1,5.
+    decimal = unsigned.replace(/\./g, '')
+  } else if (unsigned.includes(',') && unsigned.includes('.')) {
     decimal = unsigned.replace(/\./g, '').replace(',', '.')
   } else if (unsigned.includes(',')) {
     decimal = unsigned.replace(',', '.')

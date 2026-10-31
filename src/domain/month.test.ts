@@ -1,6 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
-import { dailyAllowanceCents, daysLeftInMonth, monthKey, monthRange, shiftMonth, todayIso } from './month'
+import {
+  dailyAllowanceCents,
+  daysLeftInMonth,
+  formatIsoDate,
+  monthKey,
+  monthRange,
+  shiftMonth,
+  todayIso,
+} from './month'
+
+describe('formatIsoDate', () => {
+  it('formats in the requested locale without shifting the day', () => {
+    expect(formatIsoDate('2026-10-31', 'hr')).toMatch(/^31\.\s?10\.\s?2026\.$/)
+    expect(formatIsoDate('2026-01-02', 'en')).toBe('1/2/2026')
+  })
+})
 
 describe('monthKey', () => {
   it('returns yyyy-mm', () => {

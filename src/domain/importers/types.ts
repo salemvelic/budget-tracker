@@ -31,8 +31,18 @@ export interface ImportParseResult {
   skipped: ImportSkipped
 }
 
-export function countSkip(skipped: ImportSkipped, reason: SkipReason): void {
-  skipped[reason] = (skipped[reason] ?? 0) + 1
+export function countSkip(skipped: ImportSkipped, reason: SkipReason, count = 1): void {
+  skipped[reason] = (skipped[reason] ?? 0) + count
+}
+
+export function mergeSkipped(...all: ImportSkipped[]): ImportSkipped {
+  const merged: ImportSkipped = {}
+  for (const skipped of all) {
+    for (const [reason, count] of Object.entries(skipped) as [SkipReason, number][]) {
+      countSkip(merged, reason, count)
+    }
+  }
+  return merged
 }
 
 /** One text fragment of a PDF line with its left x-coordinate. */

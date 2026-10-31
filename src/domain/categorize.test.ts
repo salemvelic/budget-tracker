@@ -2,10 +2,28 @@ import { describe, expect, it } from 'vitest'
 
 import {
   categorizeDescription,
+  isSameMerchant,
   matchesCategoryPattern,
+  merchantRulePattern,
   recategorizeOther,
   validateRulePattern,
 } from './categorize'
+
+describe('merchantRulePattern', () => {
+  it('matches the merchant literally, including regex characters', () => {
+    const pattern = merchantRulePattern('INT*DEMO  Vending (Zagreb)')
+    expect(validateRulePattern(pattern)).toBe('')
+    expect(matchesCategoryPattern(pattern, 'int*demo vending (zagreb)')).toBe(true)
+    expect(matchesCategoryPattern(pattern, 'INTXDEMO vending zagreb')).toBe(false)
+  })
+})
+
+describe('isSameMerchant', () => {
+  it('ignores case and repeated whitespace', () => {
+    expect(isSameMerchant('Demo  Shop ', 'demo shop')).toBe(true)
+    expect(isSameMerchant('Demo Shop', 'Demo Shop 2')).toBe(false)
+  })
+})
 
 describe('matchesCategoryPattern', () => {
   it('does not match inside other words', () => {

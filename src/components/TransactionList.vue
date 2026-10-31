@@ -3,6 +3,7 @@ import { useI18n } from 'vue-i18n'
 
 import type { Category, Txn } from '@/db'
 import { formatEur } from '@/domain/money'
+import { formatIsoDate } from '@/domain/month'
 
 defineProps<{
   txns: Txn[]
@@ -12,9 +13,10 @@ defineProps<{
 const emit = defineEmits<{
   edit: [txn: Txn]
   remove: [id: number]
+  recategorize: [txn: Txn, category: string]
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 function confirmRemove(txn: Txn) {
   if (txn.id != null && window.confirm(t('transactions.confirmDelete', { merchant: txn.merchant }))) {
@@ -22,9 +24,9 @@ function confirmRemove(txn: Txn) {
   }
 }
 
-function categoryLabel(categories: Category[], id: string) {
-  const category = categories.find((item) => item.id === id)
-  return category ? t(category.nameKey) : id
+function onCategoryChange(txn: Txn, event: Event) {
+  const category = (event.target as HTMLSelectElement).value
+  if (category !== txn.category) emit('recategorize', txn, category)
 }
 </script>
 
@@ -38,15 +40,25 @@ function categoryLabel(categories: Category[], id: string) {
       :key="txn.id"
       class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
     >
-      <div>
-        <p class="font-medium">{{ txn.merchant }}</p>
+      <div class="min-w-0 space-y-1">
+        <p class="font-medium break-words">{{ txn.merchant }}</p>
         <p class="text-sm text-muted">
-          {{ txn.date }} · {{ categoryLabel(categories, txn.category) }} ·
-          {{ t(`transactions.sources.${txn.source}`) }}
+          {{ formatIsoDate(txn.date, locale) }} · {{ t(`transactions.sources.${txn.source}`) }}
+          <span v-if="txn.note"> · {{ txn.note }}</span>
         </p>
+        <select
+          :value="txn.category"
+          :aria-label="t('transactions.categoryFor', { merchant: txn.merchant })"
+          class="rounded-lg border border-border bg-surface px-2 py-1 text-sm"
+          @change="onCategoryChange(txn, $event)"
+        >
+          <option v-for="category in categories" :key="category.id" :value="category.id">
+            {{ t(category.nameKey) }}
+          </option>
+        </select>
       </div>
       <div class="flex items-center gap-2">
-        <span class="tabular-nums font-semibold">{{ formatEur(txn.amountCents) }}</span>
+        <span class="font-semibold tabular-nums">{{ formatEur(txn.amountCents) }}</span>
         <button
           type="button"
           class="rounded-lg border border-border px-3 py-1.5 text-sm"

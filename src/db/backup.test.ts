@@ -23,4 +23,17 @@ describe('backup restore', () => {
     expect(await db.ignoredImports.count()).toBe(1)
     expect(await db.categories.count()).toBe(backup.categories.length)
   })
+
+  it('keeps default categories missing from an older backup', async () => {
+    const backup = {
+      ...(await readBackupData()),
+      categories: [{ id: 'food', nameKey: 'categories.food', budgetCents: 20000 }],
+    }
+
+    await restoreBackupData(backup)
+
+    expect(await db.categories.get('food')).toMatchObject({ budgetCents: 20000 })
+    expect(await db.categories.get('cash')).toBeDefined()
+    expect(await db.categories.get('loans')).toBeDefined()
+  })
 })

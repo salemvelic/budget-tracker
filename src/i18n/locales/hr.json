@@ -26,14 +26,21 @@
     "subscriptions": "Pretplate",
     "cash": "Gotovina",
     "loans": "Krediti",
+    "savings": "Štednja i ulaganja",
     "other": "Ostalo"
   },
   "dashboard": {
     "monthSpend": "Potrošeno u mjesecu",
     "noSpend": "Nema potrošnje u ovom mjesecu.",
     "monthLimit": "Mjesečni limit",
+    "limitFromBudgets": "zbroj limita po kategorijama",
+    "fixedPart": "od toga fiksni troškovi",
     "remaining": "Preostalo",
-    "dailyAllowance": "Dnevno do kraja mjeseca",
+    "flexibleLeft": "Za promjenjive troškove (nakon fiksnih)",
+    "dailyAllowance": "Dnevno za promjenjive troškove",
+    "coverageHeading": "Uvezeni podaci do",
+    "coverageIncomplete": "Za neke izvore nedostaje kraj mjeseca – uvezi sljedeći izvod.",
+    "savedThisMonth": "Štednja i ulaganja u mjesecu",
     "emergencyFund": "Hitni fond",
     "emergencyProgress": "{saved} / {target}",
     "byCategory": "Po kategorijama"
@@ -43,6 +50,9 @@
     "confirmDelete": "Obrisati transakciju „{merchant}”?",
     "addHeading": "Nova transakcija",
     "editHeading": "Uredi transakciju",
+    "rememberRule": "Promjenu kategorije zapamti za istog trgovca",
+    "ruleSaved": "Pravilo za „{merchant}” je spremljeno. Promijenjeno još {count} transakcija.",
+    "categoryFor": "Kategorija za {merchant}",
     "sources": {
       "kartica": "Erste kartica",
       "revolut": "Revolut",
@@ -73,11 +83,12 @@
     }
   },
   "import": {
-    "fileLabel": "Odaberi datoteku",
-    "reading": "Čitam datoteku…",
-    "allAlreadyImported": "Sve transakcije iz datoteke su već u bazi.",
+    "fileLabel": "Odaberi PDF izvode (može više odjednom)",
+    "reading": "Čitam datoteke…",
+    "allAlreadyImported": "Sve transakcije iz odabranih datoteka su već u bazi.",
     "previewCount": "{count} novih transakcija za uvoz",
-    "moreRows": "… i još {count} redaka",
+    "previewHelp": "Kategoriju možeš promijeniti prije uvoza.",
+    "fileResult": "{name}: {kind}",
     "importButton": "Uvezi u bazu",
     "done": "Uvezeno {count} transakcija.",
     "skippedHeading": "Nije uvezeno",
@@ -86,12 +97,12 @@
       "revolut": "Revolut izvadak",
       "zaba": "Izvadak Zagrebačke banke"
     },
-    "help": "Odaberi PDF: Erste obavijest o troškovima kartice, Revolut izvadak računa ili jedinstveni izvadak građana Zagrebačke banke. Vrsta se prepoznaje automatski. Uvoze se kartična plaćanja, podizanje gotovine (kategorija Gotovina), rate kredita (Krediti), računi, naknade i povrati. Plaća i ostali priljevi, nadoplate Revoluta, plaćanje Erste kartice, prijenosi i ulaganja se preskaču.",
+    "help": "Odaberi PDF: Erste obavijest o troškovima kartice, Revolut izvadak računa ili jedinstveni izvadak građana Zagrebačke banke. Vrsta se prepoznaje automatski. Uvoze se kartična plaćanja, podizanje gotovine (kategorija Gotovina), rate kredita (Krediti), računi, naknade i povrati. Uplate u Revolut Robo portfolio i na investicijski račun bilježe se kao Štednja i ulaganja i ne računaju se u potrošnju. Plaća i ostali priljevi, nadoplate Revoluta, plaćanje Erste kartice i prijenosi se preskaču.",
     "skipReasons": {
       "pending": "Na čekanju",
       "reversed": "Stornirano",
       "foreignCurrency": "Računi u drugim valutama",
-      "transfer": "Nadoplate, prijenosi i ulaganja",
+      "transfer": "Nadoplate i prijenosi",
       "payment": "Uplate za karticu",
       "income": "Priljevi (plaća i uplate)",
       "unparseable": "Neprepoznati redci"
@@ -109,6 +120,7 @@
   "settings": {
     "limitsHeading": "Limit i hitni fond",
     "monthlyLimit": "Mjesečni limit potrošnje",
+    "monthlyLimitHint": "Koristi se samo ako na stranici Budžet nije postavljen nijedan limit po kategoriji.",
     "emergencyTarget": "Cilj hitnog fonda",
     "emergencySaved": "Trenutno u hitnom fondu",
     "saved": "Postavke su spremljene.",
@@ -146,7 +158,8 @@
     }
   },
   "budget": {
-    "help": "Mjesečni limit po kategoriji. Prazno znači bez limita.",
+    "help": "Mjesečni limit po kategoriji; prazno znači bez limita. Zbroj limita postaje mjesečni limit. Fiksni troškovi (npr. rate kredita) odvajaju se unaprijed, pa dnevni iznos pokazuje koliko ostaje za ostalo.",
+    "fixed": "Fiksni trošak",
     "total": "Ukupno planirano",
     "limit": "Limit",
     "noLimit": "bez limita",

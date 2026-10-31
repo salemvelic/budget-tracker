@@ -26,14 +26,21 @@
     "subscriptions": "Subscriptions",
     "cash": "Cash",
     "loans": "Loans",
+    "savings": "Savings & investments",
     "other": "Other"
   },
   "dashboard": {
     "monthSpend": "Spent in month",
     "noSpend": "No spending this month.",
     "monthLimit": "Monthly limit",
+    "limitFromBudgets": "sum of category limits",
+    "fixedPart": "of which fixed costs",
     "remaining": "Remaining",
-    "dailyAllowance": "Daily until month end",
+    "flexibleLeft": "For variable spending (after fixed costs)",
+    "dailyAllowance": "Daily for variable spending",
+    "coverageHeading": "Imported data up to",
+    "coverageIncomplete": "Some sources are missing the end of the month – import the next statement.",
+    "savedThisMonth": "Savings & investments this month",
     "emergencyFund": "Emergency fund",
     "emergencyProgress": "{saved} / {target}",
     "byCategory": "By category"
@@ -43,6 +50,9 @@
     "confirmDelete": "Delete transaction “{merchant}”?",
     "addHeading": "New transaction",
     "editHeading": "Edit transaction",
+    "rememberRule": "Remember category changes for the same merchant",
+    "ruleSaved": "Rule for “{merchant}” saved. {count} more transactions changed.",
+    "categoryFor": "Category for {merchant}",
     "sources": {
       "kartica": "Erste card",
       "zaba": "ZABA account",
@@ -73,11 +83,12 @@
     }
   },
   "import": {
-    "fileLabel": "Choose file",
-    "reading": "Reading file…",
-    "allAlreadyImported": "All transactions from this file are already imported.",
+    "fileLabel": "Choose PDF statements (several at once is fine)",
+    "reading": "Reading files…",
+    "allAlreadyImported": "All transactions from the selected files are already imported.",
     "previewCount": "{count} new transactions to import",
-    "moreRows": "… and {count} more rows",
+    "previewHelp": "You can change categories before importing.",
+    "fileResult": "{name}: {kind}",
     "importButton": "Import into database",
     "done": "Imported {count} transactions.",
     "skippedHeading": "Not imported",
@@ -86,12 +97,12 @@
       "revolut": "Revolut statement",
       "zaba": "Zagrebačka banka statement"
     },
-    "help": "Choose a PDF: an Erste card statement, a Revolut account statement or a Zagrebačka banka statement (Jedinstveni izvadak građana); the type is detected automatically. Card payments, cash withdrawals (Cash category), loan instalments (Loans), bills, fees and refunds are imported. Salary and other incoming payments, Revolut top-ups, Erste card bill payments, transfers and investments are skipped.",
+    "help": "Choose a PDF: an Erste card statement, a Revolut account statement or a Zagrebačka banka statement (Jedinstveni izvadak građana); the type is detected automatically. Card payments, cash withdrawals (Cash category), loan instalments (Loans), bills, fees and refunds are imported. Payments into Revolut Robo portfolio and the investment account are recorded as Savings & investments and are not counted as spending. Salary and other incoming payments, Revolut top-ups, Erste card bill payments and transfers are skipped.",
     "skipReasons": {
       "pending": "Pending",
       "reversed": "Reversed",
       "foreignCurrency": "Other currency accounts",
-      "transfer": "Top-ups, transfers and investments",
+      "transfer": "Top-ups and transfers",
       "payment": "Card bill payments",
       "income": "Incoming payments (salary etc.)",
       "unparseable": "Unrecognised rows"
@@ -109,6 +120,7 @@
   "settings": {
     "limitsHeading": "Limit and emergency fund",
     "monthlyLimit": "Monthly spending limit",
+    "monthlyLimitHint": "Used only when no category limit is set on the Budget page.",
     "emergencyTarget": "Emergency fund target",
     "emergencySaved": "Emergency fund saved",
     "saved": "Settings saved.",
@@ -146,7 +158,8 @@
     }
   },
   "budget": {
-    "help": "Monthly limit per category. Empty means no limit.",
+    "help": "Monthly limit per category; empty means no limit. The sum of limits becomes the monthly limit. Fixed costs (e.g. loan instalments) are set aside up front, so the daily amount shows what is left for everything else.",
+    "fixed": "Fixed cost",
     "total": "Total planned",
     "limit": "Limit",
     "noLimit": "no limit",

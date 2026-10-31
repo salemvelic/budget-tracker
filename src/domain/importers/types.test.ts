@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { assignImportHashes, countSkip, dedupeWithinBatch, type ImportSkipped } from './types'
+import { assignImportHashes, countSkip, dedupeWithinBatch, mergeSkipped, type ImportSkipped } from './types'
 
 const draft = {
   date: '2026-10-01',
@@ -38,5 +38,15 @@ describe('countSkip', () => {
     countSkip(skipped, 'transfer')
     countSkip(skipped, 'transfer')
     expect(skipped).toEqual({ transfer: 2 })
+  })
+})
+
+describe('mergeSkipped', () => {
+  it('adds counts per reason across files', () => {
+    expect(mergeSkipped({ transfer: 2, pending: 1 }, {}, { transfer: 3, income: 1 })).toEqual({
+      transfer: 5,
+      pending: 1,
+      income: 1,
+    })
   })
 })

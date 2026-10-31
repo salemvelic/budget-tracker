@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { db } from '@/db'
 import { DEFAULT_CATEGORIES } from '@/domain/categories'
 import { i18n } from '@/i18n'
 
@@ -53,6 +54,12 @@ describe('TransactionList', () => {
     await wrapper.findAll('button')[1]!.trigger('click')
     expect(wrapper.emitted('remove')?.[0]).toEqual([3])
   })
+
+  it('emits a category change from the inline select', async () => {
+    const wrapper = mount(TransactionList, { props, global })
+    await wrapper.find('select').setValue('shopping')
+    expect(wrapper.emitted('recategorize')?.[0]).toEqual([props.txns[0], 'shopping'])
+  })
 })
 
 describe('ImportPreview', () => {
@@ -61,8 +68,24 @@ describe('ImportPreview', () => {
       props: { preview: [], skipped: { transfer: 4, payment: 2, pending: 0 }, importing: false },
       global,
     })
-    expect(wrapper.text()).toContain('Nadoplate, prijenosi i ulaganja: 4')
+    expect(wrapper.text()).toContain('Nadoplate i prijenosi: 4')
     expect(wrapper.text()).toContain('Uplate za karticu: 2')
     expect(wrapper.text()).not.toContain('Na čekanju')
+  })
+
+  it('lets the category be changed before import', async () => {
+    await db.categories.bulkPut(DEFAULT_CATEGORIES)
+    const row = {
+      date: '2026-10-01',
+      amountCents: 100,
+      merchant: 'Demo',
+      source: 'zaba' as const,
+      category: 'other',
+      importHash: 'zaba|id:B1',
+    }
+    const wrapper = mount(ImportPreview, { props: { preview: [row], skipped: {}, importing: false }, global })
+    await vi.waitFor(() => expect(wrapper.findAll('option').length).toBe(DEFAULT_CATEGORIES.length))
+    await wrapper.find('select').setValue('food')
+    expect(wrapper.emitted('setCategory')?.[0]).toEqual([0, 'food'])
   })
 })

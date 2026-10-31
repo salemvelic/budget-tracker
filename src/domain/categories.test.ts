@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_CATEGORIES, isKnownCategoryId } from './categories'
+import { DEFAULT_CATEGORIES, isKnownCategoryId, spendingCategories } from './categories'
+
+describe('spendingCategories', () => {
+  it('drops savings but keeps fixed categories', () => {
+    const ids = spendingCategories(DEFAULT_CATEGORIES).map((category) => category.id)
+    expect(ids).toContain('loans')
+    expect(ids).not.toContain('savings')
+  })
+})
 
 describe('DEFAULT_CATEGORIES', () => {
   it('has unique ids', () => {

@@ -1,5 +1,6 @@
 import { db } from '@/db'
 import type { BackupData } from '@/domain/backup'
+import { DEFAULT_CATEGORIES } from '@/domain/categories'
 
 export async function readBackupData(): Promise<BackupData> {
   const [txns, rules, categories, settings, ignoredImports] = await Promise.all([
@@ -20,6 +21,8 @@ export async function restoreBackupData(data: BackupData): Promise<void> {
     await db.txns.bulkAdd(data.txns)
     await db.rules.bulkAdd(data.rules)
     await db.categories.bulkAdd(data.categories)
+    const restored = new Set(data.categories.map((category) => category.id))
+    await db.categories.bulkAdd(DEFAULT_CATEGORIES.filter((category) => !restored.has(category.id)))
     await db.settings.bulkAdd(data.settings)
     await db.ignoredImports.bulkAdd(data.ignoredImports)
   })
