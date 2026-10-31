@@ -19,6 +19,12 @@
   },
   "categories": {
     "food": "Food",
+    "groceries": "Groceries",
+    "restaurants": "Restaurants & delivery",
+    "going_out": "Going out",
+    "bars": "Bars & cafés",
+    "entertainment": "Entertainment & culture",
+    "travel": "Travel",
     "fuel": "Fuel",
     "transport": "Transport",
     "utilities": "Utilities",
@@ -43,7 +49,8 @@
     "savedThisMonth": "Savings & investments this month",
     "emergencyFund": "Emergency fund",
     "emergencyProgress": "{saved} / {target}",
-    "byCategory": "By category"
+    "byCategory": "By category",
+    "unassigned": "no subcategory"
   },
   "transactions": {
     "empty": "No transactions for the selected month.",

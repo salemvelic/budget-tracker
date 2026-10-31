@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 
+import CategorySelect from '@/components/CategorySelect.vue'
 import type { Category, Txn } from '@/db'
 import { formatEur } from '@/domain/money'
 import { formatIsoDate } from '@/domain/month'
@@ -24,8 +25,7 @@ function confirmRemove(txn: Txn) {
   }
 }
 
-function onCategoryChange(txn: Txn, event: Event) {
-  const category = (event.target as HTMLSelectElement).value
+function onCategoryChange(txn: Txn, category: string) {
   if (category !== txn.category) emit('recategorize', txn, category)
 }
 </script>
@@ -46,16 +46,13 @@ function onCategoryChange(txn: Txn, event: Event) {
           {{ formatIsoDate(txn.date, locale) }} · {{ t(`transactions.sources.${txn.source}`) }}
           <span v-if="txn.note"> · {{ txn.note }}</span>
         </p>
-        <select
-          :value="txn.category"
+        <CategorySelect
+          :model-value="txn.category"
+          :categories="categories"
           :aria-label="t('transactions.categoryFor', { merchant: txn.merchant })"
           class="rounded-lg border border-border bg-surface px-2 py-1 text-sm"
-          @change="onCategoryChange(txn, $event)"
-        >
-          <option v-for="category in categories" :key="category.id" :value="category.id">
-            {{ t(category.nameKey) }}
-          </option>
-        </select>
+          @update:model-value="onCategoryChange(txn, $event)"
+        />
       </div>
       <div class="flex items-center gap-2">
         <span class="font-semibold tabular-nums">{{ formatEur(txn.amountCents) }}</span>

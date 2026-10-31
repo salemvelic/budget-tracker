@@ -6,7 +6,7 @@ import MonthPicker from '@/components/MonthPicker.vue'
 import { useLiveQuery } from '@/composables/useLiveQuery'
 import { db, type Category, type Txn, type TxnSource } from '@/db'
 import { latestImportDates } from '@/db/txns'
-import { spendingCategories } from '@/domain/categories'
+import { rollupTotals, spendingCategories, topLevelId } from '@/domain/categories'
 import { monthCoverage } from '@/domain/coverage'
 import { formatEur } from '@/domain/money'
 import { dailyAllowanceCents, formatIsoDate, monthKey, monthRange, todayIso } from '@/domain/month'
@@ -46,14 +46,24 @@ const emergencyProgress = computed(() => {
 })
 
 const categoryTotals = computed(() => {
-  const spendingIds = new Set(spendingCategories(categories.value).map((category) => category.id))
-  const known = new Set(categories.value.map((category) => category.id))
-  return Object.entries(totals.value)
-    .filter(([id]) => spendingIds.has(id) || !known.has(id))
+  const savingsIds = new Set(
+    categories.value.filter((category) => !spendingCategories(categories.value).includes(category)).map((c) => c.id),
+  )
+  const rolled = rollupTotals(totals.value, categories.value)
+  return Object.entries(rolled)
+    .filter(([id]) => !savingsIds.has(id))
     .sort((a, b) => b[1] - a[1])
+    .map(([id, cents]) => ({
+      id,
+      cents,
+      children: Object.entries(totals.value)
+        .filter(([childId]) => childId !== id && topLevelId(childId, categories.value) === id)
+        .sort((a, b) => b[1] - a[1]),
+      ownCents: totals.value[id] ?? 0,
+    }))
 })
 
-function categoryLabel(id: string) {
+function nameOf(id: string) {
   const category = categories.value.find((item) => item.id === id)
   return category ? t(category.nameKey) : id
 }
@@ -137,9 +147,21 @@ const remainingClass = computed(() => {
     <section class="rounded-xl border border-border bg-surface-muted p-4">
       <h2 class="mb-3 font-medium">{{ t('dashboard.byCategory') }}</h2>
       <ul v-if="categoryTotals.length" class="space-y-2">
-        <li v-for="[categoryId, cents] in categoryTotals" :key="categoryId" class="flex justify-between text-sm">
-          <span>{{ categoryLabel(categoryId) }}</span>
-          <span class="font-medium tabular-nums">{{ formatEur(cents) }}</span>
+        <li v-for="row in categoryTotals" :key="row.id" class="text-sm">
+          <div class="flex justify-between">
+            <span>{{ nameOf(row.id) }}</span>
+            <span class="font-medium tabular-nums">{{ formatEur(row.cents) }}</span>
+          </div>
+          <ul v-if="row.children.length" class="mt-1 space-y-0.5 pl-4 text-xs text-muted">
+            <li v-for="[childId, cents] in row.children" :key="childId" class="flex justify-between">
+              <span>{{ nameOf(childId) }}</span>
+              <span class="tabular-nums">{{ formatEur(cents) }}</span>
+            </li>
+            <li v-if="row.ownCents" class="flex justify-between">
+              <span>{{ t('dashboard.unassigned') }}</span>
+              <span class="tabular-nums">{{ formatEur(row.ownCents) }}</span>
+            </li>
+          </ul>
         </li>
       </ul>
       <p v-else class="text-sm text-muted">{{ t('dashboard.noSpend') }}</p>

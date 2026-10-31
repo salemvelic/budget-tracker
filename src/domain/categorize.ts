@@ -6,18 +6,37 @@ type Rule = Pick<CategoryRule, 'pattern' | 'category'>
 export const DEFAULT_CATEGORY_RULES: Rule[] = [
   {
     pattern:
-      'konzum|superkonzum|lidl|plodine|spar|interspar|eurospar|kaufland|studenac|tommy|ribola|billa|carrefour|profi|mega image|mlinar|pekara|orchard|grocers|mcdonald\'s|wolt|glovo|restoran|restaurant|pizzeria|bistro|konoba|caffe|cafe|kafić',
-    category: 'food',
+      "restoran|restaurant|\\p{L}*pizz\\p{L}*|bistro|konoba|street food|burger|kebab|mcdonald's|wolt|glovo",
+    category: 'restaurants',
   },
-  { pattern: 'ina|petrol|tifon|crodux|omv|mol|lukoil|shell|fuel', category: 'fuel' },
   {
     pattern:
-      'bolt|uber|yandex|taxi|autoceste|naplatna|parking|ryanair|croatia airlines|easyjet|wizz air|flixbus|hž',
-    category: 'transport',
+      'konzum|superkonzum|lidl|plodine|spar|interspar|eurospar|kaufland|studenac|tommy|ribola|billa|carrefour|profi|mega image|mlinar|pekara|orchard|grocers|trgovina krk|bakmaz|korzinka',
+    category: 'groceries',
   },
+  {
+    pattern:
+      'pub|bar|pivnic\\p{L}*|\\p{L}*beer\\p{L}*|\\p{L}*brew\\p{L}*|\\p{L}*caf(?:e|é)|caffe|kafić|kafic|cuga|\\p{L}*gelater\\p{L}*|rakhia|vinoteka',
+    category: 'bars',
+  },
+  {
+    pattern:
+      'eventim|entrio|ulaznic\\p{L}*|cinestar|cinema|kino|eventbook|koncert\\p{L}*|concert|kazališt\\p{L}*|teatar|theatre|muzej|museum|hajduk|dinamo|utakmic\\p{L}*|stadion',
+    category: 'entertainment',
+  },
+  {
+    pattern:
+      "ryanair|easyjet|wizz ?air|croatia airlines|lufthansa|air ?china|\\p{L}*airlines?|\\p{L}*airways|railways?|temir yo'llari|cfr călători|cfr calatori|hžpp|hž|flixbus|go bus|arriva|booking\\.com|airbnb|hotel|hostel|e-?visa|gov\\.kg|suvenir\\p{L}*",
+    category: 'travel',
+  },
+  { pattern: 'ina|petrol|tifon|crodux|omv|mol|lukoil|shell|fuel|ktc.*?b\\.p\\.', category: 'fuel' },
+  { pattern: 'bolt|uber|yandex|taxi|autoceste|naplatna|parking', category: 'transport' },
   { pattern: 'hep|vodovod|toplinarstvo|plinara|režije|rezije|telekom|a1|telemach|utility|utilities', category: 'utilities' },
-  { pattern: 'amazon|ekupi|emmezeta|ikea|mueller|müller|dm|deichmann|decathlon|zara', category: 'shopping' },
-  { pattern: 'netflix|spotify|disney|apple|youtube|hbo|premium plan', category: 'subscriptions' },
+  {
+    pattern: 'amazon|ekupi|emmezeta|ikea|mueller|müller|dm|deichmann|decathlon|zara|sancta domenica',
+    category: 'shopping',
+  },
+  { pattern: 'netflix|spotify|disney|apple|youtube|hbo|premium plan|myheritage', category: 'subscriptions' },
 ]
 
 export function matchesCategoryPattern(pattern: string, description: string): boolean {
@@ -62,15 +81,38 @@ export function merchantRulePattern(merchant: string): string {
   return normalizeMerchant(merchant).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+/** Text that rules are matched against: merchant plus note (transfer purpose, e.g. a match ticket). */
+export function txnDescription(txn: Pick<Txn, 'merchant' | 'note'>): string {
+  return txn.note ? `${txn.merchant} ${txn.note}` : txn.merchant
+}
+
+const SUBCATEGORY_UPGRADES: Record<string, string[] | '*'> = {
+  other: '*',
+  food: ['groceries', 'restaurants', 'bars'],
+  transport: ['travel'],
+}
+
+/**
+ * Category for an existing transaction once subcategories exist, or null to keep it.
+ * Only moves broad or default placements; anything the user picked elsewhere stays.
+ */
+export function subcategoryUpgrade(txn: Pick<Txn, 'merchant' | 'note' | 'category'>): string | null {
+  const allowed = SUBCATEGORY_UPGRADES[txn.category]
+  if (!allowed) return null
+  const next = categorizeDescription(txnDescription(txn))
+  if (next === txn.category || next === 'other') return null
+  return allowed === '*' || allowed.includes(next) ? next : null
+}
+
 /** New categories for transactions still in `other` that now match a rule. */
 export function recategorizeOther(
-  txns: Pick<Txn, 'id' | 'merchant' | 'category'>[],
+  txns: Pick<Txn, 'id' | 'merchant' | 'note' | 'category'>[],
   rules: Rule[],
 ): { id: number; category: string }[] {
   const changes: { id: number; category: string }[] = []
   for (const txn of txns) {
     if (txn.category !== 'other' || txn.id == null) continue
-    const category = categorizeDescription(txn.merchant, rules)
+    const category = categorizeDescription(txnDescription(txn), rules)
     if (category !== 'other') changes.push({ id: txn.id, category })
   }
   return changes

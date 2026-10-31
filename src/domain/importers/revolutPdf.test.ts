@@ -51,7 +51,7 @@ describe('parseRevolutPdfLines', () => {
 
   it('imports card spend, cash withdrawals, card refunds and plan fees', () => {
     expect(rows.map((r) => [r.date, r.merchant, r.amountCents, r.category])).toEqual([
-      ['2026-10-02', 'Demo Grocers', 101250, 'food'],
+      ['2026-10-02', 'Demo Grocers', 101250, 'groceries'],
       ['2026-10-03', 'Podizanje gotovine na lokaciji: Demo 1', 5100, 'cash'],
       ['2026-10-04', 'Demo Taxi', -240, 'transport'],
       ['2026-10-04', 'ATM Demo Bank', -2000, 'cash'],

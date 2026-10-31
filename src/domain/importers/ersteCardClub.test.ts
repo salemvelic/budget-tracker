@@ -51,6 +51,6 @@ describe('parseErsteCardClubLines', () => {
   })
 
   it('categorizes merchants', () => {
-    expect(rows[1]?.category).toBe('food')
+    expect(rows[1]?.category).toBe('groceries')
   })
 })

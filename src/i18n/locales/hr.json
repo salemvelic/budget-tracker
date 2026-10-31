@@ -19,6 +19,12 @@
   },
   "categories": {
     "food": "Hrana",
+    "groceries": "Namirnice",
+    "restaurants": "Restorani i dostava",
+    "going_out": "Izlasci",
+    "bars": "Barovi i kafići",
+    "entertainment": "Zabava i kultura",
+    "travel": "Putovanja",
     "fuel": "Gorivo",
     "transport": "Prijevoz",
     "utilities": "Režije",
@@ -43,7 +49,8 @@
     "savedThisMonth": "Štednja i ulaganja u mjesecu",
     "emergencyFund": "Hitni fond",
     "emergencyProgress": "{saved} / {target}",
-    "byCategory": "Po kategorijama"
+    "byCategory": "Po kategorijama",
+    "unassigned": "bez podkategorije"
   },
   "transactions": {
     "empty": "Nema transakcija za odabrani mjesec.",

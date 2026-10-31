@@ -33,6 +33,19 @@ describe('monthPlan', () => {
     expect(plan.flexibleLeftCents).toBe(35000)
   })
 
+  it('counts subcategory spending toward the parent and ignores child limits', () => {
+    const withChildren: Category[] = [
+      ...categories,
+      { id: 'groceries', nameKey: 'categories.groceries', parentId: 'food', budgetCents: 99999 },
+      { id: 'mortgage', nameKey: 'x', parentId: 'loans' },
+    ]
+    const plan = monthPlan(withChildren, { groceries: 10000, mortgage: 52000 }, 60000)
+    expect(plan.limitCents).toBe(90000)
+    expect(plan.fixedSpentCents).toBe(52000)
+    expect(plan.fixedReservedCents).toBe(52000)
+    expect(plan.variableSpentCents).toBe(10000)
+  })
+
   it('falls back to the global monthly limit without category limits', () => {
     const plain = categories.map((category) => ({ ...category, budgetCents: undefined }))
     const plan = monthPlan(plain, { food: 10000, loans: 20000, unknown: 500 }, 60000)

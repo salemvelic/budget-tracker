@@ -6,7 +6,7 @@ import MonthPicker from '@/components/MonthPicker.vue'
 import { useLiveQuery } from '@/composables/useLiveQuery'
 import { db, type Category, type Txn } from '@/db'
 import { budgetStatus, totalBudgetCents } from '@/domain/budget'
-import { spendingCategories } from '@/domain/categories'
+import { orderedCategories, rollupTotals, spendingCategories } from '@/domain/categories'
 import { formatAmountInput, formatEur, parseHrAmount } from '@/domain/money'
 import { monthKey, monthRange } from '@/domain/month'
 import { totalsByCategory } from '@/domain/transactions'
@@ -24,9 +24,20 @@ const txns = useLiveQuery(
   selectedMonth,
 )
 
-const spending = computed(() => spendingCategories(categories.value))
-const rows = computed(() => budgetStatus(spending.value, totalsByCategory(txns.value)))
+const totals = computed(() => totalsByCategory(txns.value))
+const spending = computed(() =>
+  orderedCategories(spendingCategories(categories.value))
+    .filter(({ parent }) => !parent)
+    .map(({ category }) => category),
+)
+const rows = computed(() => budgetStatus(spending.value, rollupTotals(totals.value, categories.value)))
 const totalBudget = computed(() => totalBudgetCents(spending.value))
+
+function childTotals(parentId: string) {
+  return categories.value
+    .filter((category) => category.parentId === parentId && totals.value[category.id])
+    .map((category) => ({ id: category.id, nameKey: category.nameKey, cents: totals.value[category.id]! }))
+}
 const fixedIds = computed(() => new Set(spending.value.filter((c) => c.kind === 'fixed').map((c) => c.id)))
 
 async function setFixed(id: string, fixed: boolean) {
@@ -113,6 +124,11 @@ async function saveBudget(id: string) {
               <span :class="row.over ? 'text-danger' : ''">
                 {{ row.over ? t('budget.over') : t('budget.left') }} {{ formatEur(Math.abs(row.remainingCents)) }}
               </span>
+            </template>
+          </p>
+          <p v-if="childTotals(row.id).length" class="text-xs text-muted tabular-nums">
+            <template v-for="(child, index) in childTotals(row.id)" :key="child.id">
+              <span v-if="index > 0"> · </span>{{ t(child.nameKey) }} {{ formatEur(child.cents) }}
             </template>
           </p>
         </li>

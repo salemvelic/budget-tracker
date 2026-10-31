@@ -8,6 +8,7 @@ Local-first personal budget tracker for monthly spending, category budgets and b
 
 - Calendar-month dashboard: spend vs. limit (sum of category limits, or a global limit), fixed costs set aside up front, daily allowance for variable spending, savings this month, spend by category, emergency fund progress, and the latest imported date per bank so incomplete months are visible
 - Monthly budget per category with progress, overspend warnings and a "fixed cost" flag (e.g. loans)
+- Subcategories that roll up into their parent: Food (groceries, restaurants & delivery) and Going out (bars & cafés, entertainment & culture), plus Travel; limits are set on the top-level category
 - Manual transactions (Erste card, Revolut, ZABA account, cash); change the category inline and optionally remember it for the merchant (creates a rule and updates the merchant's other transactions)
 - Statement import, parsed entirely in the browser; several PDFs at once, with per-row category choice before import:
   - **Erste card statement PDF** ("Obavijest o troškovima"): purchases, refunds, installments, membership fee, foreign-currency notes

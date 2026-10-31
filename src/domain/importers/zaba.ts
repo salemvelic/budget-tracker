@@ -1,4 +1,4 @@
-import { categorizeDescription } from '@/domain/categorize'
+import { categorizeDescription, txnDescription } from '@/domain/categorize'
 import { parseHrAmount } from '@/domain/money'
 import { lineText } from '@/domain/importers/pdfLines'
 import {
@@ -184,7 +184,7 @@ export function parseZabaLines(
       amountCents: current.inflow ? -current.amountCents : current.amountCents,
       merchant,
       source: 'zaba',
-      category: category ?? categorize(merchant),
+      category: category ?? categorize(txnDescription({ merchant, note })),
       note,
       externalId,
     })
