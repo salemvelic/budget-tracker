@@ -8,13 +8,18 @@ import { filterNewImportRows, importParsedRows } from '@/db/importRows'
 import { db, type CategoryRule } from '@/db'
 import { categorizeDescription, DEFAULT_CATEGORY_RULES } from '@/domain/categorize'
 import { parsePdfStatement, type PdfStatementKind } from '@/domain/importers/pdfStatement'
-import type { ImportParseResult, ImportSkipped, ParsedImportRow } from '@/domain/importers/types'
+import { mergeSkipped, type ImportSkipped, type ParsedImportRow } from '@/domain/importers/types'
+
+interface FileResult {
+  name: string
+  kind?: PdfStatementKind
+  errorCode?: string
+}
 
 const { t, te } = useI18n()
 
 const errorCode = ref('')
-const fileName = ref('')
-const detected = ref<PdfStatementKind | null>(null)
+const files = ref<FileResult[]>([])
 const preview = ref<ParsedImportRow[]>([])
 const skipped = ref<ImportSkipped>({})
 const importedCount = ref<number | null>(null)
@@ -35,40 +40,51 @@ function errorMessage(code: string): string {
 
 function reset() {
   errorCode.value = ''
-  detected.value = null
+  files.value = []
   preview.value = []
   skipped.value = {}
   importedCount.value = null
   allAlreadyImported.value = false
 }
 
-async function parseFile(file: File): Promise<ImportParseResult> {
-  const { extractPdfLines } = await import('@/services/pdfText')
-  const result = parsePdfStatement(await extractPdfLines(file), categorize)
-  detected.value = result.kind
-  return result
-}
-
 async function onFileChange(event: Event) {
   reset()
   const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  if (!file) return
+  const selected = [...(input.files ?? [])]
+  if (selected.length === 0) return
 
-  fileName.value = file.name
   busy.value = true
   try {
-    const result = await parseFile(file)
-    skipped.value = result.skipped
-    preview.value = await filterNewImportRows(result.rows)
-    if (result.rows.length === 0) errorCode.value = 'empty'
-    else if (preview.value.length === 0) allAlreadyImported.value = true
+    const { extractPdfLines } = await import('@/services/pdfText')
+    const rows: ParsedImportRow[] = []
+    const skips: ImportSkipped[] = []
+    for (const file of selected) {
+      try {
+        const result = parsePdfStatement(await extractPdfLines(file), categorize)
+        rows.push(...result.rows)
+        skips.push(result.skipped)
+        files.value.push(
+          result.rows.length === 0 ? { name: file.name, errorCode: 'empty' } : { name: file.name, kind: result.kind },
+        )
+      } catch (e) {
+        files.value.push({ name: file.name, errorCode: e instanceof Error ? e.message : 'invalid' })
+      }
+    }
+    skipped.value = mergeSkipped(...skips)
+    const fresh = await filterNewImportRows(rows)
+    preview.value = fresh.sort((a, b) => a.date.localeCompare(b.date))
+    if (rows.length > 0 && preview.value.length === 0) allAlreadyImported.value = true
   } catch (e) {
     errorCode.value = e instanceof Error ? e.message : 'invalid'
   } finally {
     busy.value = false
     input.value = ''
   }
+}
+
+function setCategory(index: number, category: string) {
+  const row = preview.value[index]
+  if (row) row.category = category
 }
 
 async function runImport() {
@@ -96,21 +112,34 @@ async function runImport() {
         <input
           type="file"
           accept=".pdf,application/pdf"
+          multiple
           :disabled="busy"
           class="mt-2 block w-full text-sm"
           @change="onFileChange"
         />
       </label>
-      <p v-if="fileName" class="mt-2 text-sm text-muted">
-        {{ fileName }}
-        <span v-if="detected"> · {{ t(`import.detected.${detected}`) }}</span>
-      </p>
+      <ul v-if="files.length" class="mt-2 space-y-0.5 text-sm">
+        <li v-for="file in files" :key="file.name" :class="file.errorCode ? 'text-danger' : 'text-muted'">
+          {{
+            t('import.fileResult', {
+              name: file.name,
+              kind: file.errorCode ? errorMessage(file.errorCode) : t(`import.detected.${file.kind}`),
+            })
+          }}
+        </li>
+      </ul>
       <p v-if="busy" class="mt-2 text-sm text-muted">{{ t('import.reading') }}</p>
       <p v-if="errorCode" class="mt-2 text-sm text-danger">{{ errorMessage(errorCode) }}</p>
       <p v-if="allAlreadyImported" class="mt-2 text-sm text-muted">{{ t('import.allAlreadyImported') }}</p>
     </section>
 
-    <ImportPreview :preview="preview" :skipped="skipped" :importing="busy" @import="runImport" />
+    <ImportPreview
+      :preview="preview"
+      :skipped="skipped"
+      :importing="busy"
+      @import="runImport"
+      @set-category="setCategory"
+    />
 
     <p v-if="importedCount != null" class="text-sm text-success">
       {{ t('import.done', { count: importedCount }) }}

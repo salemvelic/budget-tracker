@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useLiveQuery } from '@/composables/useLiveQuery'
 import { db, type Category } from '@/db'
 import { formatEur } from '@/domain/money'
+import { formatIsoDate } from '@/domain/month'
 import type { ImportSkipped, ParsedImportRow, SkipReason } from '@/domain/importers/types'
 
 const props = defineProps<{
@@ -15,9 +16,10 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   import: []
+  setCategory: [index: number, category: string]
 }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const categories = useLiveQuery(() => db.categories.toArray(), [] as Category[])
 
@@ -25,9 +27,8 @@ const skippedEntries = computed(() =>
   (Object.entries(props.skipped) as [SkipReason, number][]).filter(([, count]) => count > 0),
 )
 
-function categoryLabel(id: string) {
-  const category = categories.value.find((c) => c.id === id)
-  return category ? t(category.nameKey) : id
+function onCategoryChange(index: number, event: Event) {
+  emit('setCategory', index, (event.target as HTMLSelectElement).value)
 }
 </script>
 
@@ -35,23 +36,34 @@ function categoryLabel(id: string) {
   <section v-if="preview.length" class="space-y-3 rounded-xl border border-border bg-surface-muted p-6">
     <p class="text-sm">
       {{ t('import.previewCount', { count: preview.length }) }}
+      <span class="text-muted">{{ t('import.previewHelp') }}</span>
     </p>
-    <ul class="divide-y divide-border rounded-lg border border-border bg-surface">
+    <ul class="max-h-[28rem] divide-y divide-border overflow-y-auto rounded-lg border border-border bg-surface">
       <li
-        v-for="row in preview.slice(0, 10)"
+        v-for="(row, index) in preview"
         :key="row.importHash"
-        class="flex flex-col gap-1 px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between"
+        class="flex flex-col gap-2 px-3 py-2 text-sm sm:flex-row sm:items-center sm:justify-between"
       >
-        <span>
-          {{ row.date }} · {{ row.merchant }} · {{ categoryLabel(row.category) }}
+        <span class="min-w-0 break-words">
+          <span class="text-muted tabular-nums">{{ formatIsoDate(row.date, locale) }}</span>
+          · {{ row.merchant }}
           <span v-if="row.note" class="text-muted">({{ row.note }})</span>
         </span>
-        <span class="font-medium tabular-nums">{{ formatEur(row.amountCents) }}</span>
+        <span class="flex shrink-0 items-center gap-2">
+          <select
+            :value="row.category"
+            :aria-label="t('transactions.categoryFor', { merchant: row.merchant })"
+            class="rounded-lg border border-border bg-surface-muted px-2 py-1 text-sm"
+            @change="onCategoryChange(index, $event)"
+          >
+            <option v-for="category in categories" :key="category.id" :value="category.id">
+              {{ t(category.nameKey) }}
+            </option>
+          </select>
+          <span class="w-24 text-right font-medium tabular-nums">{{ formatEur(row.amountCents) }}</span>
+        </span>
       </li>
     </ul>
-    <p v-if="preview.length > 10" class="text-xs text-muted">
-      {{ t('import.moreRows', { count: preview.length - 10 }) }}
-    </p>
     <button
       type="button"
       class="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-foreground disabled:opacity-50"

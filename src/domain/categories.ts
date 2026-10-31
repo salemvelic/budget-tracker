@@ -8,10 +8,16 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'shopping', nameKey: 'categories.shopping' },
   { id: 'subscriptions', nameKey: 'categories.subscriptions' },
   { id: 'cash', nameKey: 'categories.cash' },
-  { id: 'loans', nameKey: 'categories.loans' },
+  { id: 'loans', nameKey: 'categories.loans', kind: 'fixed' },
+  { id: 'savings', nameKey: 'categories.savings', kind: 'savings' },
   { id: 'other', nameKey: 'categories.other' },
 ]
 
 export function isKnownCategoryId(id: string, categories: Category[]): boolean {
   return categories.some((category) => category.id === id)
+}
+
+/** Categories that count as spending (everything except savings). */
+export function spendingCategories(categories: Category[]): Category[] {
+  return categories.filter((category) => category.kind !== 'savings')
 }

@@ -35,9 +35,9 @@ const parsed = computed(() => {
 })
 
 const fields = [
-  { key: 'monthlyLimit', labelKey: 'settings.monthlyLimit' },
-  { key: 'emergencyTarget', labelKey: 'settings.emergencyTarget' },
-  { key: 'emergencySaved', labelKey: 'settings.emergencySaved' },
+  { key: 'monthlyLimit', labelKey: 'settings.monthlyLimit', hintKey: 'settings.monthlyLimitHint' },
+  { key: 'emergencyTarget', labelKey: 'settings.emergencyTarget', hintKey: null },
+  { key: 'emergencySaved', labelKey: 'settings.emergencySaved', hintKey: null },
 ] as const
 
 async function submit() {
@@ -63,6 +63,7 @@ async function submit() {
         class="w-full rounded-lg border border-border bg-surface px-3 py-2 tabular-nums"
         @input="status = 'idle'"
       />
+      <span v-if="field.hintKey" class="block text-xs text-muted">{{ t(field.hintKey) }}</span>
     </label>
     <button
       type="submit"

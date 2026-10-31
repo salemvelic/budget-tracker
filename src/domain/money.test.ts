@@ -26,6 +26,12 @@ describe('parseHrAmount', () => {
 
   it('parses dot decimal', () => {
     expect(parseHrAmount('1234.56')).toBe(123456)
+    expect(parseHrAmount('12.5')).toBe(1250)
+  })
+
+  it('treats dot-grouped thousands without decimals as thousands', () => {
+    expect(parseHrAmount('1.500')).toBe(150000)
+    expect(parseHrAmount('12.345.678')).toBe(1234567800)
   })
 
   it('parses negative amounts', () => {

@@ -6,12 +6,12 @@ Local-first personal budget tracker for monthly spending, category budgets and b
 
 ## Features
 
-- Calendar-month dashboard: spend vs. monthly limit, daily allowance, spend by category, emergency fund progress
-- Monthly budget per category with progress and overspend warnings
-- Manual transactions (card, Revolut, cash)
-- Statement import, parsed entirely in the browser:
+- Calendar-month dashboard: spend vs. limit (sum of category limits, or a global limit), fixed costs set aside up front, daily allowance for variable spending, savings this month, spend by category, emergency fund progress, and the latest imported date per bank so incomplete months are visible
+- Monthly budget per category with progress, overspend warnings and a "fixed cost" flag (e.g. loans)
+- Manual transactions (Erste card, Revolut, ZABA account, cash); change the category inline and optionally remember it for the merchant (creates a rule and updates the merchant's other transactions)
+- Statement import, parsed entirely in the browser; several PDFs at once, with per-row category choice before import:
   - **Erste card statement PDF** ("Obavijest o troškovima"): purchases, refunds, installments, membership fee, foreign-currency notes
-  - **Revolut statement PDF**: card payments, cash withdrawals (Cash category, Revolut fee included), refunds and plan fees; top-ups, transfers, investments, pending and reversed rows are skipped
+  - **Revolut statement PDF**: card payments, cash withdrawals (Cash category, Revolut fee included), refunds and plan fees; Robo portfolio, investment account and crypto transfers are recorded as Savings & investments (one row per day, not counted as spending); top-ups, transfers, pending and reversed rows are skipped
   - **Zagrebačka banka PDF** ("Jedinstveni izvadak građana", current account in EUR): card purchases, installments, cash withdrawals, loan instalments (Loans category), bills, transfers to others, fees and card refunds; salary and other incoming payments, Revolut top-ups and Erste card bill payments are skipped (they are already counted from those statements), loan sub-account sections are ignored
   - Re-importing the same statement adds nothing; deleted imported rows stay deleted
 - Category rules (yours first, then built-in), with one-click recategorisation of "Other"

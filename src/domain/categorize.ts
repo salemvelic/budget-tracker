@@ -49,6 +49,19 @@ export function validateRulePattern(pattern: string): string {
   return /^\|+$|\|\||^\||\|$/.test(trimmed) ? 'rule.invalid' : ''
 }
 
+function normalizeMerchant(merchant: string): string {
+  return merchant.replace(/\s+/g, ' ').trim().toLowerCase()
+}
+
+export function isSameMerchant(a: string, b: string): boolean {
+  return normalizeMerchant(a) === normalizeMerchant(b)
+}
+
+/** Rule pattern that matches this merchant name literally. */
+export function merchantRulePattern(merchant: string): string {
+  return normalizeMerchant(merchant).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 /** New categories for transactions still in `other` that now match a rule. */
 export function recategorizeOther(
   txns: Pick<Txn, 'id' | 'merchant' | 'category'>[],

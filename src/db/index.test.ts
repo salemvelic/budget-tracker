@@ -27,4 +27,27 @@ describe('schema upgrades', () => {
     const ids = (await db.categories.toArray()).map((c) => c.id).sort()
     expect(ids).toEqual(DEFAULT_CATEGORIES.map((c) => c.id).sort())
   })
+
+  it('marks loans as fixed and adds savings when upgrading from v5', async () => {
+    db.close()
+    await Dexie.delete('budget-tracker')
+    const v5 = new Dexie('budget-tracker')
+    v5.version(5).stores({
+      txns: '++id, date, category, source, &importHash',
+      rules: '++id, pattern',
+      categories: '&id',
+      settings: '&key',
+      ignoredImports: '&importHash',
+    })
+    await v5.open()
+    await v5.table('categories').bulkAdd([
+      { id: 'loans', nameKey: 'categories.loans', budgetCents: 80000 },
+      { id: 'other', nameKey: 'categories.other' },
+    ])
+    v5.close()
+
+    await db.open()
+    expect(await db.categories.get('loans')).toMatchObject({ kind: 'fixed', budgetCents: 80000 })
+    expect(await db.categories.get('savings')).toMatchObject({ kind: 'savings' })
+  })
 })

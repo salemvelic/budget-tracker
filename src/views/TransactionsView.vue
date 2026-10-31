@@ -7,13 +7,15 @@ import TransactionForm from '@/components/TransactionForm.vue'
 import TransactionList from '@/components/TransactionList.vue'
 import { useLiveQuery } from '@/composables/useLiveQuery'
 import { db, type Txn } from '@/db'
-import { deleteTxn } from '@/db/txns'
+import { deleteTxn, recategorizeTxn } from '@/db/txns'
 import { monthKey, monthRange } from '@/domain/month'
 import type { TxnInput } from '@/domain/transactions'
 
 const { t } = useI18n()
 const selectedMonth = ref(monthKey())
 const editing = ref<Txn | null>(null)
+const remember = ref(true)
+const ruleMessage = ref('')
 
 const categories = useLiveQuery(() => db.categories.toArray(), [])
 
@@ -45,6 +47,11 @@ async function removeTxn(id: number) {
     editing.value = null
   }
 }
+
+async function changeCategory(txn: Txn, category: string) {
+  const moved = await recategorizeTxn(txn, category, remember.value)
+  ruleMessage.value = remember.value ? t('transactions.ruleSaved', { merchant: txn.merchant, count: moved }) : ''
+}
 </script>
 
 <template>
@@ -64,7 +71,18 @@ async function removeTxn(id: number) {
     </section>
 
     <section class="space-y-3">
-      <TransactionList :txns="sortedTxns" :categories="categories" @edit="editing = $event" @remove="removeTxn" />
+      <label class="flex items-center gap-2 text-sm">
+        <input v-model="remember" type="checkbox" />
+        {{ t('transactions.rememberRule') }}
+      </label>
+      <p v-if="ruleMessage" class="text-sm text-success">{{ ruleMessage }}</p>
+      <TransactionList
+        :txns="sortedTxns"
+        :categories="categories"
+        @edit="editing = $event"
+        @remove="removeTxn"
+        @recategorize="changeCategory"
+      />
     </section>
   </div>
 </template>

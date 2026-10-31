@@ -38,6 +38,15 @@ const DATE_RE = /^(\d{1,2})\. (\p{L}+) (\d{4})\.$/u
 const TRAILING_AMOUNT_RE = /\s(\d{1,3}(?:\.\d{3})*,\d{2})€$/u
 const CASH_RE = /^(podizanje gotovine|atm\b)/iu
 const FEE_RE = /^naknada\b/iu
+const SAVINGS: [RegExp, string][] = [
+  [/\brobo portfolio\b/iu, 'Revolut Robo portfolio'],
+  [/investicijsk\p{L}* račun/iu, 'Revolut investicijski račun'],
+  [/revolut digital assets/iu, 'Revolut kripto'],
+]
+
+function savingsLabel(desc: string): string | null {
+  return SAVINGS.find(([re]) => re.test(desc))?.[1] ?? null
+}
 
 type Section = 'none' | 'pending' | 'reversed' | 'booked'
 type CategorizeFn = (description: string) => string
@@ -94,6 +103,7 @@ export function parseRevolutPdfLines(
   let section: Section = 'none'
   let previousBalance: number | null = null
   let current: RawRow | null = null
+  const savingsByDay = new Map<string, { date: string; merchant: string; amountCents: number; count: number }>()
 
   const finish = (row: RawRow) => {
     const balance = tryAmount(row.balance)
@@ -117,6 +127,16 @@ export function parseRevolutPdfLines(
 
     if (outflow == null || outflow === 0) {
       countSkip(skipped, 'unparseable')
+      return
+    }
+    const savings = savingsLabel(desc)
+    if (savings) {
+      // Round-ups arrive dozens of times a month; one row per day keeps the list readable.
+      const key = `${row.date}|${savings}`
+      const day = savingsByDay.get(key) ?? { date: row.date, merchant: savings, amountCents: 0, count: 0 }
+      day.amountCents += outflow
+      day.count += 1
+      savingsByDay.set(key, day)
       return
     }
     const isCash = CASH_RE.test(desc)
@@ -186,6 +206,18 @@ export function parseRevolutPdfLines(
     }
   }
   if (current) finish(current)
+
+  for (const day of savingsByDay.values()) {
+    if (day.amountCents === 0) continue
+    drafts.push({
+      date: day.date,
+      amountCents: day.amountCents,
+      merchant: day.merchant,
+      source: 'revolut',
+      category: 'savings',
+      note: day.count > 1 ? `${day.count} uplata` : undefined,
+    })
+  }
 
   return { rows: assignImportHashes(drafts), skipped }
 }

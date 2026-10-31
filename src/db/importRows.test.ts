@@ -5,7 +5,7 @@ import { assignImportHashes } from '@/domain/importers/types'
 
 import { db } from './index'
 import { filterNewImportRows, importParsedRows } from './importRows'
-import { deleteTxn } from './txns'
+import { deleteTxn, latestImportDates, recategorizeTxn } from './txns'
 
 describe('importParsedRows', () => {
   beforeEach(async () => {
@@ -82,6 +82,44 @@ describe('importParsedRows', () => {
 
     expect(await importParsedRows(preview.value)).toBe(1)
     expect(await db.txns.count()).toBe(1)
+  })
+
+  it('remembers a category for the merchant and moves its other transactions', async () => {
+    const base = { amountCents: 300, source: 'revolut' as const, category: 'other' }
+    const first = await db.txns.add({ ...base, date: '2026-10-01', merchant: 'Demo Bar' })
+    await db.txns.add({ ...base, date: '2026-10-02', merchant: 'demo  bar' })
+    await db.txns.add({ ...base, date: '2026-10-03', merchant: 'Demo Bar 2' })
+
+    const moved = await recategorizeTxn((await db.txns.get(first))!, 'food', true)
+
+    expect(moved).toBe(1)
+    expect((await db.txns.toArray()).map((t) => t.category)).toEqual(['food', 'food', 'other'])
+    expect(await db.rules.toArray()).toMatchObject([{ pattern: 'demo bar', category: 'food' }])
+
+    await recategorizeTxn((await db.txns.get(first))!, 'shopping', true)
+    expect(await db.rules.toArray()).toMatchObject([{ pattern: 'demo bar', category: 'shopping' }])
+  })
+
+  it('changes only one transaction without remember', async () => {
+    const base = { amountCents: 300, source: 'revolut' as const, category: 'other', merchant: 'Demo Bar' }
+    const first = await db.txns.add({ ...base, date: '2026-10-01' })
+    await db.txns.add({ ...base, date: '2026-10-02' })
+
+    expect(await recategorizeTxn((await db.txns.get(first))!, 'food', false)).toBe(0)
+    expect(await db.rules.count()).toBe(0)
+    expect((await db.txns.toArray()).map((t) => t.category)).toEqual(['food', 'other'])
+  })
+
+  it('finds the latest imported date per source, ignoring manual entries', async () => {
+    const rows = assignImportHashes([
+      { date: '2026-10-05', amountCents: 100, merchant: 'A', source: 'kartica', category: 'other' },
+      { date: '2026-10-20', amountCents: 100, merchant: 'B', source: 'revolut', category: 'other' },
+      { date: '2026-10-12', amountCents: 100, merchant: 'C', source: 'revolut', category: 'other' },
+    ])
+    await importParsedRows(rows)
+    await db.txns.add({ date: '2026-10-30', amountCents: 100, merchant: 'Manual', source: 'kartica', category: 'other' })
+
+    expect(await latestImportDates()).toEqual({ kartica: '2026-10-05', revolut: '2026-10-20' })
   })
 
   it('deletes manual transactions without leaving a tombstone', async () => {

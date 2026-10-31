@@ -28,6 +28,9 @@ const LINES: TextLine[] = [
   card,
   [c(43, '4. lis 2026.'), c(125, 'ATM Demo Bank'), c(417, '20,00€'), c(526, '98,38€')],
   card,
+  [c(43, '5. lis 2026.'), c(125, 'To Robo portfolio'), c(335, '0,40€'), c(531, '97,98€')],
+  [c(43, '5. lis 2026.'), c(125, 'To Robo portfolio'), c(335, '0,35€'), c(531, '97,63€')],
+  [c(43, '5. lis 2026.'), c(125, 'Na investicijski račun'), c(335, '20,00€'), c(531, '77,63€')],
   [c(43, '5. lis 2026.'), c(125, 'Naknada za Premium plan'), c(335, '9,99€'), c(531, '67,92€')],
   [c(43, '6. lis 2026.'), c(125, 'Demo Shop 7,92€'), c(531, '60,00€')],
   card,
@@ -54,8 +57,11 @@ describe('parseRevolutPdfLines', () => {
       ['2026-10-04', 'ATM Demo Bank', -2000, 'cash'],
       ['2026-10-05', 'Naknada za Premium plan', 999, 'subscriptions'],
       ['2026-10-06', 'Demo Shop', 792, 'other'],
+      ['2026-10-05', 'Revolut Robo portfolio', 75, 'savings'],
+      ['2026-10-05', 'Revolut investicijski račun', 2000, 'savings'],
     ])
     expect(rows[0]?.source).toBe('revolut')
+    expect(rows[6]?.note).toBe('2 uplata')
   })
 
   it('skips top-ups, investments, pending and reversed rows', () => {
