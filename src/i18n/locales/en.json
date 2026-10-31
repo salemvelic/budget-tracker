@@ -9,14 +9,66 @@
     "budget": "Budget",
     "settings": "Settings"
   },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month"
+  },
+  "categories": {
+    "food": "Food",
+    "fuel": "Fuel",
+    "utilities": "Utilities",
+    "shopping": "Shopping",
+    "subscriptions": "Subscriptions",
+    "other": "Other"
+  },
+  "dashboard": {
+    "monthSpend": "Spent this month",
+    "monthLimit": "Monthly limit",
+    "remaining": "Remaining",
+    "dailyAllowance": "Daily until month end",
+    "emergencyFund": "Emergency fund",
+    "emergencyProgress": "{saved} / {target}",
+    "byCategory": "By category"
+  },
+  "transactions": {
+    "empty": "No transactions for the selected month.",
+    "addHeading": "New transaction",
+    "editHeading": "Edit transaction",
+    "sources": {
+      "kartica": "Card",
+      "revolut": "Revolut",
+      "gotovina": "Cash"
+    },
+    "form": {
+      "date": "Date",
+      "amount": "Amount",
+      "amountPlaceholder": "e.g. 12.50",
+      "merchant": "Merchant / description",
+      "source": "Payment method",
+      "category": "Category",
+      "note": "Note",
+      "add": "Add",
+      "update": "Save changes",
+      "invalid": "Check your input."
+    }
+  },
+  "settings": {
+    "monthlyLimit": "Monthly spending limit",
+    "emergencyTarget": "Emergency fund target",
+    "emergencySaved": "Emergency fund saved",
+    "statementCloseDay": "Card statement close day",
+    "saved": "Settings saved."
+  },
   "views": {
     "dashboard": {
-      "heading": "Dashboard",
-      "placeholder": "Monthly overview, emergency fund progress, and expected card bill will live here."
+      "heading": "Dashboard"
     },
     "transactions": {
-      "heading": "Transactions",
-      "placeholder": "Transaction list and manual entry."
+      "heading": "Transactions"
     },
     "import": {
       "heading": "Import",
@@ -27,8 +79,7 @@
       "placeholder": "Monthly limits per category."
     },
     "settings": {
-      "heading": "Settings",
-      "placeholder": "Locale, language, and local data backup."
+      "heading": "Settings"
     }
   }
 }

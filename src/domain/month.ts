@@ -19,6 +19,19 @@ export function monthRange(ym: string): { start: string; end: string } {
   return { start, end }
 }
 
+/** Shift calendar month key by delta months (negative = past). */
+export function shiftMonth(ym: string, delta: number): string {
+  const [yStr, mStr] = ym.split('-')
+  const year = Number(yStr)
+  const month = Number(mStr)
+  if (!year || !month || month < 1 || month > 12) {
+    throw new Error(`Invalid month key: ${ym}`)
+  }
+
+  const date = new Date(year, month - 1 + delta, 1)
+  return monthKey(date)
+}
+
 export function daysLeftInMonth(today: Date = new Date()): number {
   const last = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
   return last - today.getDate() + 1

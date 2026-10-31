@@ -1,5 +1,8 @@
 import Dexie, { type Table } from 'dexie'
 
+import { DEFAULT_CATEGORIES } from '@/domain/categories'
+import { DEFAULT_SETTINGS, settingsToRows } from '@/domain/settings'
+
 export type TxnSource = 'kartica' | 'revolut' | 'gotovina'
 
 export interface Txn {
@@ -48,3 +51,8 @@ class BudgetDatabase extends Dexie {
 }
 
 export const db = new BudgetDatabase()
+
+db.on('populate', async () => {
+  await db.categories.bulkAdd(DEFAULT_CATEGORIES)
+  await db.settings.bulkPut(settingsToRows(DEFAULT_SETTINGS))
+})
