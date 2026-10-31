@@ -31,6 +31,32 @@ describe('saveRuleAndApply', () => {
     expect(txns[0]?.category).toBe('shopping')
     expect(txns[1]?.category).toBe('other')
   })
+
+  it('updates unlocked matches from groceries to the rule category', async () => {
+    await db.delete()
+    await db.open()
+    await db.txns.bulkAdd([
+      {
+        date: '2026-10-01',
+        amountCents: 100,
+        merchant: 'Demo Shop Zagreb',
+        source: 'kartica',
+        category: 'groceries',
+        categoryLocked: true,
+      },
+      {
+        date: '2026-10-02',
+        amountCents: 200,
+        merchant: 'Demo Shop Split',
+        source: 'kartica',
+        category: 'groceries',
+      },
+    ])
+
+    const moved = await saveRuleAndApply('demo shop', 'shopping')
+    expect(moved).toBe(1)
+    expect((await db.txns.get(2))?.category).toBe('shopping')
+  })
 })
 
 describe('recategorizeTxn', () => {

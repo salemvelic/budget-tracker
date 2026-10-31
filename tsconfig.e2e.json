@@ -1,0 +1,14 @@
+{
+  "extends": "@tsconfig/node24/tsconfig.json",
+  "include": ["e2e/**/*.ts", "playwright.config.ts", "src/types/file-system-access.d.ts"],
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": ["ES2023", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["node", "@playwright/test"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}

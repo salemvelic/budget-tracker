@@ -15,6 +15,10 @@ export default defineConfigWithVueTs(
     name: 'app/files-to-lint',
     files: ['**/*.{vue,ts,mts,tsx}'],
   },
+  {
+    name: 'e2e',
+    files: ['e2e/**/*.ts', 'playwright.config.ts'],
+  },
 
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
 
