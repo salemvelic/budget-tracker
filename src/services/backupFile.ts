@@ -69,11 +69,12 @@ export async function saveBackupToFile(json: string): Promise<'file' | 'download
     handle = null
   }
   if (!handle) {
-    handle = await window.showSaveFilePicker!({
+    const picked = await window.showSaveFilePicker!({
       suggestedName: backupFileName(),
       types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
     })
-    await storeHandle(handle)
+    await storeHandle(picked)
+    handle = picked
   }
 
   await writeToHandle(handle, json)

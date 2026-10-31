@@ -23,5 +23,3 @@ interface SaveFilePickerOptions {
 interface Window {
   showSaveFilePicker?(options?: SaveFilePickerOptions): Promise<FileSystemFileHandle>
 }
-
-export {}
