@@ -50,7 +50,6 @@
     "emergencyFund": "Hitni fond",
     "emergencyProgress": "{saved} / {target}",
     "byCategory": "Po kategorijama",
-    "unassigned": "bez podkategorije",
     "showSubcategories": "Prikaži podkategorije: {category}",
     "showExpenses": "Prikaži troškove: {category}",
     "noExpenses": "Nema troškova u ovoj kategoriji."
