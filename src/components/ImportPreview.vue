@@ -4,12 +4,11 @@ import { useI18n } from 'vue-i18n'
 import { useLiveQuery } from '@/composables/useLiveQuery'
 import { db, type Category } from '@/db'
 import { formatEur } from '@/domain/money'
-import type { RevolutParseSkipped } from '@/domain/importers/revolut'
 import type { ParsedImportRow } from '@/domain/importers/types'
 
 defineProps<{
   preview: ParsedImportRow[]
-  skipped: RevolutParseSkipped | null
+  skippedText?: string
   importing: boolean
 }>()
 
@@ -19,10 +18,10 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const rules = useLiveQuery(() => db.categories.toArray(), [] as Category[])
+const categories = useLiveQuery(() => db.categories.toArray(), [] as Category[])
 
 function categoryLabel(id: string) {
-  const category = rules.value.find((c) => c.id === id)
+  const category = categories.value.find((c) => c.id === id)
   return category ? t(category.nameKey) : id
 }
 </script>
@@ -30,7 +29,7 @@ function categoryLabel(id: string) {
 <template>
   <section v-if="preview.length" class="space-y-3 rounded-xl border border-border bg-surface-muted p-6">
     <p class="text-sm">
-      {{ t('import.revolut.previewCount', { count: preview.length }) }}
+      {{ t('import.previewCount', { count: preview.length }) }}
     </p>
     <ul class="divide-y divide-border rounded-lg border border-border bg-surface">
       <li
@@ -43,16 +42,10 @@ function categoryLabel(id: string) {
       </li>
     </ul>
     <p v-if="preview.length > 10" class="text-xs text-muted">
-      {{ t('import.revolut.moreRows', { count: preview.length - 10 }) }}
+      {{ t('import.moreRows', { count: preview.length - 10 }) }}
     </p>
-    <p v-if="skipped" class="text-xs text-muted">
-      {{
-        t('import.revolut.skipped', {
-          pending: skipped.notCompleted,
-          other: skipped.otherType,
-          fx: skipped.foreignCurrency,
-        })
-      }}
+    <p v-if="skippedText" class="text-xs text-muted">
+      {{ skippedText }}
     </p>
     <button
       type="button"
@@ -60,7 +53,7 @@ function categoryLabel(id: string) {
       :disabled="importing"
       @click="emit('import')"
     >
-      {{ t('import.revolut.importButton') }}
+      {{ t('import.importButton') }}
     </button>
   </section>
 </template>
