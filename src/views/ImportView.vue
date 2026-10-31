@@ -33,6 +33,7 @@ const duplicateHints = ref(new Map<string, string>())
 const manualCategory = ref(new Set<string>())
 const importedCount = ref<number | null>(null)
 const allAlreadyImported = ref(false)
+const importAlreadyHint = ref<'noIncomeInPdf' | null>(null)
 const busy = ref(false)
 
 const rules = useLiveQuery(() => db.rules.toArray(), [] as CategoryRule[])
@@ -57,6 +58,7 @@ function reset() {
   manualCategory.value = new Set()
   importedCount.value = null
   allAlreadyImported.value = false
+  importAlreadyHint.value = null
 }
 
 async function onFileChange(event: Event) {
@@ -87,7 +89,12 @@ async function onFileChange(event: Event) {
     skipped.value = mergeSkipped(...skips)
     const fresh = await filterNewImportRows(rows)
     preview.value = fresh.sort((a, b) => a.date.localeCompare(b.date))
-    if (rows.length > 0 && preview.value.length === 0) allAlreadyImported.value = true
+    if (rows.length > 0 && preview.value.length === 0) {
+      allAlreadyImported.value = true
+      if (!rows.some((row) => row.category === 'income')) {
+        importAlreadyHint.value = 'noIncomeInPdf'
+      }
+    }
 
     if (fresh.length > 0) {
       const dates = fresh.map((row) => row.date).sort()
@@ -181,6 +188,9 @@ async function runImport() {
       <p v-if="errorCode" class="text-danger mt-2 text-sm">{{ errorMessage(errorCode) }}</p>
       <p v-if="allAlreadyImported" class="text-muted mt-2 text-sm">
         {{ t('import.allAlreadyImported') }}
+      </p>
+      <p v-if="importAlreadyHint === 'noIncomeInPdf'" class="text-warning mt-2 text-sm">
+        {{ t('import.allAlreadyImportedNoIncome') }}
       </p>
     </section>
 

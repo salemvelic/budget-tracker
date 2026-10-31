@@ -107,6 +107,7 @@
     "fileLabel": "Odaberi PDF izvode (može više odjednom)",
     "reading": "Čitam datoteke…",
     "allAlreadyImported": "Sve transakcije iz odabranih datoteka su već u bazi.",
+    "allAlreadyImportedNoIncome": "U PDF-u nije pronađen priljev (npr. plaća). Osvježi stranicu (Ctrl+Shift+R) da učitaš najnoviju verziju aplikacije, pa ponovno uvezi isti izvod.",
     "previewCount": "{count} novih transakcija za uvoz",
     "previewHelp": "Kategoriju možeš promijeniti prije uvoza.",
     "fileResult": "{name}: {kind}",

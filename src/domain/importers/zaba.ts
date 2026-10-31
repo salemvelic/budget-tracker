@@ -124,6 +124,7 @@ export function parseZabaLines(
   const loanKinds = new Map<string, string>()
 
   let section: Section = 'none'
+  let sawCurrentAccount = false
   let loanAccount: string | null = null
   let row: PendingRow | null = null
 
@@ -220,8 +221,10 @@ export function parseZabaLines(
         section = 'loan'
       } else if (/Tekući račun/iu.test(text)) {
         section = /\bEUR\b/u.test(text) ? 'current' : 'foreign'
+        if (section === 'current') sawCurrentAccount = true
       } else {
         section = 'none'
+        sawCurrentAccount = false
       }
       loanAccount = null
       continue
@@ -229,6 +232,11 @@ export function parseZabaLines(
     if (/^(Zbroj prometa|NOVO STANJE)/u.test(text)) {
       finish()
       if (text.startsWith('NOVO STANJE')) section = 'none'
+      continue
+    }
+    if (/Opis prometa/u.test(text) && /Odljev/u.test(text)) {
+      finish()
+      if (sawCurrentAccount && section === 'none') section = 'current'
       continue
     }
     if (section !== 'current' && section !== 'foreign') continue
