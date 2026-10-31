@@ -1,0 +1,48 @@
+# dependencies & build
+node_modules/
+dist/
+coverage/
+*.local
+
+# env
+.env
+.env.*
+!.env.example
+
+# financial data – never commit
+data/
+exports/
+*.csv
+!**/__fixtures__/*.csv
+*.xlsx
+*.xls
+*-backup*.json
+budget-export*.json
+
+# OS / editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Vue scaffold (merged)
+*.tsbuildinfo
+.eslintcache
+__screenshots__/
+*.timestamp-*-*.mjs
+dist-ssr
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+/cypress/videos/
+/cypress/screenshots/
+scaffold-tmp/

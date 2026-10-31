@@ -1,0 +1,29 @@
+---
+description: Konvencije za Vue komponente i Tailwind stilove
+globs: src/**/*.vue
+alwaysApply: false
+---
+
+# Vue komponente
+
+- `<script setup lang="ts">`; props i emits tipizirani (`defineProps<{...}>()`, `defineEmits<{...}>()`)
+- Bez poslovne logike u komponentama – izračuni idu u `src/domain/`, dohvat podataka u composable (`useLiveQuery`)
+- Jedna komponenta = jedna odgovornost; view u `src/views/`, ponovno iskoristivi dijelovi u `src/components/`
+
+# Tailwind
+
+- Samo utility klase u template-u; bez `<style>` blokova osim kad Tailwind stvarno ne može
+- Bez `@apply` za obične komponente – ponavljanje rješavaj Vue komponentom (npr. `BaseButton.vue`), ne CSS klasom
+- Boje, razmaci i fontovi iz `@theme` tokena u `src/style.css`; bez proizvoljnih vrijednosti (`w-[137px]`) osim iznimno
+- Mobile-first: osnovne klase za mobitel, `sm:`/`md:` za veće ekrane
+- Dark mode preko `dark:` varijanti
+- Dinamičke klase kao cijeli stringovi u mapi, ne spajanjem dijelova:
+
+```ts
+// ❌ Tailwind ne vidi klasu
+const cls = `text-${over ? 'red' : 'green'}-600`
+// ✅
+const cls = over ? 'text-red-600' : 'text-green-600'
+```
+
+- Iznosi poravnati desno s `tabular-nums`

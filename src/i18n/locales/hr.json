@@ -1,0 +1,34 @@
+{
+  "app": {
+    "title": "Budget tracker"
+  },
+  "nav": {
+    "dashboard": "Pregled",
+    "transactions": "Transakcije",
+    "import": "Uvoz",
+    "budget": "Budžet",
+    "settings": "Postavke"
+  },
+  "views": {
+    "dashboard": {
+      "heading": "Pregled",
+      "placeholder": "Ovdje će biti mjesečni pregled potrošnje, hitni fond i očekivani račun kartice."
+    },
+    "transactions": {
+      "heading": "Transakcije",
+      "placeholder": "Popis transakcija i ručni unos."
+    },
+    "import": {
+      "heading": "Uvoz",
+      "placeholder": "Uvoz CSV izvoda iz banke i Revoluta."
+    },
+    "budget": {
+      "heading": "Budžet",
+      "placeholder": "Mjesečni limiti po kategorijama."
+    },
+    "settings": {
+      "heading": "Postavke",
+      "placeholder": "Valuta, jezik, sigurnosna kopija podataka."
+    }
+  }
+}

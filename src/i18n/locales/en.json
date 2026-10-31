@@ -1,0 +1,34 @@
+{
+  "app": {
+    "title": "Budget tracker"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "transactions": "Transactions",
+    "import": "Import",
+    "budget": "Budget",
+    "settings": "Settings"
+  },
+  "views": {
+    "dashboard": {
+      "heading": "Dashboard",
+      "placeholder": "Monthly overview, emergency fund progress, and expected card bill will live here."
+    },
+    "transactions": {
+      "heading": "Transactions",
+      "placeholder": "Transaction list and manual entry."
+    },
+    "import": {
+      "heading": "Import",
+      "placeholder": "Import CSV statements from your bank and Revolut."
+    },
+    "budget": {
+      "heading": "Budget",
+      "placeholder": "Monthly limits per category."
+    },
+    "settings": {
+      "heading": "Settings",
+      "placeholder": "Locale, language, and local data backup."
+    }
+  }
+}

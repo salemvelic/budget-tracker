@@ -1,0 +1,33 @@
+---
+description: Osnovna pravila projekta – stack, struktura, zabrane
+alwaysApply: true
+---
+
+# Budget tracker (Vue 3 + TS + Tailwind, local-first)
+
+## Stack
+- Vite, Vue 3 `<script setup lang="ts">`, Pinia, Vue Router (`createWebHashHistory`)
+- Tailwind CSS v4 preko `@tailwindcss/vite`; konfiguracija u CSS-u (`@import "tailwindcss"`, `@theme`), bez `tailwind.config.js`
+- Dexie (IndexedDB) – nema backenda, svi podaci ostaju u pregledniku
+- Vitest + Vue Test Utils, ESLint + Prettier (`prettier-plugin-tailwindcss`), `vue-tsc --noEmit`
+- Deploy: GitHub Pages, `base: '/budget-tracker/'`
+
+## Struktura
+- `src/domain/` – čisti TS, bez importa iz `vue`/`dexie`; sva poslovna logika ovdje
+- `src/db/` – Dexie shema i migracije (nikad ne mijenjaj postojeću `version()`, dodaj novu)
+- `src/composables/`, `src/stores/`, `src/views/`, `src/components/`
+
+## Pravila
+- Iznosi uvijek u centima (`number`, integer). Nikad float za novac.
+- Datumi kao ISO string `yyyy-mm-dd`; mjesec kao `yyyy-mm`. Praćenje po kalendarskom mjesecu.
+- Prikaz: `Intl.NumberFormat('hr-HR', { style: 'currency', currency: 'EUR' })`
+- UI tekstovi preko `vue-i18n` (hr, en), nikad hardkodirani stringovi u template-u.
+- Svaka nova funkcija u `src/domain/` dobiva Vitest test.
+
+## Zabranjeno
+- Stvarni financijski podaci, IBAN-i, brojevi kartica u kodu, testovima ili fixture-ima – samo izmišljeni.
+- Commitanje `*.csv`, `*.xlsx`, izvoza i `data/`.
+- Novi dependency bez kratkog obrazloženja u PR opisu.
+
+## Komande
+- `npm run dev` | `npm run test` | `npm run lint` | `npm run typecheck` | `npm run build`
