@@ -9,14 +9,66 @@
     "budget": "Budžet",
     "settings": "Postavke"
   },
+  "common": {
+    "save": "Spremi",
+    "cancel": "Odustani",
+    "edit": "Uredi",
+    "delete": "Obriši",
+    "previousMonth": "Prethodni mjesec",
+    "nextMonth": "Sljedeći mjesec"
+  },
+  "categories": {
+    "food": "Hrana",
+    "fuel": "Gorivo",
+    "utilities": "Režije",
+    "shopping": "Kupovine",
+    "subscriptions": "Pretplate",
+    "other": "Ostalo"
+  },
+  "dashboard": {
+    "monthSpend": "Potrošeno ovaj mjesec",
+    "monthLimit": "Mjesečni limit",
+    "remaining": "Preostalo",
+    "dailyAllowance": "Dnevno do kraja mjeseca",
+    "emergencyFund": "Hitni fond",
+    "emergencyProgress": "{saved} / {target}",
+    "byCategory": "Po kategorijama"
+  },
+  "transactions": {
+    "empty": "Nema transakcija za odabrani mjesec.",
+    "addHeading": "Nova transakcija",
+    "editHeading": "Uredi transakciju",
+    "sources": {
+      "kartica": "Kartica",
+      "revolut": "Revolut",
+      "gotovina": "Gotovina"
+    },
+    "form": {
+      "date": "Datum",
+      "amount": "Iznos",
+      "amountPlaceholder": "npr. 12,50",
+      "merchant": "Trgovac / opis",
+      "source": "Način plaćanja",
+      "category": "Kategorija",
+      "note": "Napomena",
+      "add": "Dodaj",
+      "update": "Spremi promjene",
+      "invalid": "Provjeri unos."
+    }
+  },
+  "settings": {
+    "monthlyLimit": "Mjesečni limit potrošnje",
+    "emergencyTarget": "Cilj hitnog fonda",
+    "emergencySaved": "Trenutno u hitnom fondu",
+    "statementCloseDay": "Dan zatvaranja izvoda kartice",
+    "saved": "Postavke su spremljene."
+  },
   "views": {
     "dashboard": {
-      "heading": "Pregled",
-      "placeholder": "Ovdje će biti mjesečni pregled potrošnje, hitni fond i očekivani račun kartice."
+      "heading": "Pregled"
     },
     "transactions": {
-      "heading": "Transakcije",
-      "placeholder": "Popis transakcija i ručni unos."
+      "heading": "Transakcije"
     },
     "import": {
       "heading": "Uvoz",
@@ -27,8 +79,7 @@
       "placeholder": "Mjesečni limiti po kategorijama."
     },
     "settings": {
-      "heading": "Postavke",
-      "placeholder": "Valuta, jezik, sigurnosna kopija podataka."
+      "heading": "Postavke"
     }
   }
 }

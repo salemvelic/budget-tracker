@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { dailyAllowanceCents, daysLeftInMonth, monthKey, monthRange } from './month'
+import { dailyAllowanceCents, daysLeftInMonth, monthKey, monthRange, shiftMonth } from './month'
 
 describe('monthKey', () => {
   it('returns yyyy-mm', () => {
@@ -15,6 +15,20 @@ describe('monthRange', () => {
 
   it('handles leap year February', () => {
     expect(monthRange('2024-02')).toEqual({ start: '2024-02-01', end: '2024-02-29' })
+  })
+})
+
+describe('shiftMonth', () => {
+  it('moves to next month', () => {
+    expect(shiftMonth('2026-10', 1)).toBe('2026-11')
+  })
+
+  it('wraps across year boundary', () => {
+    expect(shiftMonth('2026-12', 1)).toBe('2027-01')
+  })
+
+  it('moves to previous month', () => {
+    expect(shiftMonth('2026-01', -1)).toBe('2025-12')
   })
 })
 
