@@ -50,7 +50,10 @@
     "emergencyFund": "Hitni fond",
     "emergencyProgress": "{saved} / {target}",
     "byCategory": "Po kategorijama",
-    "unassigned": "bez podkategorije"
+    "unassigned": "bez podkategorije",
+    "showSubcategories": "Prikaži podkategorije: {category}",
+    "showExpenses": "Prikaži troškove: {category}",
+    "noExpenses": "Nema troškova u ovoj kategoriji."
   },
   "transactions": {
     "empty": "Nema transakcija za odabrani mjesec.",

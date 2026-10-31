@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { monthTotalCents, totalsByCategory, validateTxnInput } from './transactions'
+import { monthTotalCents, totalsByCategory, txnsInCategory, validateTxnInput } from './transactions'
 
 describe('validateTxnInput', () => {
   it('accepts valid input', () => {
@@ -49,5 +49,44 @@ describe('totalsByCategory', () => {
         { amountCents: 2000, category: 'fuel' },
       ]),
     ).toEqual({ food: 1500, fuel: 2000 })
+  })
+})
+
+describe('txnsInCategory', () => {
+  const txns = [
+    {
+      id: 1,
+      date: '2026-10-01',
+      amountCents: 1000,
+      merchant: 'Demo A',
+      source: 'kartica' as const,
+      category: 'groceries',
+    },
+    {
+      id: 2,
+      date: '2026-10-15',
+      amountCents: 500,
+      merchant: 'Demo B',
+      source: 'revolut' as const,
+      category: 'groceries',
+    },
+    {
+      id: 3,
+      date: '2026-10-10',
+      amountCents: 2000,
+      merchant: 'Demo C',
+      source: 'kartica' as const,
+      category: 'fuel',
+    },
+  ]
+
+  it('returns only matching category', () => {
+    expect(txnsInCategory(txns, 'groceries')).toHaveLength(2)
+    expect(txnsInCategory(txns, 'fuel')).toHaveLength(1)
+    expect(txnsInCategory(txns, 'other')).toEqual([])
+  })
+
+  it('sorts by date desc then id desc', () => {
+    expect(txnsInCategory(txns, 'groceries').map((t) => t.id)).toEqual([2, 1])
   })
 })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import MonthPicker from '@/components/MonthPicker.vue'
@@ -11,13 +11,20 @@ import { monthCoverage } from '@/domain/coverage'
 import { formatEur } from '@/domain/money'
 import { dailyAllowanceCents, formatIsoDate, monthKey, monthRange, todayIso } from '@/domain/month'
 import { monthPlan } from '@/domain/plan'
-import { totalsByCategory } from '@/domain/transactions'
+import { totalsByCategory, txnsInCategory } from '@/domain/transactions'
 import { useSettingsStore } from '@/stores/settings'
 
 const { t, locale } = useI18n()
 const settingsStore = useSettingsStore()
 const selectedMonth = ref(monthKey())
+const expandedId = ref<string | null>(null)
+const openListId = ref<string | null>(null)
 const isCurrentMonth = computed(() => selectedMonth.value === monthKey())
+
+watch(selectedMonth, () => {
+  expandedId.value = null
+  openListId.value = null
+})
 
 onMounted(() => {
   void settingsStore.load()
@@ -66,6 +73,36 @@ const categoryTotals = computed(() => {
 function nameOf(id: string) {
   const category = categories.value.find((item) => item.id === id)
   return category ? t(category.nameKey) : id
+}
+
+const openListTxns = computed(() =>
+  openListId.value ? txnsInCategory(txns.value, openListId.value) : [],
+)
+
+function categoryHasSubrows(row: (typeof categoryTotals.value)[number]) {
+  return row.children.length > 0 || row.ownCents > 0
+}
+
+function onCategoryClick(row: (typeof categoryTotals.value)[number]) {
+  if (categoryHasSubrows(row)) {
+    if (expandedId.value === row.id) {
+      expandedId.value = null
+      const open = openListId.value
+      if (open === row.id || row.children.some(([childId]) => childId === open)) {
+        openListId.value = null
+      }
+    } else {
+      expandedId.value = row.id
+      openListId.value = null
+    }
+    return
+  }
+  expandedId.value = null
+  openListId.value = openListId.value === row.id ? null : row.id
+}
+
+function onSubcategoryClick(categoryId: string) {
+  openListId.value = openListId.value === categoryId ? null : categoryId
 }
 
 const remainingClass = computed(() => {
@@ -148,18 +185,91 @@ const remainingClass = computed(() => {
       <h2 class="mb-3 font-medium">{{ t('dashboard.byCategory') }}</h2>
       <ul v-if="categoryTotals.length" class="space-y-2">
         <li v-for="row in categoryTotals" :key="row.id" class="text-sm">
-          <div class="flex justify-between">
-            <span>{{ nameOf(row.id) }}</span>
-            <span class="font-medium tabular-nums">{{ formatEur(row.cents) }}</span>
-          </div>
-          <ul v-if="row.children.length" class="mt-1 space-y-0.5 pl-4 text-xs text-muted">
-            <li v-for="[childId, cents] in row.children" :key="childId" class="flex justify-between">
-              <span>{{ nameOf(childId) }}</span>
-              <span class="tabular-nums">{{ formatEur(cents) }}</span>
+          <button
+            type="button"
+            class="flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left hover:bg-surface"
+            :aria-expanded="categoryHasSubrows(row) ? expandedId === row.id : openListId === row.id"
+            :aria-label="
+              categoryHasSubrows(row)
+                ? t('dashboard.showSubcategories', { category: nameOf(row.id) })
+                : t('dashboard.showExpenses', { category: nameOf(row.id) })
+            "
+            @click="onCategoryClick(row)"
+          >
+            <span class="flex min-w-0 items-center gap-1">
+              <span
+                v-if="categoryHasSubrows(row)"
+                class="inline-block w-4 shrink-0 text-muted transition-transform"
+                :class="expandedId === row.id ? 'rotate-90' : ''"
+                aria-hidden="true"
+              >
+                ›
+              </span>
+              <span v-else class="inline-block w-4 shrink-0" aria-hidden="true" />
+              <span>{{ nameOf(row.id) }}</span>
+            </span>
+            <span class="shrink-0 font-medium tabular-nums">{{ formatEur(row.cents) }}</span>
+          </button>
+          <ul
+            v-if="openListId === row.id && !categoryHasSubrows(row)"
+            class="mt-1 space-y-1 border-l border-border pl-6 text-xs"
+          >
+            <li v-if="!openListTxns.length" class="text-muted">{{ t('dashboard.noExpenses') }}</li>
+            <li v-for="txn in openListTxns" :key="txn.id" class="flex justify-between gap-3 py-0.5">
+              <span class="min-w-0 break-words text-muted">
+                {{ formatIsoDate(txn.date, locale) }} · {{ txn.merchant }}
+                <span v-if="txn.note"> · {{ txn.note }}</span>
+                · {{ t(`transactions.sources.${txn.source}`) }}
+              </span>
+              <span class="shrink-0 tabular-nums">{{ formatEur(txn.amountCents) }}</span>
             </li>
-            <li v-if="row.ownCents" class="flex justify-between">
-              <span>{{ t('dashboard.unassigned') }}</span>
-              <span class="tabular-nums">{{ formatEur(row.ownCents) }}</span>
+          </ul>
+          <ul v-if="expandedId === row.id" class="mt-1 space-y-0.5 pl-4 text-xs">
+            <li v-for="[childId, cents] in row.children" :key="childId">
+              <button
+                type="button"
+                class="flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left text-muted hover:bg-surface"
+                :aria-expanded="openListId === childId"
+                :aria-label="t('dashboard.showExpenses', { category: nameOf(childId) })"
+                @click="onSubcategoryClick(childId)"
+              >
+                <span>{{ nameOf(childId) }}</span>
+                <span class="tabular-nums">{{ formatEur(cents) }}</span>
+              </button>
+              <ul v-if="openListId === childId" class="mt-1 space-y-1 border-l border-border pl-4 text-muted">
+                <li v-if="!openListTxns.length" class="text-muted">{{ t('dashboard.noExpenses') }}</li>
+                <li v-for="txn in openListTxns" :key="txn.id" class="flex justify-between gap-3 py-0.5">
+                  <span class="min-w-0 break-words">
+                    {{ formatIsoDate(txn.date, locale) }} · {{ txn.merchant }}
+                    <span v-if="txn.note"> · {{ txn.note }}</span>
+                    · {{ t(`transactions.sources.${txn.source}`) }}
+                  </span>
+                  <span class="shrink-0 tabular-nums text-foreground">{{ formatEur(txn.amountCents) }}</span>
+                </li>
+              </ul>
+            </li>
+            <li v-if="row.ownCents">
+              <button
+                type="button"
+                class="flex w-full items-center justify-between gap-2 rounded-lg px-1 py-0.5 text-left text-muted hover:bg-surface"
+                :aria-expanded="openListId === row.id"
+                :aria-label="t('dashboard.showExpenses', { category: nameOf(row.id) })"
+                @click="onSubcategoryClick(row.id)"
+              >
+                <span>{{ t('dashboard.unassigned') }}</span>
+                <span class="tabular-nums">{{ formatEur(row.ownCents) }}</span>
+              </button>
+              <ul v-if="openListId === row.id" class="mt-1 space-y-1 border-l border-border pl-4 text-muted">
+                <li v-if="!openListTxns.length" class="text-muted">{{ t('dashboard.noExpenses') }}</li>
+                <li v-for="txn in openListTxns" :key="txn.id" class="flex justify-between gap-3 py-0.5">
+                  <span class="min-w-0 break-words">
+                    {{ formatIsoDate(txn.date, locale) }} · {{ txn.merchant }}
+                    <span v-if="txn.note"> · {{ txn.note }}</span>
+                    · {{ t(`transactions.sources.${txn.source}`) }}
+                  </span>
+                  <span class="shrink-0 tabular-nums text-foreground">{{ formatEur(txn.amountCents) }}</span>
+                </li>
+              </ul>
             </li>
           </ul>
         </li>
