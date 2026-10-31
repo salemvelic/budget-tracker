@@ -61,15 +61,18 @@ describe('mergeSkipped', () => {
 describe('possibleDuplicates', () => {
   it('flags rows matching source, date and amount', () => {
     const row = { ...draft, importHash: 'revolut|new|#0' }
-    const hints = possibleDuplicates([row], [
-      {
-        importHash: 'revolut|old|#0',
-        source: 'revolut',
-        date: row.date,
-        amountCents: row.amountCents,
-        merchant: 'Old merchant name',
-      },
-    ])
+    const hints = possibleDuplicates(
+      [row],
+      [
+        {
+          importHash: 'revolut|old|#0',
+          source: 'revolut',
+          date: row.date,
+          amountCents: row.amountCents,
+          merchant: 'Old merchant name',
+        },
+      ],
+    )
     expect(hints.get(row.importHash)).toBe('Old merchant name')
   })
 })

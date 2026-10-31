@@ -30,6 +30,7 @@ const preview = ref<ParsedImportRow[]>([])
 const skipped = ref<ImportSkipped>({})
 const excluded = ref(new Set<string>())
 const duplicateHints = ref(new Map<string, string>())
+const manualCategory = ref(new Set<string>())
 const importedCount = ref<number | null>(null)
 const allAlreadyImported = ref(false)
 const busy = ref(false)
@@ -53,6 +54,7 @@ function reset() {
   skipped.value = {}
   excluded.value = new Set()
   duplicateHints.value = new Map()
+  manualCategory.value = new Set()
   importedCount.value = null
   allAlreadyImported.value = false
 }
@@ -105,7 +107,12 @@ async function onFileChange(event: Event) {
 
 function setCategory(index: number, category: string) {
   const row = preview.value[index]
-  if (row) row.category = category
+  if (row) {
+    row.category = category
+    const next = new Set(manualCategory.value)
+    next.add(row.importHash)
+    manualCategory.value = next
+  }
 }
 
 function toggleInclude(importHash: string, include: boolean) {
@@ -116,7 +123,12 @@ function toggleInclude(importHash: string, include: boolean) {
 }
 
 async function runImport() {
-  const rows = preview.value.filter((row) => !excluded.value.has(row.importHash))
+  const rows = preview.value
+    .filter((row) => !excluded.value.has(row.importHash))
+    .map((row) => ({
+      ...row,
+      ...(manualCategory.value.has(row.importHash) ? { categoryLocked: true as const } : {}),
+    }))
   if (rows.length === 0) return
   busy.value = true
   errorCode.value = ''
@@ -125,7 +137,7 @@ async function runImport() {
     preview.value = []
     skipped.value = {}
     excluded.value = new Set()
-    duplicateHints.value = new Map()
+    manualCategory.value = new Set()
   } catch {
     errorCode.value = 'import.failed'
   } finally {

@@ -49,12 +49,9 @@
     "coverageHeading": "Uvezeni podaci do",
     "coverageIncomplete": "Za neke izvore nedostaje kraj mjeseca – uvezi sljedeći izvod.",
     "savedThisMonth": "Štednja i ulaganja u mjesecu",
-    "showSavings": "Prikaži raspodjelu štednje",
     "emergencyFund": "Hitni fond",
     "emergencyProgress": "{saved} / {target}",
     "byCategory": "Po kategorijama",
-    "showSubcategories": "Prikaži podkategorije: {category}",
-    "showExpenses": "Prikaži troškove: {category}",
     "noExpenses": "Nema troškova u ovoj kategoriji.",
     "backupDue": "Nema sigurnosne kopije u zadnjih 30 dana.",
     "backupDueLink": "Izvezi u Postavkama"
@@ -65,6 +62,8 @@
     "addHeading": "Nova transakcija",
     "editHeading": "Uredi transakciju",
     "rememberRule": "Promjenu kategorije zapamti za istog trgovca",
+    "ruleSuggestHeading": "Pravilo za „{merchant}”:",
+    "saveRule": "Spremi pravilo",
     "ruleSaved": "Pravilo za „{merchant}” je spremljeno. Promijenjeno još {count} transakcija.",
     "categoryFor": "Kategorija za {merchant}",
     "sources": {

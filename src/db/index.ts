@@ -16,6 +16,8 @@ export interface Txn {
   category: string
   note?: string
   importHash?: string
+  /** User chose the category manually; skip automatic recategorisation. */
+  categoryLocked?: true
 }
 
 export interface CategoryRule {

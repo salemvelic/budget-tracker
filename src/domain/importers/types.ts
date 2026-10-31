@@ -8,6 +8,7 @@ export interface ParsedImportRow {
   category: string
   note?: string
   importHash: string
+  categoryLocked?: true
 }
 
 export type ParsedImportRowDraft = Omit<ParsedImportRow, 'importHash'> & {

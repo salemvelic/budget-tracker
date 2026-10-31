@@ -27,12 +27,23 @@ const touched = reactive({
   merchant: false,
 })
 
+const LAST_CATEGORY_KEY = 'budget-tracker:lastCategory'
+
+function defaultCategory(): string {
+  if (props.initial?.category) return props.initial.category
+  try {
+    return localStorage.getItem(LAST_CATEGORY_KEY) ?? 'groceries'
+  } catch {
+    return 'groceries'
+  }
+}
+
 const form = reactive({
   date: props.initial?.date ?? todayIso(),
   amount: props.initial ? formatAmountInput(props.initial.amountCents) : '',
   merchant: props.initial?.merchant ?? '',
   source: (props.initial?.source ?? 'kartica') as TxnSource,
-  category: props.initial?.category ?? 'food',
+  category: defaultCategory(),
   note: props.initial?.note ?? '',
 })
 
@@ -76,7 +87,7 @@ watch(
     form.amount = txn ? formatAmountInput(txn.amountCents) : ''
     form.merchant = txn?.merchant ?? ''
     form.source = txn?.source ?? 'kartica'
-    form.category = txn?.category ?? 'food'
+    form.category = txn?.category ?? defaultCategory()
     form.note = txn?.note ?? ''
   },
 )
@@ -93,6 +104,11 @@ function submit() {
     note: form.note,
   })
   emit('save', input)
+  try {
+    localStorage.setItem(LAST_CATEGORY_KEY, input.category)
+  } catch {
+    /* ignore */
+  }
 }
 </script>
 

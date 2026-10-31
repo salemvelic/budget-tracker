@@ -1,6 +1,6 @@
 import { db, type Txn, type TxnSource } from '@/db'
 import { IMPORT_SOURCES } from '@/domain/coverage'
-import { isSameMerchant, merchantRulePattern } from '@/domain/categorize'
+import { matchesCategoryPattern, txnDescription, validateRulePattern } from '@/domain/categorize'
 
 export async function deleteTxn(id: number): Promise<void> {
   await db.transaction('rw', db.txns, db.ignoredImports, async () => {
@@ -12,36 +12,32 @@ export async function deleteTxn(id: number): Promise<void> {
   })
 }
 
-/**
- * Sets the category of one transaction. With `remember`, also saves a rule for the merchant
- * and moves the merchant's other transactions; returns how many others changed.
- */
-export async function recategorizeTxn(
-  txn: Txn,
-  category: string,
-  remember: boolean,
-): Promise<number> {
-  if (txn.id == null) return 0
-  const id = txn.id
+/** Sets category and marks the transaction as manually categorised. */
+export async function recategorizeTxn(txn: Txn, category: string): Promise<void> {
+  if (txn.id == null) return
+  await db.txns.update(txn.id, { category, categoryLocked: true })
+}
+
+/** Saves a rule and moves matching unlocked transactions; returns how many changed. */
+export async function saveRuleAndApply(pattern: string, category: string): Promise<number> {
+  const trimmed = pattern.trim()
+  if (validateRulePattern(trimmed)) throw new Error('rule.invalid')
+
   return db.transaction('rw', db.txns, db.rules, async () => {
-    await db.txns.update(id, { category })
-    if (!remember) return 0
-
-    const pattern = merchantRulePattern(txn.merchant)
-    const existing = await db.rules.where('pattern').equals(pattern).first()
+    const existing = await db.rules.where('pattern').equals(trimmed).first()
     if (existing?.id != null) await db.rules.update(existing.id, { category })
-    else await db.rules.add({ pattern, category })
+    else await db.rules.add({ pattern: trimmed, category })
 
-    const others = await db.txns
+    const toUpdate = await db.txns
       .filter(
-        (other) =>
-          other.id !== id &&
-          other.category !== category &&
-          isSameMerchant(other.merchant, txn.merchant),
+        (txn) =>
+          !txn.categoryLocked &&
+          txn.category !== category &&
+          matchesCategoryPattern(trimmed, txnDescription(txn)),
       )
       .toArray()
-    for (const other of others) await db.txns.update(other.id!, { category })
-    return others.length
+    for (const txn of toUpdate) await db.txns.update(txn.id!, { category })
+    return toUpdate.length
   })
 }
 

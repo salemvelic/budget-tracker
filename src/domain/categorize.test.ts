@@ -6,6 +6,7 @@ import {
   matchesCategoryPattern,
   merchantRulePattern,
   recategorizeOther,
+  suggestedRulePattern,
   subcategoryUpgrade,
   validateRulePattern,
 } from './categorize'
@@ -16,6 +17,13 @@ describe('merchantRulePattern', () => {
     expect(validateRulePattern(pattern)).toBe('')
     expect(matchesCategoryPattern(pattern, 'int*demo vending (zagreb)')).toBe(true)
     expect(matchesCategoryPattern(pattern, 'INTXDEMO vending zagreb')).toBe(false)
+  })
+})
+
+describe('suggestedRulePattern', () => {
+  it('stops before store number or city', () => {
+    expect(suggestedRulePattern('Demo Shop P-12 Zagreb')).toBe('demo shop')
+    expect(suggestedRulePattern('Demo Kiosk Zagreb')).toBe('demo kiosk')
   })
 })
 

@@ -60,11 +60,7 @@ const includeCount = computed(
               class="mt-1"
               :checked="!excluded.has(row.importHash)"
               @change="
-                emit(
-                  'toggleInclude',
-                  row.importHash,
-                  ($event.target as HTMLInputElement).checked,
-                )
+                emit('toggleInclude', row.importHash, ($event.target as HTMLInputElement).checked)
               "
             />
             <span>

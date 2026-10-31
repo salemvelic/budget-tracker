@@ -5,7 +5,7 @@ import { assignImportHashes } from '@/domain/importers/types'
 
 import { db } from './index'
 import { filterNewImportRows, importParsedRows } from './importRows'
-import { deleteTxn, latestImportDates, recategorizeTxn } from './txns'
+import { deleteTxn, latestImportDates, recategorizeTxn, saveRuleAndApply } from './txns'
 
 describe('importParsedRows', () => {
   beforeEach(async () => {
@@ -87,20 +87,22 @@ describe('importParsedRows', () => {
   it('remembers a category for the merchant and moves its other transactions', async () => {
     const base = { amountCents: 300, source: 'revolut' as const, category: 'other' }
     const first = await db.txns.add({ ...base, date: '2026-10-01', merchant: 'Demo Bar' })
-    await db.txns.add({ ...base, date: '2026-10-02', merchant: 'demo  bar' })
-    await db.txns.add({ ...base, date: '2026-10-03', merchant: 'Demo Bar 2' })
+    await db.txns.add({ ...base, date: '2026-10-02', merchant: 'demo bar' })
+    await db.txns.add({ ...base, date: '2026-10-03', merchant: 'Demo Cafe' })
 
-    const moved = await recategorizeTxn((await db.txns.get(first))!, 'food', true)
+    const txn = (await db.txns.get(first))!
+    await recategorizeTxn(txn, 'food')
+    const moved = await saveRuleAndApply('demo bar', 'food')
 
     expect(moved).toBe(1)
     expect((await db.txns.toArray()).map((t) => t.category)).toEqual(['food', 'food', 'other'])
     expect(await db.rules.toArray()).toMatchObject([{ pattern: 'demo bar', category: 'food' }])
 
-    await recategorizeTxn((await db.txns.get(first))!, 'shopping', true)
+    await saveRuleAndApply('demo bar', 'shopping')
     expect(await db.rules.toArray()).toMatchObject([{ pattern: 'demo bar', category: 'shopping' }])
   })
 
-  it('changes only one transaction without remember', async () => {
+  it('changes only one transaction without a saved rule', async () => {
     const base = {
       amountCents: 300,
       source: 'revolut' as const,
@@ -110,7 +112,7 @@ describe('importParsedRows', () => {
     const first = await db.txns.add({ ...base, date: '2026-10-01' })
     await db.txns.add({ ...base, date: '2026-10-02' })
 
-    expect(await recategorizeTxn((await db.txns.get(first))!, 'food', false)).toBe(0)
+    await recategorizeTxn((await db.txns.get(first))!, 'food')
     expect(await db.rules.count()).toBe(0)
     expect((await db.txns.toArray()).map((t) => t.category)).toEqual(['food', 'other'])
   })
