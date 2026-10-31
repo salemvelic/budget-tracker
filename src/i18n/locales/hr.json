@@ -49,6 +49,7 @@
     "coverageHeading": "Uvezeni podaci do",
     "coverageIncomplete": "Za neke izvore nedostaje kraj mjeseca – uvezi sljedeći izvod.",
     "savedThisMonth": "Štednja i ulaganja u mjesecu",
+    "showSavings": "Prikaži raspodjelu štednje",
     "emergencyFund": "Hitni fond",
     "emergencyProgress": "{saved} / {target}",
     "byCategory": "Po kategorijama",

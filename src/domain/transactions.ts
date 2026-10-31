@@ -1,4 +1,5 @@
 import type { Txn, TxnSource } from '@/db'
+import { isSameMerchant } from '@/domain/categorize'
 
 export interface TxnInput {
   date: string
@@ -50,4 +51,30 @@ export function txnsInCategory(
   return txns
     .filter((txn) => txn.category === categoryId)
     .sort((a, b) => b.date.localeCompare(a.date) || (b.id ?? 0) - (a.id ?? 0))
+}
+
+type TxnMerchantSlice = Pick<Txn, 'id' | 'date' | 'amountCents' | 'merchant' | 'source' | 'category' | 'note'>
+
+export interface MerchantTotal {
+  merchant: string
+  cents: number
+  txns: TxnMerchantSlice[]
+}
+
+export function totalsByMerchant(txns: TxnMerchantSlice[]): MerchantTotal[] {
+  const groups: { merchant: string; txns: TxnMerchantSlice[] }[] = []
+  for (const txn of txns) {
+    const group = groups.find((item) => isSameMerchant(item.merchant, txn.merchant))
+    if (group) group.txns.push(txn)
+    else groups.push({ merchant: txn.merchant, txns: [txn] })
+  }
+  return groups
+    .map((group) => ({
+      merchant: group.merchant,
+      cents: group.txns.reduce((sum, txn) => sum + txn.amountCents, 0),
+      txns: [...group.txns].sort(
+        (a, b) => b.date.localeCompare(a.date) || (b.id ?? 0) - (a.id ?? 0),
+      ),
+    }))
+    .sort((a, b) => b.cents - a.cents)
 }
